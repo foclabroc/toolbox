@@ -58,7 +58,7 @@ cat <<EOF > "$PERSISTENT_DESKTOP"
 Version=1.0
 Type=Application
 Name=$APPNAME
-Exec=$ADDONS_DIR/${APPNAME,,}/${APPNAME,,}.AppImage
+Exec=$ADDONS_DIR/${APPNAME,,}/Launcher
 Icon=$ADDONS_DIR/${APPNAME,,}/extra/${APPNAME,,}-icon.png
 Terminal=false
 Categories=Utility;batocera.linux;
@@ -77,6 +77,10 @@ fi
 EOF
 chmod +x "${APP_CONFIG_DIR}/restore_desktop_entry.sh"
 
+mkdir "$ADDONS_DIR/.dep"
+wget -q --show-progress -O "$ADDONS_DIR/.dep/dep.zip" "https://github.com/foclabroc/toolbox/raw/refs/heads/main/gparted/extra/dep.zip";
+cd $ADDONS_DIR/.dep/
+unzip -o -qq $ADDONS_DIR/.dep/dep.zip 2>/dev/null
 # Add restore script to startup
 if ! grep -q "${APP_CONFIG_DIR}/restore_desktop_entry.sh" "$CUSTOM_SCRIPT"; then
     echo "\"${APP_CONFIG_DIR}/restore_desktop_entry.sh\" &" >> "$CUSTOM_SCRIPT"
