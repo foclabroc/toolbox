@@ -83,7 +83,7 @@ set_messages() {
         CHOOSE="Utilisez ↑ et ↓ pour choisir, puis appuyez sur Entrée pour confirmer."
         # Descriptions des applications en français
         descriptions["NINTENDO-SWITCH"]="Installer le pack Switch via le Curl de Foclabroc (Détection de version automatique)"
-        descriptions["AMAZON-LUNA"]="Le service de cloud gaming d'Amazon pour jouer à des jeux en streaming"
+        descriptions["GPARTED"]="GParted est un éditeur de partition gratuit pour gérer graphiquement vos partitions de disque."
         descriptions["FIREFOX"]="Un navigateur web open-source rapide et sécurisé"
         descriptions["MINECRAFT"]="Un jeu vidéo sandbox populaire où vous pouvez construire et explorer des mondes"
         descriptions["NETFLIX"]="Une plateforme de streaming vidéo avec un large catalogue de films et de séries"
@@ -111,7 +111,7 @@ set_messages() {
         CHOOSE="Use ↑ and ↓ to choose, then press Enter to confirm."
         # Descriptions des applications en anglais
         descriptions["NINTENDO-SWITCH"]="Install the Switch pack via Foclabroc Curl (Automatic version detection)"
-        descriptions["AMAZON-LUNA"]="Amazon's cloud gaming service to play games via streaming"
+        descriptions["GPARTED"]="GParted is a free partition editor for graphically managing your disk partitions."
         descriptions["FIREFOX"]="A fast and secure open-source web browser"
         descriptions["MINECRAFT"]="A popular sandbox video game where you can build and explore worlds"
         descriptions["NETFLIX"]="A video streaming platform with a wide range of movies and TV shows"
@@ -247,12 +247,12 @@ display_ascii_art() {
 	clear
 }
 
-apps=("NINTENDO-SWITCH" "AMAZON-LUNA" "FIREFOX" "MINECRAFT" "NETFLIX" "STEAM" "POUPIPOU" "TOOLS")
+apps=("NINTENDO-SWITCH" "GPARTED" "FIREFOX" "MINECRAFT" "NETFLIX" "STEAM" "POUPIPOU" "TOOLS")
 declare -A commands
 
 # Commandes d'installation pour chaque application
 commands["NINTENDO-SWITCH"]="check_internet && curl -L bit.ly/foclabroc-switch-all | bash"
-commands["AMAZON-LUNA"]="check_internet && curl -Ls https://github.com/DTJW92/batocera-unofficial-addons/raw/main/amazonluna/amazonluna.sh | bash"
+commands["GPARTED"]="check_internet && curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/gparted/gparted.sh | bash"
 commands["FIREFOX"]="check_internet && curl -Ls https://github.com/DTJW92/batocera-unofficial-addons/raw/main/firefox/firefox.sh | bash"
 commands["MINECRAFT"]="check_internet && curl -Ls https://github.com/DTJW92/batocera-unofficial-addons/raw/main/minecraft/minecraft.sh | bash"
 commands["NETFLIX"]="check_internet && curl -Ls https://github.com/DTJW92/batocera-unofficial-addons/raw/main/netflix/netflix.sh | bash"
