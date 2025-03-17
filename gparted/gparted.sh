@@ -2,13 +2,13 @@
 
 # Define variables
 APPNAME="GParted"
-REPO_BASE_URL="https://github.com/DTJW92/batocera-unofficial-addons/raw/refs/heads/main/gparted/extra/"
+REPO_BASE_URL="https://github.com/foclabroc/toolbox/raw/refs/heads/main/gparted/extra/"
 AMD_SUFFIX="gparted.AppImage"
 ARM_SUFFIX=""
-ICON_URL="https://github.com/DTJW92/batocera-unofficial-addons/raw/main/gparted/extra/icon.png"
+ICON_URL="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/gparted/extra/icon.png"
 
 # Directories
-ADDONS_DIR="/userdata/system/add-ons"
+ADDONS_DIR="/userdata/system/pro"
 CONFIGS_DIR="/userdata/system/configs"
 DESKTOP_DIR="/usr/share/applications"
 CUSTOM_SCRIPT="/userdata/system/custom.sh"
