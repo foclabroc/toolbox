@@ -82,7 +82,7 @@ fi
 EOF
 chmod +x "${APP_CONFIG_DIR}/restore_desktop_entry.sh"
 
-mkdir "$ADDONS_DIR/.dep"
+mkdir -p "$ADDONS_DIR/.dep"
 wget -q --show-progress -O "$ADDONS_DIR/.dep/dep.zip" "https://github.com/foclabroc/toolbox/raw/refs/heads/main/gparted/extra/dep.zip";
 cd $ADDONS_DIR/.dep/
 unzip -o -qq $ADDONS_DIR/.dep/dep.zip 2>/dev/null
