@@ -52,6 +52,11 @@ if ! wget -q --show-progress -O "$ADDONS_DIR/${APPNAME,,}/extra/${APPNAME,,}-ico
     exit 1
 fi
 
+if ! wget -q --show-progress -O "$ADDONS_DIR/${APPNAME,,}/Launcher" "https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/gparted/extra/Launcher"; then
+    echo "Failed to download $APPNAME launcher. Exiting."
+    exit 1
+fi
+chmod +x "$ADDONS_DIR/${APPNAME,,}/Launcher"
 # Create persistent desktop entry
 cat <<EOF > "$PERSISTENT_DESKTOP"
 [Desktop Entry]
