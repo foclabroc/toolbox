@@ -22,6 +22,8 @@ fi
 
 # Step 3: Download the archive
 echo "Downloading YouTube TV archive from $app_url..."
+rm -rf /userdata/system/pro/youtubetv 2>/dev/null
+rm -rf /userdata/system/pro/youtube-tv 2>/dev/null
 app_dir="/userdata/system/pro/youtubetv"
 temp_dir="$app_dir/temp"
 mkdir -p "$temp_dir"
@@ -34,8 +36,6 @@ fi
 
 # Step 4: Extract the downloaded archive
 echo "Extracting YouTube TV files..."
-rm -rf /userdata/system/pro/youtubetv 2>/dev/null
-rm -rf /userdata/system/pro/youtube-tv 2>/dev/null
 mkdir -p "$app_dir"
 unzip -o "$temp_dir/youtube-tv.zip" -d "$temp_dir/youtube-tv-extracted"
 mv "$temp_dir/youtube-tv-extracted/"*/* "$app_dir"
