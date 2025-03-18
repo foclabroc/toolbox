@@ -34,6 +34,8 @@ fi
 
 # Step 4: Extract the downloaded archive
 echo "Extracting YouTube TV files..."
+rm -rf /userdata/system/pro/youtubetv 2>/dev/null
+rm -rf /userdata/system/pro/youtube-tv 2>/dev/null
 mkdir -p "$app_dir"
 unzip -o "$temp_dir/youtube-tv.zip" -d "$temp_dir/youtube-tv-extracted"
 mv "$temp_dir/youtube-tv-extracted/"*/* "$app_dir"
@@ -55,6 +57,12 @@ echo "Création d'un script YouTube TV dans Ports..."
 sleep 3
 ports_dir="/userdata/roms/ports"
 mkdir -p "$ports_dir"
+# PURGE PORTS DIR
+rm $ports_dir/YouTubeTV.sh 2>/dev/null
+rm $ports_dir/YoutubeTV.sh 2>/dev/null
+rm $ports_dir/YoutubeTV.sh.keys 2>/dev/null
+rm $ports_dir/YouTubeTV.sh.keys 2>/dev/null
+
 cat << EOF > "$ports_dir/YoutubeTV.sh"
 #!/bin/bash 
 unclutter-remote -s
@@ -109,7 +117,7 @@ curl http://127.0.0.1:1234/reloadgames
 xmlstarlet ed -L \
     -s "/gameList" -t elem -n "game" -v "" \
     -s "/gameList/game[last()]" -t elem -n "path" -v "./YoutubeTV.sh" \
-    -s "/gameList/game[last()]" -t elem -n "name" -v "YouTube TV" \
+    -s "/gameList/game[last()]" -t elem -n "name" -v "Youtube TV" \
     -s "/gameList/game[last()]" -t elem -n "image" -v "./images/YoutubeTV-screenshot.png" \
     -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/YoutubeTV-wheel.png" \
     "$gamelist_file"
