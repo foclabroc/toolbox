@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+
 # Fichier de log des erreurs
 LOG_FILE="/tmp/install_errors.log"
 
