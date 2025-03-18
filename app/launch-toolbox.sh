@@ -1,5 +1,6 @@
-#!/bin/bash
-
+#!/bin/bash -x
+export LC_ALL=C
+export PATH="/usr/local/bin:/usr/bin:/bin"
 # Fichier de log des erreurs
 LOG_FILE="/tmp/install_errors.log"
 
