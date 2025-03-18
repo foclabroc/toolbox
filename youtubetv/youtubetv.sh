@@ -24,9 +24,9 @@ fi
 echo "Downloading YouTube TV archive from $app_url..."
 rm -rf /userdata/system/pro/youtubetv 2>/dev/null
 rm -rf /userdata/system/pro/youtube-tv 2>/dev/null
+mkdir -p "/userdata/system/pro/youtubetv"
 app_dir="/userdata/system/pro/youtubetv"
 temp_dir="$app_dir/temp"
-extra_dir="$app_dir/extra"
 mkdir -p "$temp_dir"
 wget -q --show-progress -O "$temp_dir/youtube-tv.zip" "$app_url"
 
@@ -42,7 +42,7 @@ HOME=/userdata/system/pro/youtubetv/home XDG_CONFIG_HOME=/userdata/system/pro/yo
 DISPLAY=:0.0 /userdata/system/pro/youtubetv/YouTubeonTV --no-sandbox --test-type "${@}"
 EOF
 
-chmod +x "$extra_dir/Launcher"
+chmod +x "$app_dir/Launcher"
 
 if [ $? -ne 0 ]; then
     echo "Failed to download YouTube TV archive."
