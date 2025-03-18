@@ -64,13 +64,10 @@ rm $ports_dir/YoutubeTV.sh.keys 2>/dev/null
 rm $ports_dir/YouTubeTV.sh.keys 2>/dev/null
 
 cat << EOF > "$ports_dir/YoutubeTV.sh"
-#!/bin/bash 
+#!/bin/bash
 unclutter-remote -s
-sed -i "s,!appArgs.disableOldBuildWarning,1 == 0,g" 
-/userdata/system/pro/youtubetv/resources/app/lib/main.js 2>/dev/null && mkdir /userdata/system/pro/youtubetv/home 2>/dev/null;
- mkdir /userdata/system/pro/youtubetv/config 2>/dev/null; mkdir /userdata/system/pro/youtubetv/roms 2>/dev/null; LD_LIBRARY_PATH="/userdata/system/pro/.dep:${LD_LIBRARY_PATH}" 
-HOME=/userdata/system/pro/youtubetv/home XDG_CONFIG_HOME=/userdata/system/pro/youtubetv/config QT_SCALE_FACTOR="1" GDK_SCALE="1" XDG_DATA_HOME=/userdata/system/pro/youtubetv/home 
-DISPLAY=:0.0 /userdata/system/pro/youtubetv/YouTubeonTV --no-sandbox --test-type "${@}"
+killall -9 YouTubeonTV && unclutter-remote -s
+/userdata/system/pro/youtubetv/Launcher
 EOF
 
 chmod +x "$ports_dir/YoutubeTV.sh"
