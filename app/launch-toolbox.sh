@@ -1,5 +1,6 @@
 #!/bin/bash
-
+set -e
+set -o pipefail
 # Fichier de log des erreurs
 LOG_FILE="/tmp/install_errors.log"
 
