@@ -92,3 +92,4 @@ if ! grep -q "${APP_CONFIG_DIR}/restore_desktop_entry.sh" "$CUSTOM_SCRIPT"; then
 fi
 
 echo "$APPNAME setup complete."
+sleep 3

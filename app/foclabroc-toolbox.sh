@@ -9,6 +9,25 @@ log_error() {
     echo "$(date) - $error_message" >> "$LOG_FILE"
 }
 
+# Detect system architecture
+ARCH=$(uname -m)
+
+# If the system is ARM64 (aarch64), exit script
+if [ "$ARCH" = "aarch64" ]; then
+    echo "ARM64 (aarch64) detected. This script only runs on PC x86_64 (AMD/Intel)...Exit"
+    sleep 3
+    exit 0
+fi
+
+# If the system is x86_64, continue with the normal setup
+if [ "$ARCH" != "x86_64" ]; then
+    echo "This script only runs on PC x86_64 (AMD/Intel)."
+    exit 1
+fi
+echo "PC x86_64 (AMD/INTEL) detected. Loading Foclabroc toolbox....."
+echo "PC x86_64 (AMD/INTEL) detecté. Chargement de Foclabroc toolbox....."
+sleep 2
+
 # Choix de la langue
 choose_language() {
     local selected=0
@@ -71,6 +90,7 @@ set_messages() {
         DRELOAD="- Mettre à jour la liste des jeux"
         DESCRIPTION="Sélectionnez l'application à installer."
         INSTALL_MESSAGE="Voulez-vous installer"
+        INSTALL_OF_="Installation de"
         SUCCESS_MESSAGE="Installation terminée avec succès."
         FAILURE_MESSAGE="Échec de l'installation."
         EXIT_MESSAGE="Merci d'avoir utilisé le programme."
@@ -99,6 +119,7 @@ set_messages() {
         DRELOAD="- Update Batocera Gamelist"
         DESCRIPTION="Select the application to install."
         INSTALL_MESSAGE="Do you want to install"
+        INSTALL_OF="Installation of"
         SUCCESS_MESSAGE="Installation completed successfully."
         FAILURE_MESSAGE="Installation failed."
         EXIT_MESSAGE="Thank you for using the program."
@@ -416,9 +437,9 @@ select_app() {
                                     ;;
                                 "") # Entrée
                                     if [[ $install_choice -eq 0 ]]; then
-                                        echo "Installation de ${apps[$selected]}..."
+                                        echo "$INSTALL_OF ${apps[$selected]}..."
                                         if ! eval "${commands[${apps[$selected]}]}"; then
-                                            log_error "Échec de l'installation de ${apps[$selected]}"
+                                            log_error "$FAILURE_MESSAGE ${apps[$selected]}"
                                             echo -e "\e[1;31m$FAILURE_MESSAGE\e[0m"
                                             sleep 2
                                         else
