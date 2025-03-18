@@ -486,6 +486,7 @@ select_app() {
                 ;;
             [Qq]) 
                 echo -e "\e[1;37m$EXIT_MESSAGE"
+		killall -9 xterm
                 exit 0
                 ;;
         esac
