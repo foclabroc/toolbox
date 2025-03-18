@@ -13,6 +13,7 @@ log_error() {
 ARCH=$(uname -m)
 
 # If the system is ARM64 (aarch64), exit script
+clear
 if [ "$ARCH" = "aarch64" ]; then
     echo "ARM64 (aarch64) detected. This script only runs on PC x86_64 (AMD/Intel)...Exit"
     sleep 3
@@ -24,9 +25,13 @@ if [ "$ARCH" != "x86_64" ]; then
     echo "This script only runs on PC x86_64 (AMD/Intel)."
     exit 1
 fi
-echo "PC x86_64 (AMD/INTEL) detected. Loading Foclabroc toolbox....."
-echo "PC x86_64 (AMD/INTEL) detecté. Chargement de Foclabroc toolbox....."
-sleep 2
+echo -e "\e[1;36m"
+echo "#####################################################################"
+echo "#    PC x86_64 (AMD/INTEL) detected. Loading Foclabroc toolbox...   #"
+echo "#  PC x86_64 (AMD/INTEL) detecté. Chargement de Foclabroc toolbox...#"
+echo "#####################################################################"
+echo -e "\e[0m"
+sleep 3
 
 # Choix de la langue
 choose_language() {
@@ -90,7 +95,7 @@ set_messages() {
         DRELOAD="- Mettre à jour la liste des jeux"
         DESCRIPTION="Sélectionnez l'application à installer."
         INSTALL_MESSAGE="Voulez-vous installer"
-        INSTALL_OF_="Installation de"
+        INSTALL_OF="Installation de"
         SUCCESS_MESSAGE="Installation terminée avec succès."
         FAILURE_MESSAGE="Échec de l'installation."
         EXIT_MESSAGE="Merci d'avoir utilisé le programme."
@@ -104,7 +109,7 @@ set_messages() {
         # Descriptions des applications en français
         descriptions["NINTENDO-SWITCH"]="Installer le pack Switch via le Curl de Foclabroc (Détection de version automatique)"
         descriptions["GPARTED"]="GParted est un éditeur de partition gratuit pour gérer graphiquement vos partitions de disque."
-        descriptions["FIREFOX"]="Un navigateur web open-source rapide et sécurisé"
+        descriptions["YOUTUBE-TV"]="Installer YoutubeTV pour Batocera (sera disponible dans [ports])."
         descriptions["MINECRAFT"]="Un jeu vidéo sandbox populaire où vous pouvez construire et explorer des mondes"
         descriptions["NETFLIX"]="Une plateforme de streaming vidéo avec un large catalogue de films et de séries"
         descriptions["STEAM"]="Une plateforme de jeu qui propose des jeux PC, des fonctions multijoueurs et bien plus"
@@ -133,7 +138,7 @@ set_messages() {
         # Descriptions des applications en anglais
         descriptions["NINTENDO-SWITCH"]="Install the Switch pack via Foclabroc Curl (Automatic version detection)"
         descriptions["GPARTED"]="GParted is a free partition editor for graphically managing your disk partitions."
-        descriptions["FIREFOX"]="A fast and secure open-source web browser"
+        descriptions["YOUTUBE-TV"]="Install YoutubeTV for Batocera (will be available in [ports])"
         descriptions["MINECRAFT"]="A popular sandbox video game where you can build and explore worlds"
         descriptions["NETFLIX"]="A video streaming platform with a wide range of movies and TV shows"
         descriptions["STEAM"]="A gaming platform offering PC games, multiplayer features, and more"
@@ -268,13 +273,13 @@ display_ascii_art() {
 	clear
 }
 
-apps=("NINTENDO-SWITCH" "GPARTED" "FIREFOX" "MINECRAFT" "NETFLIX" "STEAM" "POUPIPOU" "TOOLS")
+apps=("NINTENDO-SWITCH" "GPARTED" "YOUTUBE-TV" "MINECRAFT" "NETFLIX" "STEAM" "POUPIPOU" "TOOLS")
 declare -A commands
 
 # Commandes d'installation pour chaque application
 commands["NINTENDO-SWITCH"]="check_internet && curl -L bit.ly/foclabroc-switch-all | bash"
 commands["GPARTED"]="check_internet && curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/gparted/gparted.sh | bash"
-commands["FIREFOX"]="check_internet && curl -Ls https://github.com/DTJW92/batocera-unofficial-addons/raw/main/firefox/firefox.sh | bash"
+commands["YOUTUBE-TV"]="check_internet && curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/youtubetv/youtubetv.sh | bash"
 commands["MINECRAFT"]="check_internet && curl -Ls https://github.com/DTJW92/batocera-unofficial-addons/raw/main/minecraft/minecraft.sh | bash"
 commands["NETFLIX"]="check_internet && curl -Ls https://github.com/DTJW92/batocera-unofficial-addons/raw/main/netflix/netflix.sh | bash"
 commands["STEAM"]="check_internet && curl -Ls https://github.com/DTJW92/batocera-unofficial-addons/raw/main/steam/steam.sh | bash"
@@ -407,7 +412,7 @@ select_app() {
                         select_tools  # Lancement du sous-menu des outils
                     else
                         echo -e "\e[1;37m$INTERNET_CHECK"
-                        sleep 2
+                        sleep 1
                         check_internet
                         # Choisir Oui ou Non pour installer
                         install_choice=0
