@@ -32,7 +32,7 @@ wget -q --show-progress -O "$temp_dir/youtube-tv.zip" "$app_url"
 
 # make Launcher
 mkdir -p "$extra_dir"
-cat << EOF > "$extra_dir/Launcher"
+cat << EOF > "$app_dir/Launcher"
 #!/bin/bash 
 unclutter-remote -s
 sed -i "s,!appArgs.disableOldBuildWarning,1 == 0,g" 
