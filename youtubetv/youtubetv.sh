@@ -55,7 +55,7 @@ echo "Création d'un script YouTube TV dans Ports..."
 sleep 3
 ports_dir="/userdata/roms/ports"
 mkdir -p "$ports_dir"
-cat << EOF > "$ports_dir/YouTubeTV.sh"
+cat << EOF > "$ports_dir/YoutubeTV.sh"
 #!/bin/bash 
 unclutter-remote -s
 sed -i "s,!appArgs.disableOldBuildWarning,1 == 0,g" 
@@ -65,7 +65,7 @@ HOME=/userdata/system/pro/youtubetv/home XDG_CONFIG_HOME=/userdata/system/pro/yo
 DISPLAY=:0.0 /userdata/system/pro/youtubetv/YouTubeonTV --no-sandbox --test-type "${@}"
 EOF
 
-chmod +x "$ports_dir/YouTubeTV.sh"
+chmod +x "$ports_dir/YoutubeTV.sh"
 
 # Step 6: Download keys file
 echo "Downloading keys file..."
@@ -108,7 +108,7 @@ curl http://127.0.0.1:1234/reloadgames
 # Add the YouTube TV entry
 xmlstarlet ed -L \
     -s "/gameList" -t elem -n "game" -v "" \
-    -s "/gameList/game[last()]" -t elem -n "path" -v "./YouTubeTV.sh" \
+    -s "/gameList/game[last()]" -t elem -n "path" -v "./YoutubeTV.sh" \
     -s "/gameList/game[last()]" -t elem -n "name" -v "YouTube TV" \
     -s "/gameList/game[last()]" -t elem -n "image" -v "./images/YoutubeTV-screenshot.png" \
     -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/YoutubeTV-wheel.png" \
