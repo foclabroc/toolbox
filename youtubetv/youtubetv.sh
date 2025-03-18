@@ -6,8 +6,7 @@ arch=$(uname -m)
 
 if [ "$arch" == "x86_64" ]; then
     echo "Architecture: x86_64 detected..."
-    app_url=$(curl -s https://api.github.com/repositories/295226865/releases/latest | \
-    jq -r ".assets[] | select(.name | contains(\"linux-x64\")) | .browser_download_url")
+    app_url=https://github.com/foclabroc/toolbox/raw/refs/heads/main/youtubetv/extra/YouTubeonTV-linux-x64.zip
 else
     echo "Unsupported architecture: $arch. Exiting."
     exit 1
@@ -17,7 +16,7 @@ fi
 if [ -z "$app_url" ]; then
     echo "Error: Failed to fetch the download URL for YouTube TV."
     echo "Debugging information:"
-    curl -s https://api.github.com/repositories/295226865/releases/latest
+    curl -s https://github.com/foclabroc/toolbox/raw/refs/heads/main/youtubetv/extra/YouTubeonTV-linux-x64.zip
     exit 1
 fi
 
@@ -46,6 +45,8 @@ echo "Extraction complete. Files moved to $app_dir."
 
 # Step 5: Create a launcher script using the original command
 echo "Creating YouTube TV script in Ports..."
+echo "Création d'un script YouTube TV dans Ports..."
+sleep 3
 ports_dir="/userdata/roms/ports"
 mkdir -p "$ports_dir"
 cat << EOF > "$ports_dir/YouTubeTV.sh"
@@ -61,7 +62,7 @@ chmod +x "$ports_dir/YouTubeTV.sh"
 
 # Step 6: Download keys file
 echo "Downloading keys file..."
-keys_url="https://github.com/DTJW92/batocera-unofficial-addons/raw/refs/heads/main/youtubetv/extra/YoutubeTV.sh.keys"
+keys_url="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/youtubetv/extra/YoutubeTV.sh.keys"
 keys_file="$ports_dir/YoutubeTV.sh.keys"
 curl -L -o "$keys_file" "$keys_url"
 
@@ -79,12 +80,16 @@ curl http://127.0.0.1:1234/reloadgames
 # Step 8: Add an entry to gamelist.xml
 echo "Adding YouTube TV entry to gamelist.xml..."
 gamelist_file="$ports_dir/gamelist.xml"
-logo_url="https://github.com/DTJW92/batocera-unofficial-addons/raw/main/youtubetv/extra/youtubetv-logo.jpg"
-logo_path="$ports_dir/images/youtubetv-logo.jpg"
+screenshot_url="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/youtubetv/extra/YoutubeTV-screenshot.png"
+screenshot_path="$ports_dir/images/YoutubeTV-screenshot.png"
+logo_url="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/youtubetv/extra/YoutubeTV-wheel.png"
+logo_path="$ports_dir/images/YoutubeTV-wheel.png"
 
 # Ensure the logo directory exists and download the logo
 mkdir -p "$(dirname "$logo_path")"
 curl -L -o "$logo_path" "$logo_url"
+mkdir -p "$(dirname "$screenshot_path")"
+curl -L -o "$screenshot_path" "$screenshot_url"
 
 # Ensure the gamelist.xml exists
 if [ ! -f "$gamelist_file" ]; then
@@ -98,7 +103,8 @@ xmlstarlet ed -L \
     -s "/gameList" -t elem -n "game" -v "" \
     -s "/gameList/game[last()]" -t elem -n "path" -v "./YouTubeTV.sh" \
     -s "/gameList/game[last()]" -t elem -n "name" -v "YouTube TV" \
-    -s "/gameList/game[last()]" -t elem -n "image" -v "./images/youtubetv-logo.jpg" \
+    -s "/gameList/game[last()]" -t elem -n "image" -v "./images/YoutubeTV-screenshot.png" \
+    -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/YoutubeTV-wheel.png" \
     "$gamelist_file"
 
 # Refresh the Ports menu
@@ -106,3 +112,6 @@ curl http://127.0.0.1:1234/reloadgames
 
 echo
 echo "Installation complete! You can now launch YouTube TV from the Ports menu."
+echo "-----------------------------------------------------------------------------------------"
+echo "Installation terminée ! Vous pouvez désormais lancer YouTube TV depuis le menu « Ports »."
+sleep 5
