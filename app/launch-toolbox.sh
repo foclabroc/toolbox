@@ -300,7 +300,7 @@ apps=("NINTENDO-SWITCH" "GPARTED" "YOUTUBE-TV" "MINECRAFT" "NETFLIX" "STEAM" "PO
 declare -A commands
 
 # Commandes d'installation pour chaque application
-commands["NINTENDO-SWITCH"]="check_internet && curl -L bit.ly/foclabroc-switch-all | bash"
+commands["NINTENDO-SWITCH"]="check_internet && switch_install"
 commands["GPARTED"]="check_internet && curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/gparted/gparted.sh | bash"
 commands["YOUTUBE-TV"]="check_internet && curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/youtubetv/youtubetv.sh | bash"
 commands["MINECRAFT"]="check_internet && curl -Ls https://github.com/DTJW92/batocera-unofficial-addons/raw/main/minecraft/minecraft.sh | bash"
@@ -308,6 +308,11 @@ commands["NETFLIX"]="check_internet && curl -Ls https://github.com/DTJW92/batoce
 commands["STEAM"]="check_internet && curl -Ls https://github.com/DTJW92/batocera-unofficial-addons/raw/main/steam/steam.sh | bash"
 commands["POUPIPOU"]="display_ascii_art"
 commands["TOOLS"]="select_tools"
+
+# Fonction special pour Curl switch
+switch_install() {
+    DISPLAY=:0.0 xterm -fs 13 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -L https://raw.githubusercontent.com/foclabroc/batocera-switch/refs/heads/main/system/switch/extra/switch-install.sh | bash" 
+}
 
 # Fonction pour afficher le sous-menu des outils
 select_tools() {
@@ -426,6 +431,8 @@ select_app() {
                 clear
                 if [[ $selected -eq ${#apps[@]} ]]; then
                     echo -e "\e[1;37m$EXIT_MESSAGE"
+                    sleep 2
+                    killall -9 xterm
                     exit 0
                 else
                     if [[ ${apps[$selected]} == "POUPIPOU" ]]; then
