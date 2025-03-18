@@ -22,7 +22,7 @@ fi
 
 # Step 3: Download the archive
 echo "Downloading YouTube TV archive from $app_url..."
-app_dir="/userdata/system/pro/youtube-tv"
+app_dir="/userdata/system/pro/youtubetv"
 temp_dir="$app_dir/temp"
 mkdir -p "$temp_dir"
 wget -q --show-progress -O "$temp_dir/youtube-tv.zip" "$app_url"
@@ -43,6 +43,12 @@ chmod a+x "$app_dir/YouTubeonTV"
 rm -rf "$temp_dir"
 echo "Extraction complete. Files moved to $app_dir."
 
+# .DEP FILES
+mkdir -p "/userdata/system/pro/.dep"
+wget -q --show-progress -O "/userdata/system/pro/.dep/dep.zip" "https://github.com/foclabroc/toolbox/raw/refs/heads/main/gparted/extra/dep.zip";
+cd /userdata/system/pro/.dep/
+unzip -o -qq /userdata/system/pro/.dep/dep.zip 2>/dev/null
+
 # Step 5: Create a launcher script using the original command
 echo "Creating YouTube TV script in Ports..."
 echo "Création d'un script YouTube TV dans Ports..."
@@ -50,12 +56,13 @@ sleep 3
 ports_dir="/userdata/roms/ports"
 mkdir -p "$ports_dir"
 cat << EOF > "$ports_dir/YouTubeTV.sh"
-#!/bin/bash
-sed -i "s,!appArgs.disableOldBuildWarning,1 == 0,g" "$app_dir/resources/app/lib/main.js" 2>/dev/null
-QT_SCALE_FACTOR="1" \
-GDK_SCALE="1" \
-DISPLAY=:0.0 \
-"$app_dir/YouTubeonTV" --no-sandbox --test-type "\$@"
+#!/bin/bash 
+unclutter-remote -s
+sed -i "s,!appArgs.disableOldBuildWarning,1 == 0,g" 
+/userdata/system/pro/youtubetv/resources/app/lib/main.js 2>/dev/null && mkdir /userdata/system/pro/youtubetv/home 2>/dev/null;
+ mkdir /userdata/system/pro/youtubetv/config 2>/dev/null; mkdir /userdata/system/pro/youtubetv/roms 2>/dev/null; LD_LIBRARY_PATH="/userdata/system/pro/.dep:${LD_LIBRARY_PATH}" 
+HOME=/userdata/system/pro/youtubetv/home XDG_CONFIG_HOME=/userdata/system/pro/youtubetv/config QT_SCALE_FACTOR="1" GDK_SCALE="1" XDG_DATA_HOME=/userdata/system/pro/youtubetv/home 
+DISPLAY=:0.0 /userdata/system/pro/youtubetv/YouTubeonTV --no-sandbox --test-type "${@}"
 EOF
 
 chmod +x "$ports_dir/YouTubeTV.sh"
@@ -111,7 +118,7 @@ xmlstarlet ed -L \
 curl http://127.0.0.1:1234/reloadgames
 
 echo
-echo "Installation complete! You can now launch YouTube TV from the Ports menu."
-echo "-----------------------------------------------------------------------------------------"
-echo "Installation terminée ! Vous pouvez désormais lancer YouTube TV depuis le menu « Ports »."
+echo -e "\e[1;32mInstallation complete! You can now launch YouTube TV from the Ports menu."
+echo -e "-----------------------------------------------------------------------------------------"
+echo -e "Installation terminée ! Vous pouvez désormais lancer YouTube TV depuis le menu « Ports ».\e[1;37m"
 sleep 5
