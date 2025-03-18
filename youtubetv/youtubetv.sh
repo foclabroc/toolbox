@@ -50,13 +50,14 @@ mkdir -p "/userdata/system/pro/.dep"
 wget -q --show-progress -O "/userdata/system/pro/.dep/dep.zip" "https://github.com/foclabroc/toolbox/raw/refs/heads/main/gparted/extra/dep.zip";
 cd /userdata/system/pro/.dep/
 unzip -o -qq /userdata/system/pro/.dep/dep.zip 2>/dev/null
-
+wget -q --show-progress -O "/userdata/system/pro/youtubetv/extra/Launcher" "https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/youtubetv/extra/Launcher";
 # Step 5: Create a launcher script using the original command
 echo "Creating YouTube TV script in Ports..."
 echo "Création d'un script YouTube TV dans Ports..."
 sleep 3
 ports_dir="/userdata/roms/ports"
 mkdir -p "$ports_dir"
+
 # PURGE PORTS DIR
 rm $ports_dir/YouTubeTV.sh 2>/dev/null
 rm $ports_dir/YoutubeTV.sh 2>/dev/null
