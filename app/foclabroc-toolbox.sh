@@ -1,57 +1,45 @@
 #!/bin/bash
 
-# Vérification de la connexion Internet
-check_internet() {
-    if ! ping -c 1 8.8.8.8 &>/dev/null; then
-        dialog --title "Erreur" --msgbox "Pas de connexion Internet !" 6 40
-        exit 1
-    fi
-}
+while true; do
+    choix=$(dialog --clear --title "Menu Principal" --menu "Choisissez une option :" 15 50 6 \
+        1 "Installer Application 1" \
+        2 "Installer Application 2" \
+        TOOLS "Outils" \
+        QUITTER "Quitter" \
+        2>&1 >/dev/tty)
 
-# Affichage ASCII (poupipou)
-show_ascii() {
-    dialog --title "Poupipou" --msgbox "\n  ██████╗  ██████╗ ██╗   ██╗██████╗ ██╗██████╗ \n  ██╔══██╗██╔═══██╗██║   ██║██╔══██╗██║██╔══██╗\n  ██║  ██║██║   ██║██║   ██║██████╔╝██║██║  ██║\n  ██║  ██║██║   ██║██║   ██║██╔══██╗██║██║  ██║\n  ██████╔╝╚██████╔╝╚██████╔╝██║  ██║██║██████╔╝\n  ╚═════╝  ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝╚═════╝ \n" 10 50
-    sleep 3
-}
+    case "$choix" in
+        1|2)
+            dialog --yesno "Voulez-vous vraiment installer l'application $choix ?" 7 50
+            if [ $? -eq 0 ]; then
+                echo "Installation de l'application $choix en cours..."
+                sleep 2  # Simulation d'installation
+            else
+                dialog --msgbox "Installation annulée." 5 30
+            fi
+            ;;
+        TOOLS)
+            while true; do
+                tool_choice=$(dialog --clear --title "Outils" --menu "Sélectionnez un outil :" 15 50 4 \
+                    SCREENSHOT "Prendre une capture d'écran" \
+                    RECORD "Enregistrer une vidéo" \
+                    RELOAD "Recharger les jeux" \
+                    RETOUR "Retour" \
+                    2>&1 >/dev/tty)
 
-# Menu TOOLS
-tools_menu() {
-    while true; do
-        CHOICE=$(dialog --title "TOOLS" --menu "Choisissez un outil:" 15 50 4 \
-            1 "SCREENSHOT" \
-            2 "RECORD" \
-            3 "RELOAD" \
-            4 "RETOUR" \
-            3>&1 1>&2 2>&3)
-        case "$CHOICE" in
-            1) batocera-screenshot;;
-            2) batocera-record;;
-            3) curl http://127.0.0.1:1234/reloadgames;;
-            4) return;;
-        esac
-    done
-}
-
-# Menu Principal
-main_menu() {
-    while true; do
-        CHOICE=$(dialog --title "Installation d'applications" --menu "Choisissez une action:" 15 50 6 \
-            1 "Installer APP1" \
-            2 "Installer APP2" \
-            3 "TOOLS" \
-            4 "QUITTER" \
-            3>&1 1>&2 2>&3)
-        case "$CHOICE" in
-            1) echo "Installation APP1...";;
-            2) echo "Installation APP2...";;
-            3) tools_menu;;
-            4) clear; exit 0;;
-        esac
-    done
-}
-
-# Exécution du script
-check_internet
-show_ascii
-main_menu
-
+                case "$tool_choice" in
+                    SCREENSHOT) batocera-screenshot ;;
+                    RECORD) batocera-record ;;
+                    RELOAD) curl http://127.0.0.1:1234/reloadgames ;;
+                    RETOUR) break ;;
+                esac
+            done
+            ;;
+        QUITTER)
+            dialog --msgbox "Merci d'avoir utilisé le script !" 6 40
+            killall -9 xterm
+            clear
+            exit 0
+            ;;
+    esac
+done
