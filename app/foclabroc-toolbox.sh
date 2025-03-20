@@ -121,7 +121,7 @@ main_menu() {
                 ;;
             9)
                 confirm_install "Ports Installer" || continue
-                wget -q --tries=30 --no-check-certificate -O /tmp/runner https://github.com/foclabroc/toolbox/blob/main/app/install-to-port.sh && chmod +x /tmp/runner && bash /tmp/runner
+                wget -q --tries=30 --no-check-certificate -O /tmp/runner https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/install-to-port.sh && chmod +x /tmp/runner && bash /tmp/runner
                 ;;
             10)
                 # Afficher un message de remerciement
