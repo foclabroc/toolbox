@@ -32,5 +32,5 @@ killall -9 emulationstation
 sleep 1
 
 
-echo "\e[1;32mFoclabroc-Toolbox Successfully Installed in Ports folder.\e[1;37m"
+echo -e "\e[1;32mFoclabroc-Toolbox Successfully Installed in Ports folder.\e[1;37m"
 sleep 3
