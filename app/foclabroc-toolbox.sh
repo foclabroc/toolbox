@@ -64,7 +64,7 @@ main_menu() {
     while true; do
         main_menu=$(dialog --clear --backtitle "Foclabroc Toolbox" \
             --title "Main Menu" \
-            --menu "Sélectionnez une option :" 25 85 10 \
+            --menu "\nSélectionnez une option :\n " 25 85 10 \
             1 "Nintendo Switch -> Installer l'émulation Switch sur Batocera" \
             2 "Youtube TV -> Installer Youtube TV" \
             3 "Docker & Containers -> Active le support des conteneurs Docker" \

@@ -65,7 +65,7 @@ main_menu() {
         main_menu=$(dialog --clear --backtitle "Foclabroc Toolbox" \
             --title "Main Menu" \
             --menu "\nSélectionnez une option :\n " 25 85 9 \
-            1 "Nintendo Switch -> Installe l'émulation Switch sur Batocera" \
+            1 "Nintendo Switch -> Installer l'émulation Switch sur Batocera" \
             2 "Youtube TV -> Installer Youtube TV" \
             3 "Docker & Containers -> Active le support des conteneurs Docker" \
             4 "Tools -> Outils supplémentaires pour améliorer Batocera" \
@@ -80,10 +80,12 @@ main_menu() {
         case $main_menu in
             1)
                 confirm_install "Nintendo Switch" || continue
+                clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -L bit.ly/foclabroc-switch-all | bash" 
                 ;;
             2)
                 confirm_install "Youtube TV" || continue
+                clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/youtubetv/youtubetv.sh | bash" 
                 ;;
             3)
