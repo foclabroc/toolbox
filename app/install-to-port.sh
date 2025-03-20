@@ -18,10 +18,10 @@ fi
 echo "installing foclabroc-toolbox to port folder..."
 sleep 3
 # Add Foclabroc-tool.sh to "ports"
-curl -L https://github.com/foclabroc/toolbox/blob/main/app/foclabroc-tools.sh -o /userdata/roms/ports/foclabroc-tools.sh
+curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/foclabroc-tools.sh -o /userdata/roms/ports/foclabroc-tools.sh
 
 # Add Foclabroc-tool.keys to "ports"
-wget  https://github.com/foclabroc/toolbox/blob/main/app/foclabroc-tools.keys -P /userdata/roms/ports/
+wget  https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/foclabroc-tools.keys -P /userdata/roms/ports/
 
 # Set execute permissions for the downloaded scripts
 chmod +x /userdata/roms/ports/foclabroc-tools.sh
