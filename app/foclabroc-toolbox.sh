@@ -89,10 +89,12 @@ main_menu() {
         case $main_menu in
             1)
                 confirm_install "Nintendo Switch" || continue
+                clear
                 curl -Ls curl -L bit.ly/foclabroc-switch-all | bash
                 ;;
             2)
                 confirm_install "Apps Menu" || continue
+                clear
                 wget -q --tries=30 --no-check-certificate -O /tmp/runner https://github.com/trashbus99/profork/raw/master/app/appmenu.sh && chmod +x /tmp/runner && DISPLAY=:0.0 xterm -hold -bg black -fa "DejaVuSansMono" -fs 12 -en UTF-8 -e "bash /tmp/runner.sh" 
                 ;;
             3)
@@ -120,7 +122,8 @@ main_menu() {
                 curl -Ls https://github.com/trashbus99/profork/raw/master/portmaster/install.sh | bash
                 ;;
             9)
-                confirm_install "Ports Installer" || continue
+                confirm_install "Ports Installer" || continue 
+                clear
                 wget -q --tries=30 --no-check-certificate -O /tmp/runner https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/install-to-port.sh && chmod +x /tmp/runner && bash /tmp/runner
                 ;;
             10)
