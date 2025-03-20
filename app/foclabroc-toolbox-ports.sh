@@ -76,8 +76,7 @@ main_menu() {
                  "6" "Flatpak Linux Games"
                  "7" "Other Linux & Windows/Wine Freeware games"
                  "8" "Install Portmaster"
-                 "9" "Install This Menu to Ports"              
-                 "10" "Exit")
+                 "9" "Exit")
 
         main_menu=$(dialog --clear --backtitle "Foclabroc Toolbox" \
                         --title "Main Menu" \
