@@ -1,5 +1,39 @@
 #!/bin/bash
 
+show_ascii() {
+echo -e "\e[1;36m"
+echo ""
+echo "     #####################################################################################################################"
+echo "     #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#"
+echo "     #@@@@@        @@        ,@@@/        &@@     @@@@@&       @@@          @@@         &@@@         @@@&        /@@@@@@@#"
+echo "     #@@@@@     ...@     @     @.    @/    &@     @@@@@        @@@     @     @@     %    @@     @     @#    (&    (@@@@@@#"
+echo "     #@@@@@     @@@@     @     @     @/    (@     @@@@@    (    @@     @     @@     &    @@     @     @*    #&    .@@@@@@#"
+echo "     #@@@@@       (@     @     @     @@@@@@@@     @@@@@    @    @@          @@@        ,@@@     @     @*    #@@@@@@@@@@@@#"
+echo "     #@@@@@     @@@@     @     @     @/    (@     @@@@     ,    %@     @     @@     @    @@     @     @*    #&    .@@@@@@#"
+echo "     #@@@@@     @@@@     @     @,    @/    &@     @@@@           @     @     @@     @    &@     @     @%    #&    /@@@@@@#"
+echo "     #@@@@@     @@@@@         @@@         *@@        @     @     @           @@     @    &@@         @@@          @@@@@@@#"
+echo "     #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#"
+echo "     #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#"
+echo "     #@@@@@@@@@@@@@@@@.          @,         @@@         @@@     @@@%         .@@@         @@     @    @@@@@@@@@@@@@@@@@@@#"
+echo "     #@@@@@@@@@@@@@@@@@@@     @@@@    .%    /@     @     @@     @@@%    ,%    @@     @     @@        (@@@@@@@@@@@@@@@@@@@#"
+echo "     #@@@@@@@@@@@@@@@@@@@     @@@&    .%    *@     @     @@     @@@%    .     @@     @     @@        @@@@@@@@@@@@@@@@@@@@#"
+echo "     #@@@@@@@@@@@@@@@@@@@     @@@&    .%    *@     @     @@     @@@%          @@     @     @@        @@@@@@@@@@@@@@@@@@@@#"
+echo "     #@@@@@@@@@@@@@@@@@@@     @@@&    .%    *@     @     @@     @@@%    ,&    .@     @     @@         @@@@@@@@@@@@@@@@@@@#"
+echo "     #@@@@@@@@@@@@@@@@@@@     @@@@    .#    %@     @     @@       /%    ,.    .@     @     @,    @    @@@@@@@@@@@@@@@@@@@#"
+echo "     #@@@@@@@@@@@@@@@@@@@     @@@@@        @@@@/        @@@       /%          @@@/       .@@     @     @@@@@@@@@@@@@@@@@@#"
+echo "     #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#"
+echo "     #####################################################################################################################"
+echo ""
+echo "                                     ###############################################"
+echo "                                     #                                             #"
+echo "                                     #    FOCLABROC TOOLBOX SCRIPT FOR BATOCERA    #"
+echo "                                     #              [PC X86_64 ONLY]               #"
+echo "                                     #                                             #"
+echo "                                     ###############################################"
+echo -e "\e[0m"
+sleep 4
+}
+
 # Vérification de la connexion Internet
 check_internet() {
     if ! ping -c 1 8.8.8.8 &>/dev/null; then
@@ -10,95 +44,97 @@ check_internet() {
 
 # Vérification de l'architecture
 arch_check() {
-# Detect system architecture
-ARCH=$(uname -m)
-
-# Clear the screen
-clear
-
-# If the system is ARM64 (aarch64), exit the script with a dialog
-if [ "$ARCH" = "aarch64" ]; then
-    dialog --title "Architecture ARM64 Détectée" --msgbox "L'architecture ARM64 (aarch64) a été détectée.\nCe script ne peut être exécuté que sur des PC x86_64 (AMD/Intel)." 8 50
-    killall -9 xterm
+    ARCH=$(uname -m)
     clear
-    exit 0
-fi
-
-# If the system is x86_64 continue
-if [ "$ARCH" = "x86_64" ]; then
-    clear
-fi
+    if [ "$ARCH" = "aarch64" ]; then
+        dialog --backtitle "FOCLABROC TOOLBOX SCRIPT FOR BATOCERA" --title "Architecture ARM64 Détectée" --msgbox "Architecture ARM64 (aarch64) détectée.\nCe script ne peut être exécuté que sur des PC x86_64 (AMD/Intel)." 8 50
+        killall -9 xterm
+        exit 1
+    fi
 }
 
-# Affichage ASCII Title
-show_ascii() {
-dialog --title "FOCLABROC TOOLBOX SCRIPT FOR BATOCERA" \
-       --infobox "\
-###############################################\n\
-#                                             #\n\
-#    FOCLABROC TOOLBOX SCRIPT FOR BATOCERA    #\n\
-#              [PC X86_64 ONLY]               #\n\
-#                                             #\n\
-###############################################" 8 51
-sleep 4
-clear
-}
+#Set color
+GREEN='\033[0;32m'  # Green color code
+CYAN='\033[0;36m'   # Cyan color code
+RED='\033[0;31m'   # Red color code
+NC='\033[0m'        # Reset color code
 
-# Confirmer l'installation
+# Confirmation d'installation
 confirm_install() {
-    local app_name=$1
-    dialog --title "Confirmation" --yesno "Voulez-vous installer $app_name ?" 7 50
+    dialog --title "Confirmation" --yesno "Voulez-vous vraiment installer $1 ?" 7 50
     return $?
 }
 
-# Menu TOOLS
-tools_menu() {
-    while true; do
-        CHOICE=$(dialog --title "TOOLS" --menu "Choisissez un outil:" 15 50 4 \
-            1 "SCREENSHOT" \
-            2 "RECORD" \
-            3 "RELOAD" \
-            4 "RETOUR" \
-            3>&1 1>&2 2>&3)
-        case "$CHOICE" in
-            1) batocera-screenshot;;
-            2) batocera-record;;
-            3) curl http://127.0.0.1:1234/reloadgames;;
-            4) return;;
-        esac
-    done
-}
-
-# Menu Principal
+# Fonction pour afficher le menu principal
 main_menu() {
     while true; do
-        CHOICE=$(dialog --title "Installation d'applications" --menu "Choisissez une action:" 15 50 6 \
-            1 "Installer APP1" \
-            2 "Installer APP2" \
-            3 "TOOLS" \
-            4 "QUITTER" \
-            3>&1 1>&2 2>&3)
-        case "$CHOICE" in
+        OPTIONS=("1" "Nintendo Switch"
+                 "2" "Standalone Apps (mostly appimages)"
+                 "3" "Docker & Containers"
+                 "4" "Tools"
+                 "5" "Wine Custom Downloader v40+"
+                 "6" "Flatpak Linux Games"
+                 "7" "Other Linux & Windows/Wine Freeware games"
+                 "8" "Install Portmaster"
+                 "9" "Install This Menu to Ports"              
+                 "10" "Exit")
+
+        main_menu=$(dialog --clear --backtitle "Foclabroc Toolbox" \
+                        --title "Main Menu" \
+                        --menu "Choose an option:" 20 80 10 \
+                        "${OPTIONS[@]}" \
+                        2>&1 >/dev/tty)
+        clear
+
+        case $main_menu in
             1)
-                if confirm_install "APP1"; then
-                    echo "Installation de APP1..."
-                    # Ajoute ici la commande réelle d'installation de APP1
-                else
-                    echo "Installation de APP1 annulée."
-                fi
+                # confirm_install "Nintendo Switch" || continue
+                # curl -Ls curl -L bit.ly/foclabroc-switch-all | bash
+                # ;;
+                confirm_install "Nintendo Switch" || continue
+                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -L bit.ly/foclabroc-switch-all | bash" 
                 ;;
             2)
-                if confirm_install "APP2"; then
-                    echo "Installation de APP2..."
-                    # Ajoute ici la commande réelle d'installation de APP2
-                else
-                    echo "Installation de APP2 annulée."
-                fi
+                confirm_install "Apps Menu" || continue
+                wget -q --tries=30 --no-check-certificate -O /tmp/runner https://github.com/trashbus99/profork/raw/master/app/appmenu.sh && chmod +x /tmp/runner && DISPLAY=:0.0 xterm -hold -bg black -fa "DejaVuSansMono" -fs 12 -en UTF-8 -e "bash /tmp/runner.sh" 
                 ;;
-            3) tools_menu;;
+            3)
+                confirm_install "Docker Menu" || continue
+                wget -q --tries=30 --no-check-certificate -O /tmp/runner https://github.com/trashbus99/profork/raw/master/app/dockermenu.sh && chmod +x /tmp/runner && bash /tmp/runner
+                ;;
             4)
+                confirm_install "Tools Menu" || continue
+                wget -q --tries=30 --no-check-certificate -O /tmp/runner https://github.com/trashbus99/profork/raw/master/app/tools.sh && chmod +x /tmp/runner && bash /tmp/runner
+                ;;
+            5)
+                confirm_install "Wine Custom" || continue
+                curl -Ls https://github.com/trashbus99/profork/raw/master/wine-custom/wine.sh | bash
+                ;;
+            6)
+                confirm_install "Flatpak Linux Games" || continue
+                curl -Ls https://raw.githubusercontent.com/trashbus99/profork/master/app/fpg.sh | bash
+                ;;
+            7)
+                confirm_install "Other Linux & Windows/Wine Freeware" || continue
+                curl -Ls https://github.com/trashbus99/profork/raw/master/app/wquashfs.sh | bash
+                ;;
+            8)
+                confirm_install "Portmaster Installer" || continue
+                curl -Ls https://github.com/trashbus99/profork/raw/master/portmaster/install.sh | bash
+                ;;
+            9)
+                confirm_install "Ports Installer" || continue
+                wget -q --tries=30 --no-check-certificate -O /tmp/runner https://github.com/trashbus99/profork/raw/master/app/install.sh && chmod +x /tmp/runner && bash /tmp/runner
+                ;;
+            10)
                 # Afficher un message de remerciement
-                dialog --title "Merci" --msgbox "Merci d'avoir utilisé le script !" 6 40
+                dialog --title "Quitter" --msgbox "Merci d'avoir utilisé le script !" 6 40
+                killall -9 xterm
+                clear
+                exit 0
+                ;;
+            *)
+                dialog --title "Quitter" --msgbox "Merci d'avoir utilisé le script !" 6 40
                 killall -9 xterm
                 clear
                 exit 0
@@ -107,8 +143,8 @@ main_menu() {
     done
 }
 
-# Exécution du script
+# Lancer les vérifications et afficher le menu
+show_ascii
 arch_check
 check_internet
-show_ascii
 main_menu
