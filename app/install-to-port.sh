@@ -21,7 +21,7 @@ sleep 3
 curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/foclabroc-tools.sh -o /userdata/roms/ports/foclabroc-tools.sh
 
 # Add Foclabroc-tool.keys to "ports"
-curl -L  https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/foclabroc-tools.keys -o /userdata/roms/ports/foclabroc-tools.keys
+curl -L  https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/foclabroc-tools.sh.keys -o /userdata/roms/ports/foclabroc-tools.sh.keys
 
 # Set execute permissions for the downloaded scripts
 chmod +x /userdata/roms/ports/foclabroc-tools.sh
