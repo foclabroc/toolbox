@@ -31,7 +31,7 @@ echo "                                     #              [PC X86_64 ONLY]      
 echo "                                     #                                             #"
 echo "                                     ###############################################"
 echo -e "\e[0m"
-sleep 4
+sleep 3
 }
 
 # Vérification de la connexion Internet
@@ -46,18 +46,12 @@ check_internet() {
 arch_check() {
     ARCH=$(uname -m)
     clear
-    if [ "$ARCH" = "aarch64" ]; then
-        dialog --backtitle "FOCLABROC TOOLBOX SCRIPT FOR BATOCERA" --title "Architecture ARM64 Détectée" --msgbox "Architecture ARM64 (aarch64) détectée.\nCe script ne peut être exécuté que sur des PC x86_64 (AMD/Intel)." 8 50
+    if [ "$ARCH" != "x86_64" ]; then
+        dialog --backtitle "FOCLABROC TOOLBOX SCRIPT FOR BATOCERA" --title "Architecture $ARCH Détectée" --msgbox "\nArchitecture $ARCH Détectée.\nCe script ne peut être exécuté que sur des PC x86_64 (AMD/Intel)." 9 50
         killall -9 xterm
         exit 1
     fi
 }
-
-#Set color
-GREEN='\033[0;32m'  # Green color code
-CYAN='\033[0;36m'   # Cyan color code
-RED='\033[0;31m'   # Red color code
-NC='\033[0m'        # Reset color code
 
 # Confirmation d'installation
 confirm_install() {
@@ -68,21 +62,19 @@ confirm_install() {
 # Fonction pour afficher le menu principal
 main_menu() {
     while true; do
-        OPTIONS=("1" "Nintendo Switch"
-                 "2" "Standalone Apps (mostly appimages)"
-                 "3" "Docker & Containers"
-                 "4" "Tools"
-                 "5" "Wine Custom Downloader v40+"
-                 "6" "Flatpak Linux Games"
-                 "7" "Other Linux & Windows/Wine Freeware games"
-                 "8" "Install Portmaster"
-                 "9" "Exit")
-
         main_menu=$(dialog --clear --backtitle "Foclabroc Toolbox" \
-                        --title "Main Menu" \
-                        --menu "Choose an option:" 20 80 9 \
-                        "${OPTIONS[@]}" \
-                        2>&1 >/dev/tty)
+            --title "Main Menu" \
+            --menu "\nSélectionnez une option :\n " 25 85 9 \
+            1 "Nintendo Switch -> Installe l'émulation Switch sur Batocera" \
+            2 "Youtube TV -> Installer Youtube TV" \
+            3 "Docker & Containers -> Active le support des conteneurs Docker" \
+            4 "Tools -> Outils supplémentaires pour améliorer Batocera" \
+            5 "Wine Custom -> Télécharge une version optimisée de Wine" \
+            6 "Flatpak Linux Games -> Installe des jeux Linux via Flatpak" \
+            7 "Other Freeware Games -> Jeux Linux & Windows (Wine)" \
+            8 "Install Portmaster -> Gestionnaire de ports pour Batocera" \
+            9 "Exit -> Quitter le script" \
+            2>&1 >/dev/tty)
         clear
 
         case $main_menu in
@@ -91,8 +83,8 @@ main_menu() {
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -L bit.ly/foclabroc-switch-all | bash" 
                 ;;
             2)
-                confirm_install "Apps Menu" || continue
-                wget -q --tries=30 --no-check-certificate -O /tmp/runner https://github.com/trashbus99/profork/raw/master/app/appmenu.sh && chmod +x /tmp/runner && DISPLAY=:0.0 xterm -hold -bg black -fa "DejaVuSansMono" -fs 12 -en UTF-8 -e "bash /tmp/runner.sh" 
+                confirm_install "Youtube TV" || continue
+                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/youtubetv/youtubetv.sh | bash" 
                 ;;
             3)
                 confirm_install "Docker Menu" || continue
