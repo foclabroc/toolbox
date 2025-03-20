@@ -88,11 +88,8 @@ main_menu() {
 
         case $main_menu in
             1)
-                # confirm_install "Nintendo Switch" || continue
-                # curl -Ls curl -L bit.ly/foclabroc-switch-all | bash
-                # ;;
                 confirm_install "Nintendo Switch" || continue
-                xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "curl -L bit.ly/foclabroc-switch-all | bash" 
+                curl -Ls curl -L bit.ly/foclabroc-switch-all | bash
                 ;;
             2)
                 confirm_install "Apps Menu" || continue
