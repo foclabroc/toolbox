@@ -53,12 +53,6 @@ arch_check() {
     fi
 }
 
-#Set color
-GREEN='\033[0;32m'  # Green color code
-CYAN='\033[0;36m'   # Cyan color code
-RED='\033[0;31m'   # Red color code
-NC='\033[0m'        # Reset color code
-
 # Confirmation d'installation
 confirm_install() {
     dialog --title "Confirmation" --yesno "Voulez-vous vraiment installer $1 ?" 7 50

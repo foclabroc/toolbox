@@ -15,13 +15,13 @@ if [ ! -d "/userdata/system/pro" ]; then
 fi
 
 
-echo "installing foclabroc-toolbox to port folder..."
+echo "Installing Foclabroc-toolbox to port folder..."
 sleep 3
 # Add Foclabroc-tool.sh to "ports"
 curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/foclabroc-tools.sh -o /userdata/roms/ports/foclabroc-tools.sh
 
 # Add Foclabroc-tool.keys to "ports"
-wget  https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/foclabroc-tools.keys -P /userdata/roms/ports/
+curl -L  https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/foclabroc-tools.keys -o /userdata/roms/ports/foclabroc-tools.keys
 
 # Set execute permissions for the downloaded scripts
 chmod +x /userdata/roms/ports/foclabroc-tools.sh
@@ -32,4 +32,5 @@ killall -9 emulationstation
 sleep 1
 
 
-echo "Finished."
+echo "\e[1;32mFoclabroc-Toolbox Successfully Installed in Ports folder.\e[1;37m"
+sleep 3
