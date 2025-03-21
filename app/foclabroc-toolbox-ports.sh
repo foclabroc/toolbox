@@ -95,7 +95,7 @@ main_menu() {
                 ;;
             4)
                 clear
-                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://github.com/foclabroc/toolbox/blob/main/bat-tools/bat-tools.sh | bash" 
+                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/bat-tools/bat-tools.sh | bash" 
                 ;;
             5)
                 confirm_install "Wine Custom" || continue
