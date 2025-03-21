@@ -12,7 +12,7 @@ start_recording() {
   batocera-record &
   RECORD_PID=$!
 
-  # Afficher la fenêtre de chronomètre avec un bouton Stop
+  # Initialisation du chronomètre
   SECONDS=0
   while true; do
     # Mettre à jour le chronomètre
@@ -22,9 +22,9 @@ start_recording() {
 
     # Afficher la fenêtre avec le chronomètre et un bouton Stop
     CHOICE=$(dialog --title "Enregistrement en cours" --backtitle "Batocera" \
+      --no-items --stdout \
       --menu "Chronomètre: $TIME" 15 50 3 \
-      1 "Stop" \
-      2>&1 >/dev/tty)
+      1 "Stop")
 
     case $CHOICE in
       1)
