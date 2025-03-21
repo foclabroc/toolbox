@@ -8,8 +8,10 @@ show_message() {
 
 # Fonction pour exécuter l'enregistrement
 start_recording() {
+
   # Lancer batocera-record en arrière-plan
-  batocera-record &>/dev/null
+  batocera-record &>/dev/null &
+  RECORD_PID=$!
 
   # Afficher la fenêtre avec un bouton Stop
   CHOICE=$(dialog --title "Capture vidéo" --backtitle "Foclabroc Toolbox" \
