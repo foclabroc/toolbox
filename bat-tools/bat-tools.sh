@@ -6,10 +6,9 @@ show_message() {
   sleep 2
 }
 
-# Fonction pour exécuter l'enregistrement
 start_recording() {
-  # Vérifier si un enregistrement est déjà en cours
-  if pgrep -x "batocera-record" > /dev/null; then
+  # Vérifier si batocera-record est déjà en cours en cherchant le processus par son nom
+  if pgrep -f "batocera-record" > /dev/null; then
     show_message "Un enregistrement est déjà en cours."
     return
   fi
@@ -21,7 +20,7 @@ start_recording() {
   # Afficher la fenêtre avec un bouton Stop
   CHOICE=$(dialog --title "Capture vidéo" --backtitle "Foclabroc Toolbox" \
     --no-items --stdout \
-    --menu "Capture vidéo en cours appuyez sur stop pour terminer..." 15 60 1 \
+    --menu "Capture vidéo en cours, appuyez sur stop pour terminer..." 15 60 1 \
     "Stop Capture")
 
   case $CHOICE in
@@ -32,8 +31,9 @@ start_recording() {
   esac
 
   # Afficher le message de fin
-  show_message "Capture vidéo enregistée dans le dossier Recordings avec succès."
+  show_message "Capture vidéo enregistrée dans le dossier Recordings avec succès."
 }
+
 
 # Fonction pour afficher le menu principal
 main_menu() {
