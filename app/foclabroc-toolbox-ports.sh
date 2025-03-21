@@ -1,5 +1,7 @@
 #!/bin/bash
 
+clear
+
 show_ascii() {
 echo -e "\e[1;36m"
 echo ""
