@@ -63,11 +63,11 @@ confirm_install() {
 main_menu() {
     while true; do
         main_menu=$(dialog --clear --backtitle "Foclabroc Toolbox" \
-            --title "Main Menu" \
-            --menu "\nSélectionnez une option :\n " 25 85 9 \
-            1 "Nintendo Switch -> Installer l'émulation Switch sur Batocera" \
-            2 "Youtube TV -> Installer Youtube TV" \
-            3 "Docker & Containers -> Active le support des conteneurs Docker" \
+            --title "Menu Principal" \
+            --menu "\nSélectionnez une option :\n " 25 85 10 \
+            1 "[Nintendo Switch] -> Installer l'émulation Switch sur Batocera" \
+            2 "[Youtube TV]      -> Installer Youtube TV" \
+            3 "[Gparted]         -> Installer Gparted" \
             4 "Tools -> Outils supplémentaires pour améliorer Batocera" \
             5 "Wine Custom -> Télécharge une version optimisée de Wine" \
             6 "Flatpak Linux Games -> Installe des jeux Linux via Flatpak" \
@@ -89,8 +89,9 @@ main_menu() {
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/youtubetv/youtubetv.sh | bash" 
                 ;;
             3)
-                confirm_install "Docker Menu" || continue
-                wget -q --tries=30 --no-check-certificate -O /tmp/runner https://github.com/trashbus99/profork/raw/master/app/dockermenu.sh && chmod +x /tmp/runner && bash /tmp/runner
+                confirm_install "Gparted" || continue
+                clear
+                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/gparted/gparted.sh | bash" 
                 ;;
             4)
                 confirm_install "Tools Menu" || continue
