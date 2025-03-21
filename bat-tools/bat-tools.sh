@@ -7,15 +7,28 @@ show_message() {
 }
 
 start_recording() {
-  # Vérifier si batocera-record est déjà en cours en cherchant le processus par son nom
-  if pgrep -f "batocera-record" > /dev/null; then
-    show_message "Un enregistrement est déjà en cours."
-    return
+  # Vérifier si batocera-record est déjà en cours
+  if ps aux | grep -v grep | grep "batocera-record" > /dev/null; then
+    show_message "Un enregistrement est déjà en cours. Le processus en cours va être tué."
+    
+    # Trouver et tuer le processus batocera-record en cours
+    PID=$(ps aux | grep -v grep | grep "batocera-record" | awk '{print $2}')
+    kill -9 $PID
+    show_message "Le processus en cours a été tué."
   fi
 
   # Lancer batocera-record en arrière-plan
   batocera-record &>/dev/null &
   RECORD_PID=$!
+
+  # Attendre un peu pour que le processus se lance
+  sleep 2
+
+  # Vérifier à nouveau si le processus a bien démarré
+  if ! ps -p $RECORD_PID > /dev/null; then
+    show_message "Échec du démarrage de l'enregistrement."
+    return
+  fi
 
   # Afficher la fenêtre avec un bouton Stop
   CHOICE=$(dialog --title "Capture vidéo" --backtitle "Foclabroc Toolbox" \
@@ -33,7 +46,6 @@ start_recording() {
   # Afficher le message de fin
   show_message "Capture vidéo enregistrée dans le dossier Recordings avec succès."
 }
-
 
 # Fonction pour afficher le menu principal
 main_menu() {
