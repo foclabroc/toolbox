@@ -19,27 +19,8 @@ DESKTOP_FILE="${DESKTOP_DIR}/${APPNAME,,}.desktop"
 # Ensure directories exist
 mkdir -p "$APP_CONFIG_DIR" "$ADDONS_DIR/${APPNAME,,}/extra"
 
-# Detect system architecture
-arch=$(uname -m)
-case "$arch" in
-    x86_64)
-        appimage_url="${REPO_BASE_URL}${AMD_SUFFIX}"
-        ;;
-    aarch64)
-        if [ -n "$ARM_SUFFIX" ]; then
-            appimage_url="${REPO_BASE_URL}${ARM_SUFFIX}"
-        else
-            echo "No ARM64 AppImage available. Exiting."
-            exit 1
-        fi
-        ;;
-    *)
-        echo "Unsupported architecture: $arch. Exiting."
-        exit 1
-        ;;
-esac
-
 # Download the AppImage
+appimage_url="${REPO_BASE_URL}${AMD_SUFFIX}"
 echo -e "\e[1;34mInstallation de Gparted en cours...\e[1;37m"
 if ! wget -q --show-progress -O "$ADDONS_DIR/${APPNAME,,}/${APPNAME,,}.AppImage" "$appimage_url"; then
     echo "Failed to download $APPNAME AppImage. Exiting."

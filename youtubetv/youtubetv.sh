@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Validate app_url
+app_url=https://github.com/foclabroc/toolbox/raw/refs/heads/main/youtubetv/extra/YouTubeonTV-linux-x64.zip
 if [ -z "$app_url" ]; then
     echo "Error: Failed to fetch the download URL for YouTube TV."
     echo "Debugging information:"
@@ -49,7 +50,7 @@ wget -q --show-progress -O "/userdata/system/pro/.dep/dep.zip" "https://github.c
 cd /userdata/system/pro/.dep/
 unzip -o -qq /userdata/system/pro/.dep/dep.zip 2>/dev/null
 
-# Step 5: Create a launcher script using the original command
+# Create a launcher script using the original command
 echo "Creating YouTube TV script in Ports..."
 echo "Création d'un script YouTube TV dans Ports..."
 sleep 3
