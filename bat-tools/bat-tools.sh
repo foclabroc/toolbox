@@ -10,7 +10,7 @@ show_message() {
 start_recording() {
 
   # Lancer batocera-record en arrière-plan
-  batocera-record &
+  batocera-record &>/dev/null &
   RECORD_PID=$!
 
   # Afficher la fenêtre avec un bouton Stop
@@ -22,7 +22,7 @@ start_recording() {
   case $CHOICE in
     1)
       # Envoyer le signal SIGINT pour arrêter l'enregistrement
-      kill -SIGINT $RECORD_PID
+      kill -SIGTERM $RECORD_PID
       ;;
   esac
 
