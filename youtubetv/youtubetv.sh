@@ -120,9 +120,9 @@ XMLSTARLET_SYMLINK="/usr/bin/xmlstarlet"
 CUSTOM_SH="/userdata/system/custom.sh"
 
 if [ -f "$XMLSTARLET_BIN" ]; then
-    echo "XMLStarlet est déjà installé, passage à la suite..."
+    echo -e "\e[1;34mXMLStarlet est déjà installé, passage à la suite...\e[1;37m"
 else
-    echo "Création du répertoire XMLStarlet..."
+    echo -e "\e[1;34mInstallation de XMLStarlet (pour l'édition du gamelist)...\e[1;37m"
     mkdir -p "$XMLSTARLET_DIR"
 
     echo "Téléchargement de XMLStarlet..."
