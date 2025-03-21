@@ -96,7 +96,7 @@ main_menu() {
                 ;;
             4)
                 clear
-                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/bat-tools/bat-tools.sh | bash
+                curl -Ls https://github.com/foclabroc/toolbox/blob/main/bat-tools/bat-tools.sh | bash
                 ;;
             5)
                 confirm_install "Wine Custom" || continue
