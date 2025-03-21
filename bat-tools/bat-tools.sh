@@ -22,7 +22,7 @@ start_recording() {
   case $CHOICE in
     1)
       # Envoyer le signal SIGINT pour arrêter l'enregistrement
-      kill -SIGTERM $RECORD_PID
+      pkill -SIGINT batocera-record
       ;;
   esac
 
