@@ -6,12 +6,6 @@ show_message() {
   sleep 2
 }
 
-# Vérification si `dialog` est installé
-if ! command -v dialog &>/dev/null; then
-  echo "Le programme 'dialog' n'est pas installé. Veuillez l'installer avant d'exécuter ce script."
-  exit 1
-fi
-
 # Fonction pour exécuter l'enregistrement
 start_recording() {
   # Vérifier si un enregistrement est déjà en cours
@@ -21,13 +15,13 @@ start_recording() {
   fi
 
   # Lancer batocera-record en arrière-plan
-  batocera-record &
+  batocera-record &>/dev/null &
   RECORD_PID=$!
 
   # Afficher la fenêtre avec un bouton Stop
-  CHOICE=$(dialog --title "Capture vidéo" --backtitle "Batocera" \
+  CHOICE=$(dialog --title "Capture vidéo" --backtitle "Foclabroc Toolbox" \
     --no-items --stdout \
-    --menu "Capture vidéo en cours..." 15 50 1 \
+    --menu "Capture vidéo en cours appuyez sur stop pour terminer..." 15 60 1 \
     "Stop Capture")
 
   case $CHOICE in
@@ -44,7 +38,7 @@ start_recording() {
 # Fonction pour afficher le menu principal
 main_menu() {
   while true; do
-    CHOICE=$(dialog --menu "Choisissez une option" 15 50 4 \
+    CHOICE=$(dialog --menu "Choisissez une option" 15 80 4 \
       1 "[Screenshot] -> Prendre des captures d'ecran de Batocera." \
       2 "[Reload]     -> Actualiser la liste des jeux." \
       3 "[Record]     -> Capturer des vidéos de l'ecran de batocera" \
