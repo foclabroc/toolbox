@@ -24,41 +24,38 @@ start_recording() {
   batocera-record &
   RECORD_PID=$!
 
-  # Afficher la fenêtre de capture en cours
-  while true; do
-    CHOICE=$(dialog --title "Capture en cours" --backtitle "Batocera" \
-      --no-items --stdout \
-      --menu "Capture en cours, appuyer sur Stop pour arrêter la capture" 15 50 1 \
-      "Stop")
+  # Afficher la fenêtre avec un bouton Stop
+  CHOICE=$(dialog --title "Capture vidéo" --backtitle "Batocera" \
+    --no-items --stdout \
+    --menu "Capture vidéo en cours..." 15 50 1 \
+    "Stop Capture")
 
-    case $CHOICE in
-      1)
-        # Envoyer le signal SIGINT pour arrêter l'enregistrement
-        kill -SIGINT $RECORD_PID
-        break
-        ;;
-    esac
-  done
+  case $CHOICE in
+    1)
+      # Envoyer le signal SIGINT pour arrêter l'enregistrement
+      kill -SIGINT $RECORD_PID
+      ;;
+  esac
 
   # Afficher le message de fin
-  show_message "Enregistrement arrêté."
+  show_message "Capture vidéo enregistée dans le dossier Recordings avec succès."
 }
 
 # Fonction pour afficher le menu principal
 main_menu() {
   while true; do
-    CHOICE=$(dialog --menu "Choisissez une option" 15 50 5 \
-      1 "Screenshot" \
-      2 "Reload" \
-      3 "Record" \
-      4 "Retour" \
+    CHOICE=$(dialog --menu "Choisissez une option" 15 50 4 \
+      1 "[Screenshot] -> Prendre des captures d'ecran de Batocera." \
+      2 "[Reload]     -> Actualiser la liste des jeux." \
+      3 "[Record]     -> Capturer des vidéos de l'ecran de batocera" \
+      4 "[Retour]     -> Retour au menu principal de la toolbox" \
       2>&1 >/dev/tty)
 
     case $CHOICE in
       1)
         # Option Screenshot
         batocera-screenshot
-        show_message "Screenshot enregistré dans le dossier screenshot"
+        show_message "Screenshot enregistré dans le dossier Screenshots avec succès"
         ;;
       2)
         # Option Reload
@@ -67,20 +64,7 @@ main_menu() {
         ;;
       3)
         # Option Record
-        RECORD_CHOICE=$(dialog --title "Enregistrement" --backtitle "Batocera" \
-          --no-items --stdout \
-          --menu "Choisir l'option" 15 50 1 \
-          1 "Start Recording")
-
-        case $RECORD_CHOICE in
-          1)
-            # Démarrer l'enregistrement
-            start_recording
-            ;;
-          *)
-            break
-            ;;
-        esac
+        start_recording
         ;;
       4)
         # Retour
