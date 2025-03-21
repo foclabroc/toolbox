@@ -9,11 +9,7 @@ show_message() {
 # Fonction pour exécuter l'enregistrement
 start_recording() {
   # Lancer batocera-record en arrière-plan
-  batocera-record &>/dev/null &
-  RECORD_PID=$(pgrep -o batocera-record)
-
-  # Attendre un peu pour que le processus démarre
-  sleep 1  # Ajuste si nécessaire
+  batocera-record &>/dev/null
 
   # Afficher la fenêtre avec un bouton Stop
   CHOICE=$(dialog --title "Capture vidéo" --backtitle "Foclabroc Toolbox" \
@@ -23,9 +19,7 @@ start_recording() {
 
   case $CHOICE in
     1)
-      # Trouver la fenêtre du terminal qui contient batocera-record et envoyer ctrl+c
-      WINDOW_ID=$(xdotool search --name "batocera-record" | head -n 1)
-      xdotool windowactivate --sync $WINDOW_ID key ctrl+c
+      killall -9 ffmpeg
       ;;
   esac
 
