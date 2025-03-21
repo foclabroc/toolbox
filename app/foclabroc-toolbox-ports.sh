@@ -68,7 +68,7 @@ main_menu() {
             1 "[Nintendo Switch] -> Installer l'émulation Switch sur Batocera" \
             2 "[Youtube TV]      -> Installer Youtube TV" \
             3 "[Gparted]         -> Installer Gparted" \
-            4 "Tools -> Outils supplémentaires pour améliorer Batocera" \
+            4 "[Tools]           -> Outils pour Batocera. Screenshot, Records..." \
             5 "Wine Custom -> Télécharge une version optimisée de Wine" \
             6 "Flatpak Linux Games -> Installe des jeux Linux via Flatpak" \
             7 "Other Freeware Games -> Jeux Linux & Windows (Wine)" \
@@ -94,8 +94,8 @@ main_menu() {
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/gparted/gparted.sh | bash" 
                 ;;
             4)
-                confirm_install "Tools Menu" || continue
-                wget -q --tries=30 --no-check-certificate -O /tmp/runner https://github.com/trashbus99/profork/raw/master/app/tools.sh && chmod +x /tmp/runner && bash /tmp/runner
+                clear
+                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/bat-tools/bat-tools.sh | bash" 
                 ;;
             5)
                 confirm_install "Wine Custom" || continue
