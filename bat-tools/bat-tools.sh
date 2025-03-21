@@ -23,8 +23,8 @@ start_recording() {
     # Afficher la fenêtre avec le chronomètre et un bouton Stop
     CHOICE=$(dialog --title "Enregistrement en cours" --backtitle "Batocera" \
       --no-items --stdout \
-      --menu "Chronomètre: $TIME" 15 50 3 \
-      1 "Stop")
+      --menu "Chronomètre: $TIME" 15 50 1 \
+      "Stop")
 
     case $CHOICE in
       1)
