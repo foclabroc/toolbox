@@ -111,6 +111,41 @@ fi
 curl http://127.0.0.1:1234/reloadgames
 
 # Add the YouTube TV entry
+
+# Installation de xmlstarlet si absent.
+XMLSTARLET_DIR="/userdata/system/pro/extra"
+XMLSTARLET_BIN="$XMLSTARLET_DIR/xmlstarlet"
+XMLSTARLET_URL="https://github.com/foclabroc/toolbox/raw/refs/heads/main/app/xmlstarlet"
+XMLSTARLET_SYMLINK="/usr/bin/xmlstarlet"
+CUSTOM_SH="/userdata/system/custom.sh"
+
+if [ -f "$XMLSTARLET_BIN" ]; then
+    echo "XMLStarlet est déjà installé, passage à la suite..."
+else
+    echo "Création du répertoire XMLStarlet..."
+    mkdir -p "$XMLSTARLET_DIR"
+
+    echo "Téléchargement de XMLStarlet..."
+    curl -# -L "$XMLSTARLET_URL" -o "$XMLSTARLET_BIN"
+
+    echo "Rendre XMLStarlet exécutable..."
+    chmod +x "$XMLSTARLET_BIN"
+
+    echo "Création du lien symbolique dans /usr/bin/xmlstarlet pour un usage immédiat..."
+    ln -sf "$XMLSTARLET_BIN" "$XMLSTARLET_SYMLINK"
+    
+    # Assure-toi que le fichier custom.sh existe
+    if [ ! -f "$CUSTOM_SH" ]; then
+        echo "#!/bin/bash" > "$CUSTOM_SH"
+        chmod +x "$CUSTOM_SH"
+    fi
+
+    # Ajoute la création du lien symbolique au démarrage (si non déjà présent)
+    if ! grep -q "ln -sf $XMLSTARLET_BIN $XMLSTARLET_SYMLINK" "$CUSTOM_SH"; then
+        echo "ln -sf $XMLSTARLET_BIN $XMLSTARLET_SYMLINK" >> "$CUSTOM_SH"
+    fi
+fi
+
 xmlstarlet ed -L \
     -s "/gameList" -t elem -n "game" -v "" \
     -s "/gameList/game[last()]" -t elem -n "path" -v "./YoutubeTV.sh" \
