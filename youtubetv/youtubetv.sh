@@ -1,17 +1,6 @@
 #!/bin/bash
 
-# Step 1: Detect system architecture
-arch=$(uname -m)
-
-if [ "$arch" == "x86_64" ]; then
-    echo "Architecture: x86_64 detected..."
-    app_url=https://github.com/foclabroc/toolbox/raw/refs/heads/main/youtubetv/extra/YouTubeonTV-linux-x64.zip
-else
-    echo "Unsupported architecture: $arch. Exiting."
-    exit 1
-fi
-
-# Step 2: Validate app_url
+# Validate app_url
 if [ -z "$app_url" ]; then
     echo "Error: Failed to fetch the download URL for YouTube TV."
     echo "Debugging information:"
@@ -19,8 +8,8 @@ if [ -z "$app_url" ]; then
     exit 1
 fi
 
-# Step 3: Download the archive
-echo -e "\e[1;34Installation de YouTube TV...\e[1;37m"
+# Download the archive
+echo -e "\e[1;34mInstallation de YouTube TV...\e[1;37m"
 rm -rf /userdata/system/pro/youtubetv 2>/dev/null
 rm -rf /userdata/system/pro/youtube-tv 2>/dev/null
 mkdir -p "/userdata/system/pro/youtubetv"
@@ -34,7 +23,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Step 4: Extract the downloaded archive
+# Extract the downloaded archive
 echo "Extracting YouTube TV files..."
 mkdir -p "$app_dir"
 unzip -o "$temp_dir/youtube-tv.zip" -d "$temp_dir/youtube-tv-extracted"

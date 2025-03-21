@@ -40,7 +40,7 @@ case "$arch" in
 esac
 
 # Download the AppImage
-echo -e" \e[1;34mInstallation de Gparted en cours...\e[1;37m"
+echo -e "\e[1;34mInstallation de Gparted en cours...\e[1;37m"
 if ! wget -q --show-progress -O "$ADDONS_DIR/${APPNAME,,}/${APPNAME,,}.AppImage" "$appimage_url"; then
     echo "Failed to download $APPNAME AppImage. Exiting."
     exit 1
