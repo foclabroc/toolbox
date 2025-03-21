@@ -40,6 +40,7 @@ case "$arch" in
 esac
 
 # Download the AppImage
+echo -e" \e[1;34mInstallation de Gparted en cours...\e[1;37m"
 if ! wget -q --show-progress -O "$ADDONS_DIR/${APPNAME,,}/${APPNAME,,}.AppImage" "$appimage_url"; then
     echo "Failed to download $APPNAME AppImage. Exiting."
     exit 1
@@ -91,5 +92,7 @@ if ! grep -q "${APP_CONFIG_DIR}/restore_desktop_entry.sh" "$CUSTOM_SCRIPT"; then
     echo "\"${APP_CONFIG_DIR}/restore_desktop_entry.sh\" &" >> "$CUSTOM_SCRIPT"
 fi
 
-echo "$APPNAME setup complete."
-sleep 3
+echo -e "\e[1;32mInstallation complete! You can now launch Gparted from F1 menu."
+echo -e "-----------------------------------------------------------------------------------------"
+echo -e "Installation terminée ! Vous pouvez désormais lancer Gparted depuis le menu « F1 applications ».\e[1;37m"
+sleep 5

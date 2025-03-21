@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Step 1: Detect system architecture
-echo "Detecting system architecture..."
 arch=$(uname -m)
 
 if [ "$arch" == "x86_64" ]; then
@@ -21,7 +20,7 @@ if [ -z "$app_url" ]; then
 fi
 
 # Step 3: Download the archive
-echo "Downloading YouTube TV archive from $app_url..."
+echo -e "\e[1;34Installation de YouTube TV...\e[1;37m"
 rm -rf /userdata/system/pro/youtubetv 2>/dev/null
 rm -rf /userdata/system/pro/youtube-tv 2>/dev/null
 mkdir -p "/userdata/system/pro/youtubetv"
