@@ -98,7 +98,7 @@ main_menu() {
                 ;;
             4)
                 clear
-                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/bat-tools/bat-tools.sh | bash
+                wget -q --tries=30 --no-check-certificate -O /tmp/runner https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/bat-tools/bat-tools.sh && chmod +x /tmp/runner && bash /tmp/runner
                 ;;
             5)
                 confirm_install "Wine Custom" || continue
