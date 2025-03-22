@@ -22,7 +22,7 @@ start_recording() {
   case $CHOICE in
     1)
       # Envoyer le signal SIGINT pour arrêter l'enregistrement
-      killall -9 ffmpeg
+      xterm -e "pkill -SIGINT ffmpeg; exit" &
       ;;
   esac
 
