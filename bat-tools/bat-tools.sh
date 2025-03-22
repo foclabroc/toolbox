@@ -17,19 +17,11 @@ start_recording() {
   CHOICE=$(dialog --title "Capture vidéo" --backtitle "Foclabroc Toolbox" \
     --no-items --stdout \
     --menu "Capture vidéo en cours appuyez sur stop pour terminer..." 15 60 1 \
-    1 "Stop Capture" \
-    2>&1 >/dev/tty)
+    1 "Stop Capture")
 
   case $CHOICE in
     1)
-      # Vérifier si ffmpeg est en cours d'exécution avant de tenter de l'arrêter
-      if pgrep -x "ffmpeg" > /dev/null; then
-        # Envoyer le signal SIGINT pour arrêter l'enregistrement
-        xterm -e "pkill -SIGINT ffmpeg; exit" &
-        show_message "Capture vidéo enregistrée dans le dossier Recordings avec succès."
-      else
-        show_message "Aucun processus ffmpeg en cours."
-      fi
+      break
       ;;
   esac
 }
