@@ -8,25 +8,27 @@ show_message() {
 
 # Fonction pour exécuter l'enregistrement
 start_recording() {
+
   # Lancer batocera-record en arrière-plan
   batocera-record &>/dev/null &
-  RECORD_PID=$!
+  # RECORD_PID=$!
 
   # Afficher la fenêtre avec un bouton Stop
-  dialog --title "Capture vidéo" --backtitle "Foclabroc Toolbox" \
-    --stdout --menu "Capture vidéo en cours, appuyez sur Stop pour terminer..." 15 60 1 \
-    "1" "Stop Capture"
+  CHOICE=$(dialog --title "Capture vidéo" --backtitle "Foclabroc Toolbox" \
+    --stdout \
+    --menu "Capture vidéo en cours appuyez sur stop pour terminer..." 15 60 1 \
+    "Stop Capture")
 
-  # Arrêter l'enregistrement proprement
-  pkill -f batocera-record
-
-  # Vérifier si le processus s'est bien arrêté
-  if ps -p $RECORD_PID &>/dev/null; then
-    kill -2 $RECORD_PID
-  fi
+  case $CHOICE in
+    1)
+      # Envoyer le signal SIGINT pour arrêter l'enregistrement
+      sleep 1
+      kill -15 ffmpeg
+      ;;
+  esac
 
   # Afficher le message de fin
-  show_message "Capture vidéo enregistrée dans le dossier Recordings avec succès."
+  show_message "Capture vidéo enregistée dans le dossier Recordings avec succès."
 }
 
 # Fonction pour afficher le menu principal
