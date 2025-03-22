@@ -11,7 +11,7 @@ start_recording() {
 
   # Lancer batocera-record en arrière-plan
   batocera-record &>/dev/null &
-  RECORD_PID=$!
+  # RECORD_PID=$!
 
   # Afficher la fenêtre avec un bouton Stop
   CHOICE=$(dialog --title "Capture vidéo" --backtitle "Foclabroc Toolbox" \
@@ -22,7 +22,7 @@ start_recording() {
   case $CHOICE in
     1)
       # Envoyer le signal SIGINT pour arrêter l'enregistrement
-      killall -9 ffmpeg
+      kill $(pgrep -P $(pgrep -f batocera-record))
       ;;
   esac
 
