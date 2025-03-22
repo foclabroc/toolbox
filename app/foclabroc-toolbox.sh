@@ -56,7 +56,8 @@ tools_options() {
     case $CHOICE in
       1)
         # Envoyer le signal SIGINT pour arrêter l'enregistrement
-        killall ffmpeg
+        killall -9 batocera-record
+        killall -9 ffmpeg
         ;;
     esac
 
