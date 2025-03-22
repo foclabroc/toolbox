@@ -15,7 +15,7 @@ start_recording() {
 
   # Afficher la fenêtre avec un bouton Stop
   CHOICE=$(dialog --title "Capture vidéo" --backtitle "Foclabroc Toolbox" \
-    --no-items \
+    --no-items --stdout \
     --menu "Capture vidéo en cours appuyez sur stop pour terminer..." 15 60 1 \
     "Stop Capture")
 
