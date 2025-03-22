@@ -55,9 +55,13 @@ tools_options() {
 
     case $CHOICE in
       1)
-        # Envoyer le signal SIGINT pour arrêter l'enregistrement
-        killall -9 batocera-record
-        killall -9 ffmpeg
+        # Vérifier si batocera-record et ffmpeg sont en cours d'exécution
+        if pgrep -x "batocera-record" > /dev/null; then
+          killall -2 batocera-record  # Envoyer SIGINT pour arrêter l'enregistrement
+        fi
+        if pgrep -x "ffmpeg" > /dev/null; then
+          killall -2 ffmpeg  # Envoyer SIGINT pour arrêter ffmpeg
+        fi
         ;;
     esac
 
