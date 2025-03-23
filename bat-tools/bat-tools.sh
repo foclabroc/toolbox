@@ -114,11 +114,13 @@ tools_options() {
           ;;
         4)
           # Retour
+		  clear
           break
 		  clear
           ;;
         *)
           # Quitter
+		  clear
           break
           clear
           ;;
