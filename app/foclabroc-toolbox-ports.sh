@@ -55,6 +55,102 @@ arch_check() {
     fi
 }
 
+tools_options() {
+  show_message() {
+    dialog --msgbox "$1" 6 50
+  }
+
+  # Fonction pour exécuter l'enregistrement
+  start_recording() {
+    # Vérifier si un enregistrement est déjà en cours
+    if [ -f /tmp/record_pid ]; then
+      show_message "Un enregistrement est déjà en cours."
+      return
+    fi
+
+    # Lancer batocera-record dans une session tmux distincte
+    tmux new-session -d -s record_session "bash -c 'batocera-record'"
+
+    # Récupérer le PID du processus en cours
+    RECORD_PID=$(pgrep -f "batocera-record" | head -n 1)
+    echo $RECORD_PID > /tmp/record_pid
+
+    # Afficher la fenêtre avec un bouton Stop
+    CHOICE=$(dialog --title "Capture vidéo" --backtitle "Foclabroc Toolbox" \
+      --no-items --stdout \
+      --menu "Capture vidéo en cours. Appuyez sur stop pour terminer..." 15 60 1 \
+      "Stop Capture")
+
+    echo "CHOICE sélectionné : $CHOICE" >> /tmp/debug_record.log  # Debugging
+
+    case $CHOICE in
+      "Stop Capture")
+        # Vérifier si la session tmux existe
+        if tmux has-session -t record_session 2>/dev/null; then
+          echo "Session tmux détectée, envoi du Ctrl+C..." >> /tmp/debug_record.log
+
+          # Envoyer un vrai Ctrl+C
+          tmux send-keys -t record_session C-c
+          sleep 2  # Attendre que le processus s'arrête
+
+          # Fermer la session
+          tmux kill-session -t record_session 2>/dev/null
+          echo "Session tmux terminée." >> /tmp/debug_record.log
+
+          # Afficher un message de confirmation
+          show_message "Capture vidéo arrêtée et enregistrée dans le dossier Recordings avec succès."
+          rm /tmp/record_pid
+        else
+          echo "Aucune session tmux trouvée." >> /tmp/debug_record.log
+          show_message "Aucun enregistrement en cours."
+        fi
+        ;;
+      *)
+        echo "CHOICE non reconnu : $CHOICE" >> /tmp/debug_record.log
+        ;;
+    esac
+  }
+
+  # Fonction pour afficher le menu principal
+  main_menu() {
+    while true; do
+      CHOICE=$(dialog --menu "Choisissez une option" 15 80 4 \
+        1 "[Screenshot] -> Prendre des captures d'écran de Batocera." \
+        2 "[Reload]     -> Actualiser la liste des jeux." \
+        3 "[Record]     -> Capturer des vidéos de l'écran de Batocera" \
+        4 "[Retour]     -> Retour au menu principal de la toolbox" \
+        2>&1 >/dev/tty)
+
+      case $CHOICE in
+        1)
+          # Option Screenshot
+          batocera-screenshot
+          show_message "Screenshot enregistré dans le dossier Screenshots avec succès."
+          ;;
+        2)
+          # Option Reload
+          curl http://127.0.0.1:1234/reloadgames
+          show_message "Liste des jeux actualisée avec succès."
+          ;;
+        3)
+          # Option Record
+          start_recording
+          ;;
+        4)
+          # Retour
+          break
+          ;;
+        *)
+          # Quitter
+          break
+          ;;
+      esac
+    done
+  }
+
+  main_menu
+}
+
 # Confirmation d'installation
 confirm_install() {
     dialog --title "Confirmation" --yesno "Voulez-vous vraiment installer $1 ?" 7 50
@@ -97,7 +193,7 @@ main_menu() {
                 ;;
             4)
                 clear
-                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/bat-tools/bat-tools.sh | bash" 
+                tools_options
                 ;;
             5)
                 confirm_install "Wine Custom" || continue

@@ -36,6 +36,25 @@ echo -e "\e[0m"
 sleep 3
 }
 
+# Vérification de la connexion Internet
+check_internet() {
+    if ! ping -c 1 8.8.8.8 &>/dev/null; then
+        dialog --title "Erreur" --msgbox "Pas de connexion Internet !" 6 40
+        exit 1
+    fi
+}
+
+# Vérification de l'architecture
+arch_check() {
+    ARCH=$(uname -m)
+    clear
+    if [ "$ARCH" != "x86_64" ]; then
+        dialog --backtitle "FOCLABROC TOOLBOX SCRIPT FOR BATOCERA" --title "Architecture $ARCH Détectée" --msgbox "\nArchitecture $ARCH Détectée.\nCe script ne peut être exécuté que sur des PC x86_64 (AMD/Intel)." 9 50
+        killall -9 xterm
+        exit 1
+    fi
+}
+
 tools_options() {
   show_message() {
     dialog --msgbox "$1" 6 50
@@ -43,30 +62,53 @@ tools_options() {
 
   # Fonction pour exécuter l'enregistrement
   start_recording() {
-    # Lancer batocera-record en arrière-plan
-    batocera-record &>/dev/null &
-    RECORD_PID=$!
+    # Vérifier si un enregistrement est déjà en cours
+    if [ -f /tmp/record_pid ]; then
+      show_message "Un enregistrement est déjà en cours."
+      return
+    fi
+
+    # Lancer batocera-record dans une session tmux distincte
+    tmux new-session -d -s record_session "bash -c 'batocera-record'"
+
+    # Récupérer le PID du processus en cours
+    RECORD_PID=$(pgrep -f "batocera-record" | head -n 1)
+    echo $RECORD_PID > /tmp/record_pid
 
     # Afficher la fenêtre avec un bouton Stop
     CHOICE=$(dialog --title "Capture vidéo" --backtitle "Foclabroc Toolbox" \
       --no-items --stdout \
-      --menu "Capture vidéo en cours appuyez sur stop pour terminer..." 15 60 1 \
+      --menu "Capture vidéo en cours. Appuyez sur stop pour terminer..." 15 60 1 \
       "Stop Capture")
 
+    echo "CHOICE sélectionné : $CHOICE" >> /tmp/debug_record.log  # Debugging
+
     case $CHOICE in
-      1)
-        # Vérifier si batocera-record et ffmpeg sont en cours d'exécution
-        if pgrep -x "batocera-record" > /dev/null; then
-          killall -2 batocera-record  # Envoyer SIGINT pour arrêter l'enregistrement
-        fi
-        if pgrep -x "ffmpeg" > /dev/null; then
-          killall -2 ffmpeg  # Envoyer SIGINT pour arrêter ffmpeg
+      "Stop Capture")
+        # Vérifier si la session tmux existe
+        if tmux has-session -t record_session 2>/dev/null; then
+          echo "Session tmux détectée, envoi du Ctrl+C..." >> /tmp/debug_record.log
+
+          # Envoyer un vrai Ctrl+C
+          tmux send-keys -t record_session C-c
+          sleep 2  # Attendre que le processus s'arrête
+
+          # Fermer la session
+          tmux kill-session -t record_session 2>/dev/null
+          echo "Session tmux terminée." >> /tmp/debug_record.log
+
+          # Afficher un message de confirmation
+          show_message "Capture vidéo arrêtée et enregistrée dans le dossier Recordings avec succès."
+          rm /tmp/record_pid
+        else
+          echo "Aucune session tmux trouvée." >> /tmp/debug_record.log
+          show_message "Aucun enregistrement en cours."
         fi
         ;;
+      *)
+        echo "CHOICE non reconnu : $CHOICE" >> /tmp/debug_record.log
+        ;;
     esac
-
-    # Afficher le message de fin
-    show_message "Capture vidéo enregistrée dans le dossier Recordings avec succès."
   }
 
   # Fonction pour afficher le menu principal
@@ -96,7 +138,6 @@ tools_options() {
           ;;
         4)
           # Retour
-          dialog --title "Retour" --msgbox "Retour au menu principal." 6 40
           break
           ;;
         *)
@@ -108,25 +149,6 @@ tools_options() {
   }
 
   main_menu
-}
-
-# Vérification de la connexion Internet
-check_internet() {
-    if ! ping -c 1 8.8.8.8 &>/dev/null; then
-        dialog --title "Erreur" --msgbox "Pas de connexion Internet !" 6 40
-        exit 1
-    fi
-}
-
-# Check de l'architecture
-arch_check() {
-    ARCH=$(uname -m)
-    clear
-    if [ "$ARCH" != "x86_64" ]; then
-        dialog --backtitle "FOCLABROC TOOLBOX SCRIPT FOR BATOCERA" --title "Architecture $ARCH Détectée" --msgbox "\nArchitecture $ARCH Détectée.\nCe script ne peut être exécuté que sur des PC x86_64 (AMD/Intel)." 9 50
-        killall -9 xterm
-        exit 1
-    fi
 }
 
 # Confirmation d'installation
@@ -149,8 +171,7 @@ main_menu() {
             6 "Flatpak Linux Games -> Installe des jeux Linux via Flatpak" \
             7 "Other Freeware Games -> Jeux Linux & Windows (Wine)" \
             8 "Install Portmaster -> Gestionnaire de ports pour Batocera" \
-            9 "Install This Menu to Ports -> Ajoute ce menu aux ports Batocera" \
-            10 "Exit -> Quitter le script" \
+            9 "Exit -> Quitter le script" \
             2>&1 >/dev/tty)
         clear
 
@@ -158,17 +179,17 @@ main_menu() {
             1)
                 confirm_install "Nintendo Switch" || continue
                 clear
-                curl -Ls bit.ly/foclabroc-switch-all | bash
+                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls bit.ly/foclabroc-switch-all | bash" 
                 ;;
             2)
                 confirm_install "Youtube TV" || continue
                 clear
-                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/youtubetv/youtubetv.sh | bash
+                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/youtubetv/youtubetv.sh | bash" 
                 ;;
             3)
                 confirm_install "Gparted" || continue
                 clear
-                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/gparted/gparted.sh | bash
+                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/gparted/gparted.sh | bash" 
                 ;;
             4)
                 clear
@@ -191,11 +212,6 @@ main_menu() {
                 curl -Ls https://github.com/trashbus99/profork/raw/master/portmaster/install.sh | bash
                 ;;
             9)
-                confirm_install "Ports Installer" || continue 
-                clear
-                wget -q --tries=30 --no-check-certificate -O /tmp/runner https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/install-to-port.sh && chmod +x /tmp/runner && bash /tmp/runner
-                ;;
-            10)
                 # Afficher un message de remerciement
                 dialog --title "Quitter" --msgbox "Merci d'avoir utilisé le script !" 6 40
                 killall -9 xterm
@@ -203,7 +219,7 @@ main_menu() {
                 exit 0
                 ;;
             *)
-                dialog --title "Quitter" --msgbox "\nMerci d'avoir utilisé le script !" 6 40
+                dialog --title "Quitter" --msgbox "Merci d'avoir utilisé le script !" 6 40
                 killall -9 xterm
                 clear
                 exit 0
