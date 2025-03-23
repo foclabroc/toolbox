@@ -115,10 +115,12 @@ tools_options() {
         4)
           # Retour
           break
+		  clear
           ;;
         *)
           # Quitter
           break
+          clear
           ;;
       esac
     done
