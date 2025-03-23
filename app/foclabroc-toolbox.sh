@@ -127,6 +127,7 @@ tools_options() {
   stop_recording() {
     if tmux has-session -t record_session 2>/dev/null; then
       tmux send-keys -t record_session C-c
+      sleep 2
       tmux kill-session -t record_session 2>/dev/null
       rm /tmp/record_pid
       show_message "Capture vidéo enregistrée avec succès."
