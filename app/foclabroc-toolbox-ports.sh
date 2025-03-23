@@ -91,7 +91,6 @@ tools_options() {
 
           # Envoyer un vrai Ctrl+C
           tmux send-keys -t record_session C-c
-          sleep 2  # Attendre que le processus s'arrête
 
           # Fermer la session
           tmux kill-session -t record_session 2>/dev/null
