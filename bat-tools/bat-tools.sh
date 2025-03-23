@@ -125,7 +125,7 @@ tools_options() {
       esac
     done
   }
-
+  clear
   main_menu
 }
 
