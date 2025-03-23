@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# Fonction pour afficher un message pendant 2 secondes
-show_message() {
-  dialog --msgbox "$1" 6 50
-  sleep 2
-}
-
 tools_options() {
   show_message() {
     dialog --msgbox "$1" 6 50
