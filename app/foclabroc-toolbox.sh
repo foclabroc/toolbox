@@ -60,54 +60,79 @@ tools_options() {
     dialog --msgbox "$1" 6 50
   }
 
-  # Fonction pour exécuter l'enregistrement
-  start_recording() {
-    # Vérifier si un enregistrement est déjà en cours
+# Fonction pour exécuter l'enregistrement avec sous-menu
+  start_recording_menu() {
+    CHOICE=$(dialog --menu "Choisissez une option d'enregistrement" 15 60 4 \
+      1 "Record manuel (avec bouton Stop)" \
+      2 "Record 15 secondes (arrêt auto)" \
+      3 "Record 35 secondes (arrêt auto)" \
+      4 "Retour" \
+      2>&1 >/dev/tty)
+
+    case $CHOICE in
+      1)
+        start_recording_manual
+        ;;
+      2)
+        start_recording_auto 15
+        ;;
+      3)
+        start_recording_auto 35
+        ;;
+      4)
+        return
+        ;;
+    esac
+  }
+
+  # Fonction pour l'enregistrement manuel
+  start_recording_manual() {
     if [ -f /tmp/record_pid ]; then
       show_message "Un enregistrement est déjà en cours."
       return
     fi
 
-    # Lancer batocera-record dans une session tmux distincte
     tmux new-session -d -s record_session "bash -c 'batocera-record'"
-
-    # Récupérer le PID du processus en cours
     RECORD_PID=$(pgrep -f "batocera-record" | head -n 1)
     echo $RECORD_PID > /tmp/record_pid
 
-    # Afficher la fenêtre avec un bouton Stop
     CHOICE=$(dialog --title "Capture vidéo" --backtitle "Foclabroc Toolbox" \
       --no-items --stdout \
-      --menu "Capture vidéo en cours. Appuyez sur stop pour terminer..." 15 60 1 \
+      --menu "Capture vidéo en cours. Appuyez sur Stop pour terminer..." 15 60 1 \
       "Stop Capture")
 
-    echo "CHOICE sélectionné : $CHOICE" >> /tmp/debug_record.log  # Debugging
+    if [ "$CHOICE" == "Stop Capture" ]; then
+      stop_recording
+    fi
+  }
 
-    case $CHOICE in
-      "Stop Capture")
-        # Vérifier si la session tmux existe
-        if tmux has-session -t record_session 2>/dev/null; then
-          echo "Session tmux détectée, envoi du Ctrl+C..." >> /tmp/debug_record.log
+  # Fonction pour l'enregistrement automatique avec arrêt après X secondes
+  start_recording_auto() {
+    DURATION=$1
+    if [ -f /tmp/record_pid ]; then
+      show_message "Un enregistrement est déjà en cours."
+      return
+    fi
 
-          # Envoyer un vrai Ctrl+C
-          tmux send-keys -t record_session C-c
+    tmux new-session -d -s record_session "bash -c 'batocera-record'"
+    RECORD_PID=$(pgrep -f "batocera-record" | head -n 1)
+    echo $RECORD_PID > /tmp/record_pid
 
-          # Fermer la session
-          tmux kill-session -t record_session 2>/dev/null
-          echo "Session tmux terminée." >> /tmp/debug_record.log
+    dialog --infobox "Capture de $DURATION secondes en cours. Veuillez patienter..." 6 50
+    sleep $DURATION
+    stop_recording
+  }
 
-          # Afficher un message de confirmation
-          show_message "Capture vidéo arrêtée et enregistrée dans le dossier Recordings avec succès."
-          rm /tmp/record_pid
-        else
-          echo "Aucune session tmux trouvée." >> /tmp/debug_record.log
-          show_message "Aucun enregistrement en cours."
-        fi
-        ;;
-      *)
-        echo "CHOICE non reconnu : $CHOICE" >> /tmp/debug_record.log
-        ;;
-    esac
+  # Fonction pour arrêter l'enregistrement
+  stop_recording() {
+    if tmux has-session -t record_session 2>/dev/null; then
+      tmux send-keys -t record_session C-c
+      tmux kill-session -t record_session 2>/dev/null
+      rm /tmp/record_pid
+      show_message "Capture vidéo enregistrée avec succès."
+    else
+      show_message "Aucun enregistrement en cours."
+    fi
   }
 
   # Fonction pour afficher le menu principal
@@ -133,7 +158,7 @@ tools_options() {
           ;;
         3)
           # Option Record
-          start_recording
+          start_recording_menu
           ;;
         4)
           # Retour
