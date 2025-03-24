@@ -62,7 +62,7 @@ tools_options() {
 
 # Fonction pour exécuter l'enregistrement avec sous-menu
   start_recording_menu() {
-    CHOICE=$(dialog --backtitle "Foclabroc Toolbox" --menu "Choisissez une option d'enregistrement :" 15 60 4 \
+    CHOICE=$(dialog --backtitle "Foclabroc Toolbox" --menu "\nChoisissez une option d'enregistrement :\n" 15 60 4 \
       1 "Record manuel (avec bouton Stop)" \
       2 "Record 15 secondes (arrêt auto)" \
       3 "Record 35 secondes (arrêt auto)" \
@@ -141,7 +141,7 @@ tools_options() {
   # Fonction pour afficher le menu principal
   main_menu() {
     while true; do
-      CHOICE=$(dialog --backtitle "Foclabroc Toolbox" --menu "Choisissez une option" 15 80 4 \
+      CHOICE=$(dialog --backtitle "Foclabroc Toolbox" --menu "\nChoisissez une option :\n" 15 80 4 \
         1 "[Screenshot] -> Prendre des captures d'écran de Batocera." \
         2 "[Reload]     -> Actualiser la liste des jeux." \
         3 "[Record]     -> Capturer des vidéos de l'écran de Batocera" \
@@ -157,7 +157,7 @@ tools_options() {
         2)
           # Option Reload
           curl http://127.0.0.1:1234/reloadgames
-          show_message "Liste des jeux actualisée avec succès."
+          show_message "\nListe des jeux actualisée avec succès."
           ;;
         3)
           # Option Record
