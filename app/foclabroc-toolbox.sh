@@ -99,7 +99,7 @@ tools_options() {
     CHOICE=$(dialog --title "Capture vidéo" --backtitle "Foclabroc Toolbox" \
       --no-items --stdout \
       --menu "\nCapture vidéo en cours. Appuyez sur Stop pour terminer...\n" 9 60 1 \
-      "\nStop Capture")
+      "Stop Capture")
 
     if [ "$CHOICE" == "Stop Capture" ]; then
       stop_recording
