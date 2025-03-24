@@ -141,7 +141,7 @@ tools_options() {
 show_batocera_info() {
     echo "" > /tmp/batocera_info.txt
     batocera-info >> /tmp/batocera_info.txt
-    dialog --title "Information Système" --backtitle "Foclabroc Toolbox" --textbox /tmp/batocera_info.txt 18 60
+    dialog --title "Information Système" --backtitle "Foclabroc Toolbox" --textbox /tmp/batocera_info.txt 21 45
     rm /tmp/batocera_info.txt
 }
 
