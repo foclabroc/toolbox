@@ -139,8 +139,9 @@ tools_options() {
 
 # Fonction pour afficher les infos systeme
 show_batocera_info() {
-    batocera-info > /tmp/batocera_info.txt
-    dialog --title "Information Système" --backtitle "Foclabroc Toolbox" --textbox /tmp/batocera_info.txt 25 90
+    echo "" > /tmp/batocera_info.txt
+    batocera-info >> /tmp/batocera_info.txt
+    dialog --title "Information Système" --backtitle "Foclabroc Toolbox" --textbox /tmp/batocera_info.txt 18 60
     rm /tmp/batocera_info.txt
 }
 
