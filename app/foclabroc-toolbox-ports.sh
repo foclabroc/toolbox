@@ -239,13 +239,13 @@ main_menu() {
                 ;;
             9)
                 # Afficher un message de remerciement
-                dialog --title "Quitter" --msgbox "Merci d'avoir utilisé le script !" 6 40
+                dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --msgbox "Merci d'avoir utilisé le script !" 7 40
                 killall -9 xterm
                 clear
                 exit 0
                 ;;
             *)
-                dialog --title "Quitter" --msgbox "Merci d'avoir utilisé le script !" 6 40
+                dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --msgbox "Merci d'avoir utilisé le script !" 7 40
                 killall -9 xterm
                 clear
                 exit 0

@@ -54,13 +54,13 @@ arch_check() {
         exit 1
     fi
 }
-
+# Fonction pour le sous-menu Tools
 tools_options() {
   show_message() {
     dialog --backtitle "Foclabroc Toolbox" --msgbox "$1" 7 50
   }
 
-# Fonction pour exécuter l'enregistrement avec sous-menu
+  # Fonction pour exécuter l'enregistrement avec sous-menu
   start_recording_menu() {
     CHOICE=$(dialog --backtitle "Foclabroc Toolbox" --menu "\nChoisissez une option d'enregistrement :\n " 15 60 4 \
       1 "Record manuel (avec bouton Stop)" \
@@ -137,6 +137,12 @@ tools_options() {
     start_recording_menu  # Retour automatique au sous-menu d'enregistrement
   }
 
+# Fonction pour afficher les infos systeme
+show_batocera_info() {
+    INFO=$(batocera-info 2>&1)  # Exécute la commande et capture la sortie
+    dialog --backtitle "Foclabroc Toolbox" --msgbox "$INFO" 20 80
+}
+
   # Fonction pour afficher le menu principal
   main_menu() {
     while true; do
@@ -144,7 +150,8 @@ tools_options() {
         1 "[Screenshot] -> Prendre des captures d'écran de Batocera." \
         2 "[Reload]     -> Actualiser la liste des jeux." \
         3 "[Record]     -> Capturer des vidéos de l'écran de Batocera" \
-        4 "[Retour]     -> Retour au menu principal de la toolbox" \
+        4 "[Infos]      -> Afficher les informations système de Batocera." \
+        5 "[Retour]     -> Retour au menu principal de la toolbox" \
         2>&1 >/dev/tty)
 
       case $CHOICE in
@@ -163,6 +170,10 @@ tools_options() {
           start_recording_menu
           ;;
         4)
+          # Option Info systeme
+          show_batocera_info
+          ;;
+        5)
           # Retour
           break
           ;;
