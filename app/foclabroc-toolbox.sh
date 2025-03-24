@@ -130,7 +130,7 @@ tools_options() {
       sleep 2 #pour eviter la corruption de la capture
       tmux kill-session -t record_session 2>/dev/null
       rm /tmp/record_pid
-      show_message "\nCapture vidéo enregistrée avec succès.\n"
+      show_message "\nCapture vidéo enregistrée avec succès dans le dossier Recordings.\n"
     else
       show_message "\nAucun enregistrement en cours.\n"
     fi
@@ -258,7 +258,7 @@ main_menu() {
                 ;;
             10)
                 # Afficher un message de remerciement
-                dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --msgbox "Merci d'avoir utilisé le script !" 7 40
+                dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --msgbox "\nMerci d'avoir utilisé le script !" 7 40
                 killall -9 xterm
                 clear
                 exit 0
