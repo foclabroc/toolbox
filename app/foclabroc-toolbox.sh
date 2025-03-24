@@ -98,8 +98,8 @@ tools_options() {
 
     CHOICE=$(dialog --title "Capture vidéo" --backtitle "Foclabroc Toolbox" \
       --no-items --stdout \
-      --menu "Capture vidéo en cours. Appuyez sur Stop pour terminer..." 15 60 1 \
-      "Stop Capture")
+      --menu "\nCapture vidéo en cours. Appuyez sur Stop pour terminer...\n" 9 60 1 \
+      "\nStop Capture")
 
     if [ "$CHOICE" == "Stop Capture" ]; then
       stop_recording
@@ -130,9 +130,9 @@ tools_options() {
       sleep 2 #pour eviter la corruption de la capture
       tmux kill-session -t record_session 2>/dev/null
       rm /tmp/record_pid
-      show_message "\nCapture vidéo enregistrée avec succès."
+      show_message "\nCapture vidéo enregistrée avec succès.\n"
     else
-      show_message "\nAucun enregistrement en cours."
+      show_message "\nAucun enregistrement en cours.\n"
     fi
   }
 
@@ -150,12 +150,12 @@ tools_options() {
         1)
           # Option Screenshot
           batocera-screenshot
-          show_message "\nScreenshot enregistré dans le dossier Screenshots avec succès."
+          show_message "Screenshot enregistré dans le dossier Screenshots avec succès."
           ;;
         2)
           # Option Reload
           curl http://127.0.0.1:1234/reloadgames
-          show_message "\nListe des jeux actualisée avec succès."
+          show_message "Liste des jeux actualisée avec succès."
           ;;
         3)
           # Option Record
@@ -244,13 +244,13 @@ main_menu() {
                 ;;
             10)
                 # Afficher un message de remerciement
-                dialog --title "Quitter" --msgbox "Merci d'avoir utilisé le script !" 6 40
+                dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --msgbox "Merci d'avoir utilisé le script !" 7 40
                 killall -9 xterm
                 clear
                 exit 0
                 ;;
             *)
-                dialog --title "Quitter" --msgbox "\nMerci d'avoir utilisé le script !" 6 40
+                dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --msgbox "\nMerci d'avoir utilisé le script !" 7 40
                 killall -9 xterm
                 clear
                 exit 0
