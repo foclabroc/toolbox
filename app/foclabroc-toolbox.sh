@@ -57,12 +57,12 @@ arch_check() {
 
 tools_options() {
   show_message() {
-    dialog --backtitle "Foclabroc Toolbox" --msgbox "$1" 6 50
+    dialog --backtitle "Foclabroc Toolbox" --msgbox "$1" 7 50
   }
 
 # Fonction pour exécuter l'enregistrement avec sous-menu
   start_recording_menu() {
-    CHOICE=$(dialog --backtitle "Foclabroc Toolbox" --menu "Choisissez une option d'enregistrement" 15 60 4 \
+    CHOICE=$(dialog --backtitle "Foclabroc Toolbox" --menu "Choisissez une option d'enregistrement :" 15 60 4 \
       1 "Record manuel (avec bouton Stop)" \
       2 "Record 15 secondes (arrêt auto)" \
       3 "Record 35 secondes (arrêt auto)" \
@@ -98,7 +98,7 @@ tools_options() {
 
     CHOICE=$(dialog --title "Capture vidéo" --backtitle "Foclabroc Toolbox" \
       --no-items --stdout \
-      --menu "\nCapture vidéo en cours. Appuyez sur Stop pour terminer...\n" 9 60 1 \
+      --menu "\nCapture vidéo en cours. Appuyez sur Stop pour terminer...\n" 10 60 1 \
       "Stop Capture")
 
     if [ "$CHOICE" == "Stop Capture" ]; then
@@ -131,8 +131,10 @@ tools_options() {
       tmux kill-session -t record_session 2>/dev/null
       rm /tmp/record_pid
       show_message "\nCapture vidéo enregistrée avec succès.\n"
+	  return
     else
       show_message "\nAucun enregistrement en cours.\n"
+	  return
     fi
   }
 
