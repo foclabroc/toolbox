@@ -127,7 +127,7 @@ tools_options() {
   stop_recording() {
     if tmux has-session -t record_session 2>/dev/null; then
       tmux send-keys -t record_session C-c
-      sleep 2
+      sleep 2 #pour eviter la corruption de la capture
       tmux kill-session -t record_session 2>/dev/null
       rm /tmp/record_pid
       show_message "Capture vidéo enregistrée avec succès."
@@ -196,7 +196,8 @@ main_menu() {
             6 "Flatpak Linux Games -> Installe des jeux Linux via Flatpak" \
             7 "Other Freeware Games -> Jeux Linux & Windows (Wine)" \
             8 "Install Portmaster -> Gestionnaire de ports pour Batocera" \
-            9 "Exit -> Quitter le script" \
+            9 "Install This Menu to Ports -> Ajoute ce menu aux ports Batocera" \
+            10 "Exit -> Quitter le script" \
             2>&1 >/dev/tty)
         clear
 
@@ -204,17 +205,17 @@ main_menu() {
             1)
                 confirm_install "Nintendo Switch" || continue
                 clear
-                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls bit.ly/foclabroc-switch-all | bash" 
+                curl -Ls bit.ly/foclabroc-switch-all | bash
                 ;;
             2)
                 confirm_install "Youtube TV" || continue
                 clear
-                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/youtubetv/youtubetv.sh | bash" 
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/youtubetv/youtubetv.sh | bash
                 ;;
             3)
                 confirm_install "Gparted" || continue
                 clear
-                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/gparted/gparted.sh | bash" 
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/gparted/gparted.sh | bash
                 ;;
             4)
                 clear
@@ -237,6 +238,11 @@ main_menu() {
                 curl -Ls https://github.com/trashbus99/profork/raw/master/portmaster/install.sh | bash
                 ;;
             9)
+                confirm_install "Ports Installer" || continue 
+                clear
+                wget -q --tries=30 --no-check-certificate -O /tmp/runner https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/install-to-port.sh && chmod +x /tmp/runner && bash /tmp/runner
+                ;;
+            10)
                 # Afficher un message de remerciement
                 dialog --title "Quitter" --msgbox "Merci d'avoir utilisé le script !" 6 40
                 killall -9 xterm
@@ -244,7 +250,7 @@ main_menu() {
                 exit 0
                 ;;
             *)
-                dialog --title "Quitter" --msgbox "Merci d'avoir utilisé le script !" 6 40
+                dialog --title "Quitter" --msgbox "\nMerci d'avoir utilisé le script !" 6 40
                 killall -9 xterm
                 clear
                 exit 0
