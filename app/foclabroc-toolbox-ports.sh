@@ -139,8 +139,9 @@ tools_options() {
 
 # Fonction pour afficher les infos systeme
 show_batocera_info() {
-    INFO=$(batocera-info 2>&1)  # Exécute la commande et capture la sortie
-    dialog --title "Information Systeme" --backtitle "Foclabroc Toolbox" --programbox "$INFO" 20 80
+    batocera-info > /tmp/batocera_info.txt
+    dialog --title "Information Système" --backtitle "Foclabroc Toolbox" --textbox /tmp/batocera_info.txt 25 90
+    rm /tmp/batocera_info.txt
 }
 
   # Fonction pour afficher le menu principal
