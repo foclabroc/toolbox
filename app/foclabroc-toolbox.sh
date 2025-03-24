@@ -131,11 +131,10 @@ tools_options() {
       tmux kill-session -t record_session 2>/dev/null
       rm /tmp/record_pid
       show_message "\nCapture vidéo enregistrée avec succès.\n"
-	  return
     else
       show_message "\nAucun enregistrement en cours.\n"
-	  return
     fi
+    start_recording_menu  # Retour automatique au sous-menu d'enregistrement
   }
 
   # Fonction pour afficher le menu principal
