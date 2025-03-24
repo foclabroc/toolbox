@@ -98,7 +98,7 @@ tools_options() {
 
     CHOICE=$(dialog --title "Capture vidéo" --backtitle "Foclabroc Toolbox" \
       --no-items --stdout \
-      --menu "\nCapture vidéo en cours. Appuyez sur Stop pour terminer...\n " 10 60 1 \
+      --menu "\nCapture vidéo en cours. Appuyez sur Stop pour terminer... " 10 60 1 \
       "Stop Capture")
 
     if [ "$CHOICE" == "Stop Capture" ]; then
@@ -130,7 +130,7 @@ tools_options() {
       sleep 2 #pour eviter la corruption de la capture
       tmux kill-session -t record_session 2>/dev/null
       rm /tmp/record_pid
-      show_message "\nCapture vidéo enregistrée avec succès dans le dossier Recordings.\n"
+      show_message "Capture vidéo enregistrée avec succès dans le dossier Recordings.\n"
     else
       show_message "\nAucun enregistrement en cours.\n"
     fi
