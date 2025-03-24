@@ -39,7 +39,7 @@ sleep 3
 # Vérification de la connexion Internet
 check_internet() {
     if ! ping -c 1 8.8.8.8 &>/dev/null; then
-        dialog --title "Erreur" --msgbox "Pas de connexion Internet !" 6 40
+        dialog --backtitle "Foclabroc Toolbox" --title "Erreur" --msgbox "Pas de connexion Internet !" 6 40
         exit 1
     fi
 }
@@ -57,12 +57,12 @@ arch_check() {
 
 tools_options() {
   show_message() {
-    dialog --msgbox "$1" 6 50
+    dialog --backtitle "Foclabroc Toolbox" --msgbox "$1" 6 50
   }
 
 # Fonction pour exécuter l'enregistrement avec sous-menu
   start_recording_menu() {
-    CHOICE=$(dialog --menu "Choisissez une option d'enregistrement" 15 60 4 \
+    CHOICE=$(dialog --backtitle "Foclabroc Toolbox" --menu "Choisissez une option d'enregistrement" 15 60 4 \
       1 "Record manuel (avec bouton Stop)" \
       2 "Record 15 secondes (arrêt auto)" \
       3 "Record 35 secondes (arrêt auto)" \
@@ -88,7 +88,7 @@ tools_options() {
   # Fonction pour l'enregistrement manuel
   start_recording_manual() {
     if [ -f /tmp/record_pid ]; then
-      show_message "Un enregistrement est déjà en cours."
+      show_message "\nUn enregistrement est déjà en cours."
       return
     fi
 
@@ -110,7 +110,7 @@ tools_options() {
   start_recording_auto() {
     DURATION=$1
     if [ -f /tmp/record_pid ]; then
-      show_message "Un enregistrement est déjà en cours."
+      show_message "\nUn enregistrement est déjà en cours."
       return
     fi
 
@@ -118,7 +118,7 @@ tools_options() {
     RECORD_PID=$(pgrep -f "batocera-record" | head -n 1)
     echo $RECORD_PID > /tmp/record_pid
 
-    dialog --infobox "Capture de $DURATION secondes en cours. Veuillez patienter..." 6 50
+    dialog --infobox "\nCapture de $DURATION secondes en cours. Veuillez patienter..." 6 50
     sleep $DURATION
     stop_recording
   }
@@ -130,16 +130,16 @@ tools_options() {
       sleep 2 #pour eviter la corruption de la capture
       tmux kill-session -t record_session 2>/dev/null
       rm /tmp/record_pid
-      show_message "Capture vidéo enregistrée avec succès."
+      show_message "\nCapture vidéo enregistrée avec succès."
     else
-      show_message "Aucun enregistrement en cours."
+      show_message "\nAucun enregistrement en cours."
     fi
   }
 
   # Fonction pour afficher le menu principal
   main_menu() {
     while true; do
-      CHOICE=$(dialog --menu "Choisissez une option" 15 80 4 \
+      CHOICE=$(dialog --backtitle "Foclabroc Toolbox" --menu "Choisissez une option" 15 80 4 \
         1 "[Screenshot] -> Prendre des captures d'écran de Batocera." \
         2 "[Reload]     -> Actualiser la liste des jeux." \
         3 "[Record]     -> Capturer des vidéos de l'écran de Batocera" \
@@ -150,12 +150,12 @@ tools_options() {
         1)
           # Option Screenshot
           batocera-screenshot
-          show_message "Screenshot enregistré dans le dossier Screenshots avec succès."
+          show_message "\nScreenshot enregistré dans le dossier Screenshots avec succès."
           ;;
         2)
           # Option Reload
           curl http://127.0.0.1:1234/reloadgames
-          show_message "Liste des jeux actualisée avec succès."
+          show_message "\nListe des jeux actualisée avec succès."
           ;;
         3)
           # Option Record
@@ -178,7 +178,7 @@ tools_options() {
 
 # Confirmation d'installation
 confirm_install() {
-    dialog --title "Confirmation" --yesno "Voulez-vous vraiment installer $1 ?" 7 50
+    dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "Voulez-vous vraiment installer $1 ?" 7 50
     return $?
 }
 
