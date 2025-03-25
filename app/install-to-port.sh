@@ -30,7 +30,7 @@ chmod +x /userdata/roms/ports/foclabroc-tools.sh
 echo "Refreshing Ports menu..."
 curl http://127.0.0.1:1234/reloadgames
 
-# Add an entry to gamelist.xml
+# Add an entry to gamelist.xml#################################xmledit#########################################################
 ports_dir="/userdata/roms/ports"
 mkdir -p "$ports_dir"
 echo "Adding YouTube TV entry to gamelist.xml..."
@@ -39,12 +39,16 @@ screenshot_url="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/m
 screenshot_path="$ports_dir/images/foctool-screenshot.jpg"
 logo_url="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/foctool-wheel.png"
 logo_path="$ports_dir/images/foctool-wheel.png"
+box_url="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/foctool-box.png"
+box_path="$ports_dir/images/foctool-box.png"
 
 # Ensure the logo directory exists and download the logo
 mkdir -p "$(dirname "$logo_path")"
 curl -L -o "$logo_path" "$logo_url"
 mkdir -p "$(dirname "$screenshot_path")"
 curl -L -o "$screenshot_path" "$screenshot_url"
+mkdir -p "$(dirname "$box_path")"
+curl -L -o "$box_path" "$box_url"
 
 # Ensure the gamelist.xml exists
 if [ ! -f "$gamelist_file" ]; then
@@ -94,11 +98,15 @@ xmlstarlet ed -L \
     -s "/gameList/game[last()]" -t elem -n "desc" -v "Boite à outils de Foclabroc permettant l'installation facile de divers pack et outils pour Batocera Linux " \
     -s "/gameList/game[last()]" -t elem -n "developer" -v "Foclabroc" \
     -s "/gameList/game[last()]" -t elem -n "publisher" -v "Foclabroc" \
+    -s "/gameList/game[last()]" -t elem -n "genre" -v "Toolbox" \
+    -s "/gameList/game[last()]" -t elem -n "rating" -v "1.00" \
     -s "/gameList/game[last()]" -t elem -n "region" -v "eu" \
     -s "/gameList/game[last()]" -t elem -n "lang" -v "fr" \
     -s "/gameList/game[last()]" -t elem -n "image" -v "./images/foctool-screenshot.jpg" \
     -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/foctool-wheel.png" \
+    -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/foctool-box.png" \
     "$gamelist_file"
+# Add an entry to gamelist.xml#################################xmledit#########################################################
 
 killall -9 emulationstation
 
