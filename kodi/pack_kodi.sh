@@ -1,6 +1,5 @@
 #!/bin/bash
 
-clear
 # Définir l'URL du fichier ZIP
 ZIP_URL="https://github.com/foclabroc/toolbox/releases/download/Fichiers/kodi.zip"
 
@@ -22,6 +21,8 @@ if [ $? -ne 0 ]; then
     exit 0
 fi
 
+clear
+
 # Vérifier si le dossier Kodi existe, puis le supprimer
 if [ -d "$KODI_DIR" ]; then
     echo "Suppression du dossier .Kodi..."
@@ -35,9 +36,17 @@ wget -q --show-progress -O /tmp/kodi.zip "$ZIP_URL"
 
 # Vérifier si le téléchargement a réussi
 if [ $? -eq 0 ]; then
-    echo "Téléchargement réussi. Extraction en cours..."
-    unzip -o /tmp/kodi.zip -d /userdata/system/ | pv -lep -s $(unzip -l /tmp/kodi.zip | wc -l) > /dev/null
-    echo "Extraction terminée."
+    echo "Extraction en cours..."
+    TOTAL_FILES=$(unzip -l /tmp/kodi.zip | wc -l)
+    COUNT=0
+
+unzip -o /tmp/kodi.zip -d /userdata/system/ | while read line; do
+    COUNT=$((COUNT + 1))
+    PERCENT=$((COUNT * 100 / TOTAL_FILES))
+    echo -ne "Progression : $PERCENT%\r"
+done
+
+echo -e "\nExtraction terminée."
     sleep 2
 else
     echo "Échec du téléchargement."
