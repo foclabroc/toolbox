@@ -201,17 +201,18 @@ main_menu() {
     while true; do
         main_menu=$(dialog --clear --backtitle "Foclabroc Toolbox" \
             --title "Menu Principal" \
-            --menu "\nSélectionnez une option :\n " 25 85 10 \
+            --menu "\nSélectionnez une option :\n " 25 85 11 \
             1 "[Nintendo Switch] -> Installer l'émulation Switch sur Batocera" \
             2 "[Youtube TV]      -> Installer Youtube TV" \
             3 "[Gparted]         -> Installer Gparted" \
-            4 "[Tools]           -> Outils pour Batocera. Screenshot, Records..." \
-            5 "Wine Custom -> Télécharge une version optimisée de Wine" \
-            6 "Flatpak Linux Games -> Installe des jeux Linux via Flatpak" \
-            7 "Other Freeware Games -> Jeux Linux & Windows (Wine)" \
-            8 "Install Portmaster -> Gestionnaire de ports pour Batocera" \
-            9 "Install This Menu to Ports -> Ajoute ce menu aux ports Batocera" \
-            10 "Exit -> Quitter le script" \
+            4 "[Pack Kodi]       -> Installe le pack streaming/iptv kodi foclabroc" \
+            5 "[Tools]           -> Outils pour Batocera. Screenshot, Records..." \
+            6 "Wine Custom -> Télécharge une version optimisée de Wine" \
+            7 "Wine Custom3 -> Télécharge une version optimisée de Wine" \
+            8 "Other Freeware Games -> Jeux Linux & Windows (Wine)" \
+            9 "Install Portmaster -> Gestionnaire de ports pour Batocera" \
+            10 "Install This Menu to Ports -> Ajoute ce menu aux ports Batocera" \
+            11 "Exit -> Quitter le script" \
             2>&1 >/dev/tty)
         clear
 
@@ -232,31 +233,36 @@ main_menu() {
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/gparted/gparted.sh | bash
                 ;;
             4)
+                confirm_install "Pack Kodi" || continue
+                clear
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/kodi/pack_kodi.sh | bash
+                ;;
+            5)
                 clear
                 tools_options
                 ;;
-            5)
+            6)
                 confirm_install "Wine Custom" || continue
                 curl -Ls https://github.com/trashbus99/profork/raw/master/wine-custom/wine.sh | bash
                 ;;
-            6)
+            7)
                 confirm_install "Flatpak Linux Games" || continue
                 curl -Ls https://raw.githubusercontent.com/trashbus99/profork/master/app/fpg.sh | bash
                 ;;
-            7)
+            8)
                 confirm_install "Other Linux & Windows/Wine Freeware" || continue
                 curl -Ls https://github.com/trashbus99/profork/raw/master/app/wquashfs.sh | bash
                 ;;
-            8)
+            9)
                 confirm_install "Portmaster Installer" || continue
                 curl -Ls https://github.com/trashbus99/profork/raw/master/portmaster/install.sh | bash
                 ;;
-            9)
+            10)
                 confirm_install "Ports Installer" || continue 
                 clear
                 wget -q --tries=30 --no-check-certificate -O /tmp/runner https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/install-to-port.sh && chmod +x /tmp/runner && bash /tmp/runner
                 ;;
-            10)
+            11)
                 # Afficher un message de remerciement
                 dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --msgbox "\nMerci d'avoir utilisé le script !" 7 40
                 killall -9 xterm
