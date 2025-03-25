@@ -8,11 +8,12 @@ KODI_DIR="/userdata/system/.kodi"
 
 # Affichage d'une boîte de dialogue de confirmation
 dialog --backtitle "Foclabroc Toolbox" --title "Pack Kodi" \
---yesno "Script d'installation pack Kodi Foclabroc. (Vstream; IPTV...)
+--yesno "\nScript d'installation pack Kodi Foclabroc. (Vstream; IPTV...)
 
-Attention : l'installation du pack supprimera tout le dossier .kodi, y compris tous vos paramètres actuels de Kodi, et les remplacera par ceux de mon pack.
+Attention : l'installation du pack supprimera tout le dossier .kodi 
+y compris tous vos paramètres actuels de Kodi, et les remplacera par ceux de mon pack.
 
-Êtes-vous sûr de vouloir installer le pack ?" 10 60
+Êtes-vous sûr de vouloir installer le pack ?" 15 60
 
 # Vérifier la réponse de l'utilisateur
 if [ $? -ne 0 ]; then
@@ -36,16 +37,19 @@ if [ $? -eq 0 ]; then
     echo "Téléchargement réussi. Extraction en cours..."
     unzip /tmp/kodi.zip -d /userdata/system/
     echo "Extraction terminée."
+    sleep 2
 else
     echo "Échec du téléchargement."
     exit 1
 fi
 
 # Nettoyage du fichier ZIP
-echo "Suppression du fichier ZIP..."
+echo "Nettoyage des fichiers temporaire..."
+sleep 1
 rm -f /tmp/kodi.zip
 
 echo "Opération terminée."
+sleep 2
 
 # Affichage du message de confirmation
 dialog --backtitle "Foclabroc Toolbox" --title "Terminé" \
