@@ -68,6 +68,9 @@ echo "Nettoyage des fichiers temporaire..."
 sleep 1
 rm -f $DESTINATION$ARCHIVE_NAME
 
+#actualisation liste des jeux
+echo "Actualisation de la liste des jeux"
+curl http://127.0.0.1:1234/reloadgames
 echo "Opération terminée."
 sleep 2
 
