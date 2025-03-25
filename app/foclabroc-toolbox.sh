@@ -201,18 +201,19 @@ main_menu() {
     while true; do
         main_menu=$(dialog --clear --backtitle "Foclabroc Toolbox" \
             --title "Menu Principal" \
-            --menu "\nSélectionnez une option :\n " 25 85 11 \
-            1 "[Nintendo Switch] -> Installer l'émulation Switch sur Batocera" \
+            --menu "\nSélectionnez une option :\n " 25 86 12 \
+            1 "[Nintendo Switch] -> Installer l'émulation Switch sur Batocera (foclabroc)" \
             2 "[Youtube TV]      -> Installer Youtube TV" \
             3 "[Gparted]         -> Installer Gparted" \
-            4 "[Pack Kodi]       -> Installe le pack streaming/iptv kodi foclabroc" \
-            5 "[Tools]           -> Outils pour Batocera. Screenshot, Records..." \
-            6 "Wine Custom -> Télécharge une version optimisée de Wine" \
-            7 "Wine Custom3 -> Télécharge une version optimisée de Wine" \
-            8 "Other Freeware Games -> Jeux Linux & Windows (Wine)" \
-            9 "Install Portmaster -> Gestionnaire de ports pour Batocera" \
-            10 "Install This Menu to Ports -> Ajoute ce menu aux ports Batocera" \
-            11 "Exit -> Quitter le script" \
+            4 "[Pack Kodi]       -> Installer le pack streaming/iptv kodi (foclabroc)" \
+            5 "[Pack Nes3D]      -> Installer le pack Nintendo Nes 3D (foclabroc)" \
+            6 "[Tools]           -> Outils pour Batocera. Screenshot, Records..." \
+            7 "Wine Custom -> Télécharge une version optimisée de Wine" \
+            8 "Wine Custom3 -> Télécharge une version optimisée de Wine" \
+            9 "Other Freeware Games -> Jeux Linux & Windows (Wine)" \
+            10 "Install Portmaster -> Gestionnaire de ports pour Batocera" \
+            11 "Install This Menu to Ports -> Ajoute ce menu aux ports Batocera" \
+            12 "Exit -> Quitter le script" \
             2>&1 >/dev/tty)
         clear
 
@@ -238,31 +239,36 @@ main_menu() {
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/kodi/pack_kodi.sh | bash
                 ;;
             5)
+                confirm_install "Pack Nes3D" || continue
+                clear
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/3d/pack_3d.sh | bash
+                ;;
+            6)
                 clear
                 tools_options
                 ;;
-            6)
+            7)
                 confirm_install "Wine Custom" || continue
                 curl -Ls https://github.com/trashbus99/profork/raw/master/wine-custom/wine.sh | bash
                 ;;
-            7)
+            8)
                 confirm_install "Flatpak Linux Games" || continue
                 curl -Ls https://raw.githubusercontent.com/trashbus99/profork/master/app/fpg.sh | bash
                 ;;
-            8)
+            9)
                 confirm_install "Other Linux & Windows/Wine Freeware" || continue
                 curl -Ls https://github.com/trashbus99/profork/raw/master/app/wquashfs.sh | bash
                 ;;
-            9)
+            10)
                 confirm_install "Portmaster Installer" || continue
                 curl -Ls https://github.com/trashbus99/profork/raw/master/portmaster/install.sh | bash
                 ;;
-            10)
+            11)
                 confirm_install "Ports Installer" || continue 
                 clear
                 wget -q --tries=30 --no-check-certificate -O /tmp/runner https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/install-to-port.sh && chmod +x /tmp/runner && bash /tmp/runner
                 ;;
-            11)
+            12)
                 # Afficher un message de remerciement
                 dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --msgbox "\nMerci d'avoir utilisé le script !" 7 40
                 killall -9 xterm
