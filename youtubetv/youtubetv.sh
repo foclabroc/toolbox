@@ -24,14 +24,22 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Extract the downloaded archive
-echo "Extracting YouTube TV files..."
-mkdir -p "$app_dir"
-total_size=$(stat -c %s "$temp_dir/youtube-tv.zip")
-# Extraire avec une barre de progression
-pv -p -s "$total_size" "$temp_dir/youtube-tv.zip" | unzip -o -d "$temp_dir/youtube-tv-extracted" >/dev/null
-mv "$temp_dir/youtube-tv-extracted/"*/* "$app_dir"
-chmod a+x "$app_dir/YouTubeonTV"
+echo "Extraction en cours..."
+if unzip -t "$temp_dir/youtube-tv.zip" >/dev/null 2>&1; then
+    TOTAL_FILES=$(unzip -l "$temp_dir/youtube-tv.zip" | grep -E '^\s*[0-9]+' | wc -l)
+    COUNT=0
+    unzip -o "$temp_dir/youtube-tv.zip" -d "$temp_dir/youtube-tv-extracted" | while read -r line; do
+        COUNT=$((COUNT + 1))
+        PERCENT=$((COUNT * 100 / TOTAL_FILES))
+        echo -ne "Progression : $PERCENT% \r"
+    done
+    echo -e "\nExtraction terminée !"
+    mv "$temp_dir/youtube-tv-extracted/"*/* "$app_dir"
+    chmod a+x "$app_dir/YouTubeonTV"
+else
+    echo "Erreur : L'archive est invalide ou corrompue."
+    exit 1
+fi
 
 # Cleanup temp files
 rm -rf "$temp_dir"
