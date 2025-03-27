@@ -96,12 +96,16 @@ screenshot_url="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/m
 screenshot_path="$ports_dir/images/YoutubeTV-screenshot.png"
 logo_url="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/youtubetv/extra/YoutubeTV-wheel.png"
 logo_path="$ports_dir/images/YoutubeTV-wheel.png"
+box_url="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/youtubetv/extra/YoutubeTV-cartridge.png"
+box_path="$ports_dir/images/YoutubeTV-cartridge.png"
 
 # Ensure the logo directory exists and download the logo
 mkdir -p "$(dirname "$logo_path")"
 curl -L -o "$logo_path" "$logo_url"
 mkdir -p "$(dirname "$screenshot_path")"
 curl -L -o "$screenshot_path" "$screenshot_url"
+mkdir -p "$(dirname "$box_path")"
+curl -L -o "$box_path" "$box_url"
 
 # Ensure the gamelist.xml exists
 if [ ! -f "$gamelist_file" ]; then
@@ -150,8 +154,16 @@ xmlstarlet ed -L \
     -s "/gameList" -t elem -n "game" -v "" \
     -s "/gameList/game[last()]" -t elem -n "path" -v "./YoutubeTV.sh" \
     -s "/gameList/game[last()]" -t elem -n "name" -v "Youtube TV" \
+    -s "/gameList/game[last()]" -t elem -n "desc" -v "Youtube TV pour Batocera Linux. Découvrez les contenus regardés partout dans le monde : des clips musicaux du moment aux vidéos populaires sur les jeux vidéo, la mode, la beauté, les actualités, l'éducation et bien plus encore." \
+    -s "/gameList/game[last()]" -t elem -n "developer" -v "Youtube" \
+    -s "/gameList/game[last()]" -t elem -n "publisher" -v "Youtube" \
+    -s "/gameList/game[last()]" -t elem -n "genre" -v "Divertissement" \
+    -s "/gameList/game[last()]" -t elem -n "rating" -v "1.00" \
+    -s "/gameList/game[last()]" -t elem -n "region" -v "eu" \
+    -s "/gameList/game[last()]" -t elem -n "lang" -v "fr" \
     -s "/gameList/game[last()]" -t elem -n "image" -v "./images/YoutubeTV-screenshot.png" \
     -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/YoutubeTV-wheel.png" \
+    -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/YoutubeTV-cartridge.png" \
     "$gamelist_file"
 
 # Refresh the Ports menu
