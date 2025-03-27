@@ -27,7 +27,9 @@ fi
 # Extract the downloaded archive
 echo "Extracting YouTube TV files..."
 mkdir -p "$app_dir"
-unzip -o "$temp_dir/youtube-tv.zip" -d "$temp_dir/youtube-tv-extracted"
+total_size=$(stat -c %s "$temp_dir/youtube-tv.zip")
+# Extraire avec une barre de progression
+pv -p -s "$total_size" "$temp_dir/youtube-tv.zip" | unzip -o -d "$temp_dir/youtube-tv-extracted" >/dev/null
 mv "$temp_dir/youtube-tv-extracted/"*/* "$app_dir"
 chmod a+x "$app_dir/YouTubeonTV"
 
