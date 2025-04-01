@@ -8,7 +8,7 @@ INSTALL_DIR="/userdata/system/wine/custom/"
 mkdir -p "$INSTALL_DIR"
 
 # Récupération des versions disponibles
-dialog --clear --backtitle "Foclabroc Toolbox" --title "Récuperation" --infobox "\nRécupération des versions de Wine Vanilla/Regular..." 5 60
+dialog --clear --backtitle "Foclabroc Toolbox" --title "Récuperation" --msgbox "\nRécupération des versions de Wine Vanilla/Regular..." 5 60
 sleep 2
 release_data=$(curl -s "$REPO_URL")
 clear
