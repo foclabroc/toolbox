@@ -1,5 +1,13 @@
 #!/bin/bash
 
+clear
+
+# Vérification de la présence de jq
+if ! command -v jq &>/dev/null; then
+    echo "Erreur : 'jq' est requis mais non installé. Installez-le et relancez le script."
+    exit 1
+fi
+
 # API endpoint pour récupérer les versions
 REPO_URL="https://api.github.com/repos/Kron4ek/Wine-Builds/releases?per_page=300"
 
@@ -22,11 +30,10 @@ while true; do
     options=()
     i=0
 
-    # Construire la liste des options (index et nom)
+    # Construire la liste des options (index et tag_name)
     while IFS= read -r line; do
-        name=$(echo "$line" | jq -r '.name')
         tag=$(echo "$line" | jq -r '.tag_name')
-        options+=("$i" "$name - $tag")
+        options+=("$i" "$tag")
         ((i++))
     done < <(echo "$release_data" | jq -c '.[]')
 
@@ -72,7 +79,7 @@ while true; do
 
     if [[ $response -ne 0 ]]; then
         echo "Téléchargement annulé pour Wine ${version}."
-        sleep 2
+        sleep 1
         continue
     fi
 
@@ -80,7 +87,9 @@ while true; do
     WINE_DIR="${INSTALL_DIR}wine-${version}"
     mkdir -p "$WINE_DIR"
 
-    # Téléchargement du fichier
+    clear
+
+    # Téléchargement du fichier avec reprise possible
     echo "Téléchargement de Wine ${version}..."
     wget -q --tries=10 --no-check-certificate --no-cache --no-cookies --show-progress -O "${WINE_DIR}/wine-${version}.tar.xz" "$url"
 
@@ -91,13 +100,34 @@ while true; do
         continue
     fi
 
-    # Décompression
-    echo "Décompression de Wine ${version}..."
-    tar --strip-components=1 -xf "${WINE_DIR}/wine-${version}.tar.xz" -C "$WINE_DIR"
-    
+# Taille de l'archive pour calcul du pourcentage
+ARCHIVE="${WINE_DIR}/wine-${version}.tar.xz"
+SIZE=$(du -b "$ARCHIVE" | cut -f1)
+
+# Total de fichiers à extraire (via tar -tf)
+TOTAL_FILES=$(tar -tf "$ARCHIVE" | wc -l)
+COUNT=0
+
+# Extraction avec progression
+    echo "Décompression de Wine ${version} dans ${WINE_DIR}..."
+    if tar -xJf "$ARCHIVE" -C "$WINE_DIR" --verbose | while read line; do
+        COUNT=$((COUNT + 1))
+        PERCENT=$((COUNT * 100 / TOTAL_FILES))
+        echo -ne "Progression : $PERCENT%\r"
+    done; then
+        rm "$ARCHIVE"
+        echo -e "\nDécompression réussie et archive supprimée."
+        sleep 1
+    else
+        echo "Erreur : extraction de Wine ${version} échouée."
+        sleep 1
+        continue
+    fi
+
     # Suppression de l'archive
     rm "${WINE_DIR}/wine-${version}.tar.xz"
-    
+
     echo "Installation de Wine ${version} terminée."
+    echo "Pour l'utiliser, selectionnez le dans les options avancées windows -> runner."
     sleep 2
 done
