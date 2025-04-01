@@ -10,7 +10,7 @@ INSTALL_DIR="/userdata/system/wine/custom/"
 mkdir -p "$INSTALL_DIR"
 
 # Récupération des versions disponibles
-dialog --infobox "Récupération des versions de Wine Vanilla/Regular..." 10 70
+dialog --infobox "\nRécupération des versions de Wine Vanilla/Regular..." 6 60
 release_data=$(curl -s "$REPO_URL")
 
 # Vérification du succès de la requête

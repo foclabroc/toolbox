@@ -2,15 +2,15 @@
 
 # Define the options
 OPTIONS=(
-  "1" "Telechargement Runner Wine & Proton (vanilla/regular) builds"
-  "2" "Telechargement Runner Wine-TKG-Staging builds"
-  "3" "Telechargement Runner Wine-GE Custom builds"
-  "4" "Telechargement Runner GE-Proton builds"
-  "5" "Telechargement Runner GE-Custom de la version 40 (pour garder vos anciennes bottles/sauvegarde)"
-  "6" "Installation de Winetricks automatique"
-  "7" "Convertir dossier .pc en dossier .wine"
-  "8" "Compresser dossier .wine en fichier .wsquashfs ou .tgz"
-  "9" "Decompresser fichiers .wsquashfs ou .tgz en dossier .wine"
+  " 1" "Telechargement Runner Wine & Proton (vanilla/regular) builds"
+  " 2" "Telechargement Runner Wine-TKG-Staging builds"
+  " 3" "Telechargement Runner Wine-GE Custom builds"
+  " 4" "Telechargement Runner GE-Proton builds"
+  " 5" "Telechargement Runner GE-Custom de la version 40 (pour garder vos anciennes bottles/sauvegarde)"
+  " 6" "Installation de Winetricks automatique"
+  " 7" "Convertir dossier .pc en dossier .wine"
+  " 8" "Compresser dossier .wine en fichier .wsquashfs ou .tgz"
+  " 9" "Decompresser fichiers .wsquashfs ou .tgz en dossier .wine"
 )
 
 # Use dialog to display the menu
