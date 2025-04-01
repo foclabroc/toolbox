@@ -208,7 +208,7 @@ main_menu() {
             4 "[Pack Kodi]       -> Installer le pack streaming/iptv kodi (foclabroc)" \
             5 "[Pack Nes3D]      -> Installer le pack Nintendo Nes 3D (foclabroc)" \
             6 "[Tools]           -> Outils pour Batocera. Screenshot, Records..." \
-            7 "Wine Custom -> Télécharge une version optimisée de Wine" \
+            7 "[Wine Toolbox]    -> Téléchargement de Runner Wine et outils wsquash..." \
             8 "Wine Custom3 -> Télécharge une version optimisée de Wine" \
             9 "Other Freeware Games -> Jeux Linux & Windows (Wine)" \
             10 "Install Portmaster -> Gestionnaire de ports pour Batocera" \
@@ -248,8 +248,8 @@ main_menu() {
                 tools_options
                 ;;
             7)
-                confirm_install "Wine Custom" || continue
-                curl -Ls https://github.com/trashbus99/profork/raw/master/wine-custom/wine.sh | bash
+                clear
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
                 ;;
             8)
                 confirm_install "Flatpak Linux Games" || continue
