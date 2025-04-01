@@ -30,9 +30,9 @@ while true; do
     options=()
     i=0
 
-    # Construire la liste des options (index et tag_name)
+    # Construire la liste des options (index et name)
     while IFS= read -r line; do
-        tag=$(echo "$line" | jq -r '.tag_name')
+        tag=$(echo "$line" | jq -r '.name')
         options+=("$i" "$tag")
         ((i++))
     done < <(echo "$release_data" | jq -c '.[]')
