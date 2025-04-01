@@ -18,37 +18,35 @@ if [[ $? -ne 0 || -z "$release_data" ]]; then
 fi
 
 while true; do
-    # Préparation du menu de sélection
+    # Préparation des options pour le menu
     options=()
     i=0
 
-    # Construire la liste des options
+    # Construire la liste des options (index et nom)
     while IFS= read -r line; do
         name=$(echo "$line" | jq -r '.name')
         tag=$(echo "$line" | jq -r '.tag_name')
-        description="${name} - ${tag}"
-        options+=($i "$description" off)
+        options+=("$i" "$name - $tag")
         ((i++))
     done < <(echo "$release_data" | jq -c '.[]')
 
-    # Vérification que la liste des options n'est pas vide
+    # Vérifier que des options existent
     if [[ ${#options[@]} -eq 0 ]]; then
         echo "Erreur : aucune version disponible."
         exit 1
     fi
 
     # Affichage du menu et récupération du choix
-    choice=$(dialog --clear --title "Sélection de Wine" --menu "\nChoisissez une version à télécharger :\n " 22 76 16 "${options[@]}" 2>&1 >/dev/tty)
-
-    # Si l'utilisateur annule (ESC ou annulation)
-    if [[ -z "$choice" ]]; then
-        clear
-        echo "Annulation. Retour au système."
-        exit 0
-    fi
+    choice=$(dialog --clear --backtitle "Foclabroc Toolbox" --title "Sélection de Wine" --menu "\nChoisissez une version à télécharger :\n " 22 76 16 "${options[@]}" 2>&1 >/dev/tty)
 
     # Nettoyage de l'affichage
     clear
+
+    # Si l'utilisateur annule
+    if [[ -z "$choice" ]]; then
+        echo "Annulation. Retour au système."
+        exit 0
+    fi
 
     # Vérification que le choix est bien un nombre
     if ! [[ "$choice" =~ ^[0-9]+$ ]]; then
@@ -57,11 +55,13 @@ while true; do
         continue
     fi
 
+    # Récupérer la version et l'URL
     version=$(echo "$release_data" | jq -r ".[$choice].tag_name" 2>/dev/null)
     url=$(echo "$release_data" | jq -r ".[$choice].assets[] | select(.name | endswith(\"amd64.tar.xz\")).browser_download_url" | head -n1 2>/dev/null)
 
+    # Vérifier que les infos sont bien récupérées
     if [[ -z "$version" || -z "$url" ]]; then
-        echo "Erreur : Impossible de récupérer les informations pour la version $choice."
+        echo "Erreur : impossible de récupérer les informations pour la version $choice."
         sleep 2
         continue
     fi
@@ -86,7 +86,7 @@ while true; do
 
     # Vérification du téléchargement
     if [ ! -f "${WINE_DIR}/wine-${version}.tar.xz" ]; then
-        echo "Erreur : Échec du téléchargement de Wine ${version}."
+        echo "Erreur : échec du téléchargement de Wine ${version}."
         sleep 2
         continue
     fi
