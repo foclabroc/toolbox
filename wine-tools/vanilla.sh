@@ -45,14 +45,16 @@ while true; do
 
     # Si l'utilisateur appuie sur "Annuler" (retourne 1)
     if [[ $? -eq 1 ]]; then
-        echo "Retour en cours..."
+        dialog --infobox "\nRetour Menu Wine Tools..." 5 60
+        sleep 2
         curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
         exit 0
     fi
 
     # Si l'utilisateur annule la sélection (choix vide)
     if [[ -z "$choice" ]]; then
-        echo "Annulation. Retour au système."
+        dialog --infobox "\nRetour Menu Wine Tools..." 5 60
+        sleep 2
         curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
         exit 0
     fi

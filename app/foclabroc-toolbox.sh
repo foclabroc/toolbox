@@ -247,7 +247,7 @@ main_menu() {
                 clear
                 tools_options
                 ;;
-            7)
+            7)  #wine tools
                 clear
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
                 ;;
