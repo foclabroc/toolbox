@@ -57,7 +57,7 @@ while true; do
     fi
 
     # Récupérer la version et l'URL
-    version=$(echo "$release_data" | jq -r ".[$choice].tag_name" 2>/dev/null)
+    version=$(echo "$release_data" | jq -r ".[$choice].name" 2>/dev/null)
     url=$(echo "$release_data" | jq -r ".[$choice].assets[] | select(.name | endswith(\"amd64.tar.xz\")).browser_download_url" | head -n1 2>/dev/null)
 
     # Vérifier que les infos sont bien récupérées
@@ -107,7 +107,7 @@ COUNT=0
     if tar -xJf "$ARCHIVE" -C "$WINE_DIR" --verbose | while read line; do
         COUNT=$((COUNT + 1))
         PERCENT=$((COUNT * 100 / TOTAL_FILES))
-        echo -ne "Progression : $PERCENT%\r"
+        echo -ne "Décompression : $PERCENT%\r"
     done; then
         rm "$ARCHIVE"
         echo -e "\nDécompression réussie et archive supprimée."
