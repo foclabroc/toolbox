@@ -2,12 +2,6 @@
 
 clear
 
-# Vérification de la présence de jq
-if ! command -v jq &>/dev/null; then
-    echo "Erreur : 'jq' est requis mais non installé. Installez-le et relancez le script."
-    exit 1
-fi
-
 # API endpoint pour récupérer les versions
 REPO_URL="https://api.github.com/repos/Kron4ek/Wine-Builds/releases?per_page=300"
 
@@ -84,7 +78,7 @@ while true; do
     fi
 
     # Création du répertoire de destination
-    WINE_DIR="${INSTALL_DIR}wine-${version}"
+    WINE_DIR="${INSTALL_DIR}"
     mkdir -p "$WINE_DIR"
 
     clear
@@ -120,12 +114,10 @@ COUNT=0
         sleep 1
     else
         echo "Erreur : extraction de Wine ${version} échouée."
+        rm "$ARCHIVE"
         sleep 1
         continue
     fi
-
-    # Suppression de l'archive
-    rm "${WINE_DIR}/wine-${version}.tar.xz"
 
     echo "Installation de Wine ${version} terminée."
     echo "Pour l'utiliser, selectionnez le dans les options avancées windows -> runner."
