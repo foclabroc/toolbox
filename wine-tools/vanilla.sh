@@ -72,30 +72,30 @@ while true; do
     response=$?
 
     if [[ $response -ne 0 ]]; then
-        echo "Téléchargement annulé pour Wine ${version}."
+        echo "Téléchargement annulé pour ${version}."
         sleep 1
         continue
     fi
 
     # Création du répertoire de destination
-    WINE_DIR="${INSTALL_DIR}"
+    WINE_DIR="${INSTALL_DIR}wine-${version}"
     mkdir -p "$WINE_DIR"
-
+    cd "${WINE_DIR}"
     clear
 
     # Téléchargement du fichier avec reprise possible
-    echo "Téléchargement de Wine ${version}..."
-    wget -q --tries=10 --no-check-certificate --no-cache --no-cookies --show-progress -O "${WINE_DIR}/wine-${version}.tar.xz" "$url"
+    echo "Téléchargement de ${version}..."
+    wget -q --tries=10 --no-check-certificate --no-cache --no-cookies --show-progress -O "${WINE_DIR}/${version}.tar.xz" "$url"
 
     # Vérification du téléchargement
-    if [ ! -f "${WINE_DIR}/wine-${version}.tar.xz" ]; then
+    if [ ! -f "${WINE_DIR}/${version}.tar.xz" ]; then
         echo "Erreur : échec du téléchargement de Wine ${version}."
         sleep 2
         continue
     fi
 
 # Taille de l'archive pour calcul du pourcentage
-ARCHIVE="${WINE_DIR}/wine-${version}.tar.xz"
+ARCHIVE="${WINE_DIR}/${version}.tar.xz"
 SIZE=$(du -b "$ARCHIVE" | cut -f1)
 
 # Total de fichiers à extraire (via tar -tf)
@@ -103,8 +103,9 @@ TOTAL_FILES=$(tar -tf "$ARCHIVE" | wc -l)
 COUNT=0
 
 # Extraction avec progression
+
     echo "Décompression de Wine ${version} dans ${WINE_DIR}..."
-    if tar -xJf "$ARCHIVE" -C "$WINE_DIR" --verbose | while read line; do
+    if tar --strip-components=1 -xJf "$ARCHIVE" -C "$WINE_DIR" --verbose | while read line; do
         COUNT=$((COUNT + 1))
         PERCENT=$((COUNT * 100 / TOTAL_FILES))
         echo -ne "Décompression : $PERCENT%\r"
@@ -113,13 +114,13 @@ COUNT=0
         echo -e "\nDécompression réussie et archive supprimée."
         sleep 1
     else
-        echo "Erreur : extraction de Wine ${version} échouée."
+        echo "Erreur : extraction de ${version} échouée."
         rm "$ARCHIVE"
         sleep 1
         continue
     fi
 
-    echo "Installation de Wine ${version} terminée."
+    echo "Installation de ${version} terminée."
     echo "Pour l'utiliser, selectionnez le dans les options avancées windows -> runner."
     sleep 2
 done
