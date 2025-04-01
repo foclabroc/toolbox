@@ -19,7 +19,7 @@ fi
 
 while true; do
     # Préparation du menu de sélection
-    cmd=(dialog --separate-output --radiolist "Sélectionnez la version de Wine/Proton à télécharger :" 22 76 16)
+    cmd=(dialog --separate-output --radiolist "\nSélectionnez la version de Wine/Proton à télécharger :\n" 22 76 16)
     options=()
     i=0
 
@@ -47,11 +47,18 @@ while true; do
 
     # Traitement des choix
     for choice in $choices; do
-        version=$(echo "$release_data" | jq -r ".[$choice].tag_name")
-        url=$(echo "$release_data" | jq -r ".[$choice].assets[] | select(.name | endswith(\"amd64.tar.xz\")).browser_download_url" | head -n1)
+        # Vérifier que le choix est bien un nombre
+        if ! [[ "$choice" =~ ^[0-9]+$ ]]; then
+            echo "Erreur : choix invalide ($choice)."
+            sleep 2
+            continue
+        fi
 
-        if [[ -z "$url" ]]; then
-            echo "Erreur : Aucun fichier amd64.tar.xz trouvé pour la version $version."
+        version=$(echo "$release_data" | jq -r ".[$choice].tag_name" 2>/dev/null)
+        url=$(echo "$release_data" | jq -r ".[$choice].assets[] | select(.name | endswith(\"amd64.tar.xz\")).browser_download_url" | head -n1 2>/dev/null)
+
+        if [[ -z "$version" || -z "$url" ]]; then
+            echo "Erreur : Impossible de récupérer les informations pour la version $choice."
             sleep 2
             continue
         fi
