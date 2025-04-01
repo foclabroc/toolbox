@@ -10,7 +10,7 @@ INSTALL_DIR="/userdata/system/wine/custom/"
 mkdir -p "$INSTALL_DIR"
 
 # Récupération des versions disponibles
-echo "Récupération des versions de Wine..."
+dialog --infobox "Récupération des versions de Wine Vanilla/Regular..." 10 70
 release_data=$(curl -s "$REPO_URL")
 
 # Vérification du succès de la requête
@@ -38,7 +38,7 @@ while true; do
     fi
 
     # Affichage du menu et récupération du choix
-    choice=$(dialog --clear --backtitle "Foclabroc Toolbox" --title "Sélection de Wine" --menu "\nChoisissez une version à télécharger :\n " 22 76 16 "${options[@]}" 2>&1 >/dev/tty)
+    choice=$(dialog --clear --backtitle "Foclabroc Toolbox" --title "Wine-proton" --menu "\nChoisissez une version à télécharger :\n " 22 76 16 "${options[@]}" 2>&1 >/dev/tty)
 
     # Nettoyage de l'affichage
     clear
@@ -68,7 +68,7 @@ while true; do
     fi
 
     # Demande de confirmation avant téléchargement
-    dialog --yesno "Voulez-vous télécharger et installer Wine ${version} ?" 8 60
+    dialog --yesno "Voulez-vous télécharger et installer ${version} ?" 8 60
     response=$?
 
     if [[ $response -ne 0 ]]; then
@@ -78,7 +78,7 @@ while true; do
     fi
 
     # Création du répertoire de destination
-    WINE_DIR="${INSTALL_DIR}wine-${version}"
+    WINE_DIR="${INSTALL_DIR}${version}"
     mkdir -p "$WINE_DIR"
     cd "${WINE_DIR}"
     clear
@@ -89,7 +89,7 @@ while true; do
 
     # Vérification du téléchargement
     if [ ! -f "${WINE_DIR}/${version}.tar.xz" ]; then
-        echo "Erreur : échec du téléchargement de Wine ${version}."
+        echo "Erreur : échec du téléchargement de ${version}."
         sleep 2
         continue
     fi
@@ -104,7 +104,7 @@ COUNT=0
 
 # Extraction avec progression
 
-    echo "Décompression de Wine ${version} dans ${WINE_DIR}..."
+    echo "Décompression de ${version} dans ${WINE_DIR}..."
     if tar --strip-components=1 -xJf "$ARCHIVE" -C "$WINE_DIR" --verbose | while read line; do
         COUNT=$((COUNT + 1))
         PERCENT=$((COUNT * 100 / TOTAL_FILES))
