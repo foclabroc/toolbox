@@ -53,6 +53,7 @@ while true; do
     # Si l'utilisateur annule la sélection (choix vide)
     if [[ -z "$choice" ]]; then
         echo "Annulation. Retour au système."
+        curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
         exit 0
     fi
 
