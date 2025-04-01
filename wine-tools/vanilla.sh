@@ -11,6 +11,7 @@ mkdir -p "$INSTALL_DIR"
 
 # Récupération des versions disponibles
 dialog --clear --backtitle "Foclabroc Toolbox" --infobox "\nRécupération des versions de Wine Vanilla/Regular..." 5 60
+sleep 2
 release_data=$(curl -s "$REPO_URL")
 
 # Vérification du succès de la requête
