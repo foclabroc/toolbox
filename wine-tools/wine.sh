@@ -28,7 +28,7 @@ clear
 case $CHOICE in
     1)
         echo "Liste Wine Vanilla and Proton."
-        curl -L https://github.com/foclabroc/toolbox/blob/main/wine-tools/vanilla.sh | bash
+        curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/vanilla.sh | bash
         ;;
     2)
         echo "You chose Wine-tkg staging."
