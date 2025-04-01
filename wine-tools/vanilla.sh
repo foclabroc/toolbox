@@ -10,7 +10,7 @@ INSTALL_DIR="/userdata/system/wine/custom/"
 mkdir -p "$INSTALL_DIR"
 
 # Récupération des versions disponibles
-dialog --infobox "\nRécupération des versions de Wine Vanilla/Regular..." 6 60
+dialog --infobox "\nRécupération des versions de Wine Vanilla/Regular..." 5 60
 release_data=$(curl -s "$REPO_URL")
 
 # Vérification du succès de la requête
@@ -31,6 +31,9 @@ while true; do
         ((i++))
     done < <(echo "$release_data" | jq -c '.[]')
 
+    # Ajouter l'option Retour
+    options+=("$i" "Retour")  # Ajoute l'option de retour
+
     # Vérifier que des options existent
     if [[ ${#options[@]} -eq 0 ]]; then
         echo "Erreur : aucune version disponible."
@@ -46,6 +49,13 @@ while true; do
     # Si l'utilisateur annule
     if [[ -z "$choice" ]]; then
         echo "Annulation. Retour au système."
+        exit 0
+    fi
+
+    # Si l'utilisateur choisit l'option Retour
+    if [[ "$choice" -eq "$i" ]]; then
+        echo "Retour en cours..."
+        curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/vanilla.sh | bash
         exit 0
     fi
 
@@ -68,7 +78,7 @@ while true; do
     fi
 
     # Demande de confirmation avant téléchargement
-    dialog --yesno "Voulez-vous télécharger et installer ${version} ?" 8 60
+    dialog --yesno "\nVoulez-vous télécharger et installer ${version} ?" 7 60
     response=$?
 
     if [[ $response -ne 0 ]]; then
@@ -94,18 +104,17 @@ while true; do
         continue
     fi
 
-# Taille de l'archive pour calcul du pourcentage
-ARCHIVE="${WINE_DIR}/${version}.tar.xz"
-SIZE=$(du -b "$ARCHIVE" | cut -f1)
+    # Taille de l'archive pour calcul du pourcentage
+    ARCHIVE="${WINE_DIR}/${version}.tar.xz"
+    SIZE=$(du -b "$ARCHIVE" | cut -f1)
 
-# Total de fichiers à extraire (via tar -tf)
-TOTAL_FILES=$(tar -tf "$ARCHIVE" | wc -l)
-COUNT=0
+    # Total de fichiers à extraire (via tar -tf)
+    TOTAL_FILES=$(tar -tf "$ARCHIVE" | wc -l)
+    COUNT=0
 
-# Extraction avec progression
-
+    # Extraction avec progression
     echo "Décompression de ${version} dans ${WINE_DIR}..."
-    if tar --strip-components=1 -xJf "$ARCHIVE" -C "$WINE_DIR" --verbose | while read line; do
+    if tar --strip-components=1 -xJf "$ARCHIVE" -C "$WINE_DIR" | while read line; do
         COUNT=$((COUNT + 1))
         PERCENT=$((COUNT * 100 / TOTAL_FILES))
         echo -ne "Décompression : $PERCENT%\r"
@@ -116,8 +125,6 @@ COUNT=0
     else
         echo "Erreur : extraction de ${version} échouée."
         rm "$ARCHIVE"
-        sleep 1
-        continue
     fi
 
     echo "Installation de ${version} terminée."
