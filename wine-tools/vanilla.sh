@@ -31,9 +31,6 @@ while true; do
         ((i++))
     done < <(echo "$release_data" | jq -c '.[]')
 
-    # Ajouter l'option Retour
-    options+=("$i" "Retour")  # Ajoute l'option de retour
-
     # Vérifier que des options existent
     if [[ ${#options[@]} -eq 0 ]]; then
         echo "Erreur : aucune version disponible."
@@ -46,16 +43,10 @@ while true; do
     # Nettoyage de l'affichage
     clear
 
-    # Si l'utilisateur annule
-    if [[ -z "$choice" ]]; then
-        echo "Annulation. Retour au système."
-        exit 0
-    fi
-
-    # Si l'utilisateur choisit l'option Retour
-    if [[ "$choice" -eq "$i" ]]; then
+    # Si l'utilisateur appuie sur "Annuler" (retourne 1)
+    if [[ $? -eq 1 ]]; then
         echo "Retour en cours..."
-        curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/vanilla.sh | bash
+        curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
         exit 0
     fi
 
