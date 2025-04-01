@@ -1,7 +1,5 @@
 #!/bin/bash
 
-clear
-
 # API endpoint pour récupérer les versions
 REPO_URL="https://api.github.com/repos/Kron4ek/Wine-Builds/releases?per_page=300"
 
@@ -13,6 +11,7 @@ mkdir -p "$INSTALL_DIR"
 dialog --clear --backtitle "Foclabroc Toolbox" --infobox "\nRécupération des versions de Wine Vanilla/Regular..." 5 60
 sleep 2
 release_data=$(curl -s "$REPO_URL")
+clear
 
 # Vérification du succès de la requête
 if [[ $? -ne 0 || -z "$release_data" ]]; then
