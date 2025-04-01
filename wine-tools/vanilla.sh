@@ -50,6 +50,12 @@ while true; do
         exit 0
     fi
 
+    # Si l'utilisateur annule la sélection (choix vide)
+    if [[ -z "$choice" ]]; then
+        echo "Annulation. Retour au système."
+        exit 0
+    fi
+
     # Vérification que le choix est bien un nombre
     if ! [[ "$choice" =~ ^[0-9]+$ ]]; then
         echo "Erreur : choix invalide ($choice)."
