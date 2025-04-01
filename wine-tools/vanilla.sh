@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# Vérification des dépendances
-if ! command -v jq &>/dev/null || ! command -v dialog &>/dev/null; then
-    echo "Erreur : 'jq' et 'dialog' sont requis. Installez-les avant de lancer ce script."
-    exit 1
-fi
-
 # API endpoint pour récupérer les versions
 REPO_URL="https://api.github.com/repos/Kron4ek/Wine-Builds/releases?per_page=300"
 
@@ -44,7 +38,7 @@ while true; do
     fi
 
     # Affichage du menu et récupération du choix
-    choice=$(dialog --clear --title "Sélection de Wine" --menu "Choisissez une version à télécharger :" 22 76 16 "${options[@]}" 2>&1 >/dev/tty)
+    choice=$(dialog --clear --title "Sélection de Wine" --menu "\nChoisissez une version à télécharger :\n " 22 76 16 "${options[@]}" 2>&1 >/dev/tty)
 
     # Si l'utilisateur annule (ESC ou annulation)
     if [[ -z "$choice" ]]; then
