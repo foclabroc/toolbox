@@ -31,8 +31,8 @@ case $CHOICE in
         curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/vanilla.sh | bash
         ;;
     2)
-        echo "You chose Wine-tkg staging."
-        curl -L https://github.com/trashbus99/profork/raw/master/wine-custom/tkg.sh | bash
+        #echo "Liste Wine-tkg staging."
+        curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/tkg.sh | bash
         ;;
     3)
         echo "You chose Wine-GE Custom."
