@@ -89,14 +89,12 @@ while true; do
 	version=$(cat /tmp/version.txt)
 
 	response=$(dialog --yesno "\nVoulez-vous télécharger et installer ${version} ?" 7 60 2>&1 >/dev/tty)
-	clear
 	if [[ $? -ne 0 ]]; then
 		(
 			dialog --infobox "\nTéléchargement annulé pour ${version}." 5 60
 			sleep 2
 		) 2>&1 >/dev/tty
 		continue
-		clear
 	fi
 
     # Création du répertoire de destination
@@ -105,7 +103,7 @@ while true; do
     cd "${WINE_DIR}"
     clear
     (
-      dialog --infobox "\nTéléchargement et extraction du runner..." 5 60
+      dialog --infobox "\nTéléchargement et extraction de ${version}..." 5 60
       sleep 2
     ) 2>&1 >/dev/tty
     sleep 2
@@ -138,7 +136,7 @@ while true; do
         rm "$ARCHIVE"
     fi
     (
-      dialog --infobox "\nTéléchargement et extraction du runner terminé avec succès " 5 60
+      dialog --infobox "\nTéléchargement et extraction du runner ${version} terminé avec succès " 5 60
       sleep 2
     ) 2>&1 >/dev/tty
     sleep 2
