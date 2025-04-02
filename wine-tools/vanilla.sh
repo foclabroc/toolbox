@@ -126,7 +126,7 @@ while true; do
 				echo "$PERCENT" # Envoie ce pourcentage à la boîte de dialogue
 			fi
 		done
-	) | dialog --gauge "Téléchargement de ${version}..." 10 70 0
+	) | (dialog --gauge "Téléchargement de ${version}..." 10 70 0) 2>&1 >/dev/tty
 
 # Vérification du téléchargement
 	if [ ! -f "$ARCHIVE" ]; then
