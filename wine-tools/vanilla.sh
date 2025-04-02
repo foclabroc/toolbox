@@ -88,10 +88,6 @@ while true; do
 # Récupérer la version depuis le fichier temporaire pour l'utiliser plus tard
 	version=$(cat /tmp/version.txt)
 
-# Vérification que la version a été correctement récupérée depuis le fichier
-	echo -e "DEBUG: version récupérée depuis le fichier temporaire: $version"
-
-
 	response=$(dialog --yesno "\nVoulez-vous télécharger et installer ${version} ?" 7 60 2>&1 >/dev/tty)
 	clear
 	if [[ $? -ne 0 ]]; then
@@ -108,9 +104,12 @@ while true; do
     mkdir -p "$WINE_DIR"
     cd "${WINE_DIR}"
     clear
-
+    (
+      dialog --infobox "\nTéléchargement et extraction du runner..." 5 60
+      sleep 2
+    ) 2>&1 >/dev/tty
+    sleep 2
     # Téléchargement du fichier avec reprise possible
-    echo -e "Téléchargement de ${version}..."
     wget -q --tries=10 --no-check-certificate --no-cache --no-cookies --show-progress -O "${WINE_DIR}/${version}.tar.xz" "$url"
 
     # Vérification du téléchargement
@@ -129,21 +128,18 @@ while true; do
     COUNT=0
 
     # Extraction avec progression
-    echo -e "Décompression de ${version} dans ${WINE_DIR}..."
     if tar --strip-components=1 -xJf "$ARCHIVE" -C "$WINE_DIR" | while read line; do
         COUNT=$((COUNT + 1))
         PERCENT=$((COUNT * 100 / TOTAL_FILES))
-        echo -ne "Décompression : $PERCENT%\r"
     done; then
         rm "$ARCHIVE"
-        echo -e "\nDécompression réussie et archive supprimée."
         sleep 1
     else
-        echo -e "Erreur : extraction de ${version} échouée."
         rm "$ARCHIVE"
     fi
-
-    echo -e "Installation de ${version} terminée."
-    echo -e "Pour l'utiliser, selectionnez le dans les options avancées windows runner."
+    (
+      dialog --infobox "\nTéléchargement et extraction du runner terminé avec succès " 5 60
+      sleep 2
+    ) 2>&1 >/dev/tty
     sleep 2
 done
