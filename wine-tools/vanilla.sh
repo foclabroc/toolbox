@@ -71,17 +71,26 @@ while true; do
         continue
     fi
 
-    # Récupérer la version et l'URL
-    version=$(echo "$release_data" | jq -r ".[$choice].name" 2>/dev/null)
-    url=$(echo "$release_data" | jq -r ".[$choice].assets[] | select(.name | endswith(\"amd64.tar.xz\")).browser_download_url" | head -n1 2>/dev/null)
+# Extraire la version et l'URL
+	version=$(echo "$release_data" | jq -r ".[$choice].name" 2>/dev/null)
+	url=$(echo "$release_data" | jq -r ".[$choice].assets[] | select(.name | endswith(\"amd64.tar.xz\")).browser_download_url" | head -n1 2>/dev/null)
 
-    # Vérifier que les infos sont bien récupérées
-    if [[ -z "$version" || -z "$url" ]]; then
-        echo "Erreur : impossible de récupérer les informations pour la version $choice."
-        sleep 2
-        continue
-    fi
-	clear
+# Vérifier si la version est bien récupérée
+	if [[ -z "$version" || -z "$url" ]]; then
+		echo "Erreur : impossible de récupérer les informations pour la version $choice."
+		sleep 2
+		continue
+	fi
+
+# Sauvegarder la version dans un fichier temporaire
+	echo "$version" > /tmp/version.txt
+
+# Récupérer la version depuis le fichier temporaire pour l'utiliser plus tard
+	version=$(cat /tmp/version.txt)
+
+# Vérification que la version a été correctement récupérée depuis le fichier
+	echo "DEBUG: version récupérée depuis le fichier temporaire: $version"
+
 
 	response=$(dialog --yesno "\nVoulez-vous télécharger et installer ${version} ?" 7 60 2>&1 >/dev/tty)
 
@@ -92,7 +101,7 @@ while true; do
 		) 2>&1 >/dev/tty
 		continue
 	fi
-	clear
+
 
     # Création du répertoire de destination
     WINE_DIR="${INSTALL_DIR}${version}"
