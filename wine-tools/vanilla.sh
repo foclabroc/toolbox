@@ -81,6 +81,7 @@ while true; do
         sleep 2
         continue
     fi
+	clear
 
 	response=$(dialog --yesno "\nVoulez-vous télécharger et installer ${version} ?" 7 60 2>&1 >/dev/tty)
 
@@ -91,6 +92,7 @@ while true; do
 		) 2>&1 >/dev/tty
 		continue
 	fi
+	clear
 
     # Création du répertoire de destination
     WINE_DIR="${INSTALL_DIR}${version}"
