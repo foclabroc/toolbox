@@ -26,12 +26,16 @@ while true; do
     i=0
 
     # Construire la liste des options (index et name)
-    while IFS= read -r line; do
-        tag=$(echo "$line" | jq -r '.name')
+	while IFS= read -r line; do
+		name=$(echo "$line" | jq -r '.name')
+		tag=$(echo "$line" | jq -r '.tag_name')
+		description="${name} - ${tag}"
 		tkg_staging_assets=$(echo "$line" | jq -c '.assets[] | select(.name | contains("staging-tkg"))')
-        options+=("$i" "$tag")
-        ((i++))
-    done < <(echo "$release_data" | jq -c '.[]')
+		if [ -n "$tkg_staging_assets" ]; then
+			options+=($i "$description" off)
+			((i++))
+		fi
+	done < <(echo "$release_data" | jq -c '.[]')
 
     # Vérifier que des options existent
     if [[ ${#options[@]} -eq 0 ]]; then
