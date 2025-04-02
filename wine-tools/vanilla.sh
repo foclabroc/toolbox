@@ -91,7 +91,7 @@ while true; do
 	response=$(dialog --yesno "\nVoulez-vous télécharger et installer ${version} ?" 7 60 2>&1 >/dev/tty)
 	if [[ $? -ne 0 ]]; then
 		(
-			dialog --infobox "\nTéléchargement annulé pour ${version}." 5 60
+			dialog --infobox "\nTéléchargement de ${version} annulé." 5 60
 			sleep 1
 		) 2>&1 >/dev/tty
 		continue

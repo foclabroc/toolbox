@@ -27,7 +27,7 @@ clear
 # Run the appropriate script based on the user's choice
 case $CHOICE in
     1)
-        echo "Liste Wine Vanilla and Proton."
+        #echo "Liste Wine Vanilla and Proton."
         curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/vanilla.sh | bash
         ;;
     2)
