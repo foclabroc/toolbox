@@ -77,11 +77,11 @@ while true; do
         continue
     fi
 
-    # Demande de confirmation avant téléchargement
-    dialog --yesno "\nVoulez-vous télécharger et installer ${version} ?" 7 60
-    response=$?
+    exec 3>&1
+    response=$(dialog --yesno "\nVoulez-vous télécharger et installer ${version} ?" 7 60 2>&1 1>&3)
+    exec 3>&-
 
-    if [[ $response -ne 0 ]]; then
+    if [[ $? -ne 0 ]]; then
         echo "Téléchargement annulé pour ${version}."
         sleep 1
         continue
