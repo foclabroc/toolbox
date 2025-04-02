@@ -44,21 +44,25 @@ while true; do
     # Nettoyage de l'affichage
     clear
 
-    # Si l'utilisateur appuie sur "Annuler" (retourne 1)
-    if [[ $? -eq 1 ]]; then
-        dialog --infobox "\nRetour Menu Wine Tools..." 5 60
-        sleep 2
-        curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
-        exit 0
-    fi
+# Si l'utilisateur appuie sur "Annuler" (retourne 1)
+	if [[ $? -eq 1 ]]; then
+		(
+			dialog --infobox "\nRetour Menu Wine Tools..." 5 60
+			sleep 2
+		) 2>&1 >/dev/tty
+		curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
+		exit 0
+	fi
 
-    # Si l'utilisateur annule la sélection (choix vide)
-    if [[ -z "$choice" ]]; then
-        dialog --infobox "\nRetour Menu Wine Tools..." 5 60
-        sleep 2
-        curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
-        exit 0
-    fi
+# Si l'utilisateur annule la sélection (choix vide)
+	if [[ -z "$choice" ]]; then
+		(
+			dialog --infobox "\nRetour Menu Wine Tools..." 5 60
+			sleep 2
+		) 2>&1 >/dev/tty
+		curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
+		exit 0
+	fi
 
     # Vérification que le choix est bien un nombre
     if ! [[ "$choice" =~ ^[0-9]+$ ]]; then
@@ -78,15 +82,15 @@ while true; do
         continue
     fi
 
-    exec 3>&1
-    response=$(dialog --yesno "\nVoulez-vous télécharger et installer ${version} ?" 7 60 2>&1 1>&3)
-    exec 3>&-
+	response=$(dialog --yesno "\nVoulez-vous télécharger et installer ${version} ?" 7 60 2>&1 >/dev/tty)
 
-    if [[ $? -ne 0 ]]; then
-        echo "Téléchargement annulé pour ${version}."
-        sleep 1
-        continue
-    fi
+	if [[ $? -ne 0 ]]; then
+		(
+			dialog --infobox "\nTéléchargement annulé pour ${version}." 5 60
+			sleep 2
+		) 2>&1 >/dev/tty
+		continue
+	fi
 
     # Création du répertoire de destination
     WINE_DIR="${INSTALL_DIR}${version}"
