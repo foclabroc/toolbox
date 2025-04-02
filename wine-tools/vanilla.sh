@@ -97,38 +97,35 @@ while true; do
 		continue
 	fi
 
-# Création du répertoire de destination
+	# Création du répertoire de destination
 	WINE_DIR="${INSTALL_DIR}${version}"
 	mkdir -p "$WINE_DIR"
 	cd "${WINE_DIR}"
 	clear
 
-# Afficher un message d'information dans une boîte dialog
+	# Afficher un message d'information dans une boîte dialog
 	(
 		dialog --infobox "\nTéléchargement et extraction de ${version}..." 5 60
-		sleep 2
+		sleep 1
 	) 2>&1 >/dev/tty
-	sleep 2
 
-# Préparer le fichier de téléchargement
+	# Préparer le fichier de téléchargement
 	ARCHIVE="${WINE_DIR}/${version}.tar.xz"
-	SIZE=$(curl -sI "$url" | grep -i Content-Length | awk '{print $2}')
 
-# Télécharger le fichier avec wget et afficher la progression dans une boîte dialog
+	# Télécharger le fichier avec wget et afficher la progression dans une boîte dialog
 	(
 		wget --tries=10 --no-check-certificate --no-cache --no-cookies --show-progress -O "$ARCHIVE" "$url" 2>&1 | \
 		while read -r line; do
-			# Extrait la progression du téléchargement
+			# Si la ligne contient un pourcentage, extrait la valeur
 			if [[ "$line" =~ ([0-9]+)% ]]; then
-				# Récupère le pourcentage de progression
-				PERCENT=${BASH_REMATCH[1]}
-				# Affiche la progression dans la boîte de dialogue
-				echo "$PERCENT" # Envoie ce pourcentage à la boîte de dialogue
+				PERCENT=${BASH_REMATCH[1]}  # Récupère le pourcentage
+				# Envoie la progression à la boîte dialog --gauge
+				echo "$PERCENT"  # La progression est envoyée à la boîte de dialogue
 			fi
 		done
-	) | (dialog --gauge "Téléchargement de ${version}..." 10 70 0) 2>&1 >/dev/tty
+	) | dialog --gauge "Téléchargement de ${version}..." 10 70 0 2>&1 >/dev/tty
 
-# Vérification du téléchargement
+	# Vérification du téléchargement
 	if [ ! -f "$ARCHIVE" ]; then
 		echo -e "Erreur : échec du téléchargement de ${version}."
 		sleep 2
