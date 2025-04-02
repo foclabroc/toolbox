@@ -25,17 +25,22 @@ while true; do
     options=()
     i=1
 
-    # Construire la liste des options (index et name)
-	while IFS= read -r tag; do
-		options+=("$i" "$tag")
-		((i++))
-	done < <(jq -r '.[] | select(.name | contains("staging-tkg")) | .name' <<< "$release_data")
+    # Construire la liste des options (index et name) avec ajout de "-staging-tkg"
+    while IFS= read -r line; do
+        tag=$(echo "$line" | jq -r '.name')
 
-	# Vérifier si des versions ont été trouvées
-	if [[ ${#options[@]} -eq 0 ]]; then
-		echo "❌ Aucune version 'staging-tkg' trouvée."
-		exit 1
-	fi
+        # Ajouter "-staging-tkg" à la version
+        tag="${tag}-staging-tkg"
+
+        options+=("$i" "$tag")
+        ((i++))
+    done < <(echo "$release_data" | jq -c '.[]')
+
+    # Vérifier que des options existent
+    if [[ ${#options[@]} -eq 0 ]]; then
+        echo -e "Erreur : aucune version disponible."
+        exit 1
+    fi
 
     # Affichage du menu et récupération du choix
     choice=$(dialog --clear --backtitle "Foclabroc Toolbox" --title "Wine-proton" --menu "\nChoisissez une version à télécharger :\n " 22 76 16 "${options[@]}" 2>&1 >/dev/tty)
@@ -71,8 +76,9 @@ while true; do
     fi
 
 # Extraire la version et l'URL
-    version=$(echo "$release_data" | jq -r ".[$choice-1].name")
-    url=$(echo "$release_data" | jq -r ".[$choice-1].assets[] | select(.name | contains(\"staging-tkg\") and endswith(\"amd64.tar.xz\")).browser_download_url" | head -n1)
+	version=$(echo "$release_data" | jq -r ".[$choice-1].name" 2>/dev/null)
+	version="${version}-staging-tkg"
+    url=$(echo "$release_data" | jq -r ".[$choice-1].assets[] | select(.name | contains(\"staging-tkg\") and endswith(\"amd64.tar.xz\")).browser_download_url" | head -n1 2>/dev/null)
 
 # Vérifier si la version est bien récupérée
 	if [[ -z "$version" || -z "$url" ]]; then
