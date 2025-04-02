@@ -10,7 +10,7 @@ mkdir -p "$INSTALL_DIR"
 # Récupération des versions disponibles
 (
   dialog --infobox "\nRécupération des versions de Wine Vanilla/Regular..." 5 60
-  sleep 2
+  sleep 1
 ) 2>&1 >/dev/tty
 release_data=$(curl -s "$REPO_URL")
 
@@ -48,7 +48,7 @@ while true; do
 	if [[ $? -eq 1 ]]; then
 		(
 			dialog --infobox "\nRetour Menu Wine Tools..." 5 60
-			sleep 2
+			sleep 1
 		) 2>&1 >/dev/tty
 		curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
 		exit 0
@@ -92,30 +92,48 @@ while true; do
 	if [[ $? -ne 0 ]]; then
 		(
 			dialog --infobox "\nTéléchargement annulé pour ${version}." 5 60
-			sleep 2
+			sleep 1
 		) 2>&1 >/dev/tty
 		continue
 	fi
 
-    # Création du répertoire de destination
-    WINE_DIR="${INSTALL_DIR}${version}"
-    mkdir -p "$WINE_DIR"
-    cd "${WINE_DIR}"
-    clear
-    (
-      dialog --infobox "\nTéléchargement et extraction de ${version}..." 5 60
-      sleep 2
-    ) 2>&1 >/dev/tty
-    sleep 2
-    # Téléchargement du fichier avec reprise possible
-    wget -q --tries=10 --no-check-certificate --no-cache --no-cookies --show-progress -O "${WINE_DIR}/${version}.tar.xz" "$url"
+# Création du répertoire de destination
+	WINE_DIR="${INSTALL_DIR}${version}"
+	mkdir -p "$WINE_DIR"
+	cd "${WINE_DIR}"
+	clear
 
-    # Vérification du téléchargement
-    if [ ! -f "${WINE_DIR}/${version}.tar.xz" ]; then
-        echo -e "Erreur : échec du téléchargement de ${version}."
-        sleep 2
-        continue
-    fi
+# Afficher un message d'information dans une boîte dialog
+	(
+		dialog --infobox "\nTéléchargement et extraction de ${version}..." 5 60
+		sleep 2
+	) 2>&1 >/dev/tty
+	sleep 2
+
+# Préparer le fichier de téléchargement
+	ARCHIVE="${WINE_DIR}/${version}.tar.xz"
+	SIZE=$(curl -sI "$url" | grep -i Content-Length | awk '{print $2}')
+
+# Télécharger le fichier avec wget et afficher la progression dans une boîte dialog
+	(
+		wget --tries=10 --no-check-certificate --no-cache --no-cookies --show-progress -O "$ARCHIVE" "$url" 2>&1 | \
+		while read -r line; do
+			# Extrait la progression du téléchargement
+			if [[ "$line" =~ ([0-9]+)% ]]; then
+				# Récupère le pourcentage de progression
+				PERCENT=${BASH_REMATCH[1]}
+				# Affiche la progression dans la boîte de dialogue
+				echo "$PERCENT" # Envoie ce pourcentage à la boîte de dialogue
+			fi
+		done
+	) | dialog --gauge "Téléchargement de ${version}..." 10 70 0
+
+# Vérification du téléchargement
+	if [ ! -f "$ARCHIVE" ]; then
+		echo -e "Erreur : échec du téléchargement de ${version}."
+		sleep 2
+		continue
+	fi
 
     # Taille de l'archive pour calcul du pourcentage
     ARCHIVE="${WINE_DIR}/${version}.tar.xz"
