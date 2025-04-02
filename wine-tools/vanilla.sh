@@ -58,7 +58,7 @@ while true; do
 	if [[ -z "$choice" ]]; then
 		(
 			dialog --infobox "\nRetour Menu Wine Tools..." 5 60
-			sleep 2
+			sleep 1
 		) 2>&1 >/dev/tty
 		curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
 		exit 0
@@ -103,12 +103,6 @@ while true; do
 	cd "${WINE_DIR}"
 	clear
 
-	# Afficher un message d'information dans une boîte dialog
-	(
-		dialog --infobox "\nTéléchargement et extraction de ${version}..." 5 60
-		sleep 1
-	) 2>&1 >/dev/tty
-
 	# Préparer le fichier de téléchargement
 	ARCHIVE="${WINE_DIR}/${version}.tar.xz"
 
@@ -123,7 +117,7 @@ while true; do
 				echo "$PERCENT"  # La progression est envoyée à la boîte de dialogue
 			fi
 		done
-	) | dialog --gauge "Téléchargement de ${version}..." 10 70 0 2>&1 >/dev/tty
+	) | dialog --gauge "\nTéléchargement et extraction de ${version} Patientez..." 8 70 0 2>&1 >/dev/tty
 
 	# Vérification du téléchargement
 	if [ ! -f "$ARCHIVE" ]; then
@@ -151,8 +145,8 @@ while true; do
         rm "$ARCHIVE"
     fi
     (
-      dialog --infobox "\nTéléchargement et extraction du runner ${version} terminé avec succès " 5 60
-      sleep 2
+      dialog --infobox "\nTéléchargement et extraction du runner ${version} terminé avec succès " 6 60
+      sleep 1
     ) 2>&1 >/dev/tty
     sleep 2
 done
