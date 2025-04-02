@@ -16,7 +16,7 @@ release_data=$(curl -s "$REPO_URL")
 
 # Vérification du succès de la requête
 if [[ $? -ne 0 || -z "$release_data" ]]; then
-    echo "Erreur : impossible de récupérer les informations depuis GitHub."
+    echo -e "Erreur : impossible de récupérer les informations depuis GitHub."
     exit 1
 fi
 
@@ -34,7 +34,7 @@ while true; do
 
     # Vérifier que des options existent
     if [[ ${#options[@]} -eq 0 ]]; then
-        echo "Erreur : aucune version disponible."
+        echo -e "Erreur : aucune version disponible."
         exit 1
     fi
 
@@ -66,7 +66,7 @@ while true; do
 
     # Vérification que le choix est bien un nombre
     if ! [[ "$choice" =~ ^[0-9]+$ ]]; then
-        echo "Erreur : choix invalide ($choice)."
+        echo -e "Erreur : choix invalide ($choice)."
         sleep 2
         continue
     fi
@@ -77,32 +77,32 @@ while true; do
 
 # Vérifier si la version est bien récupérée
 	if [[ -z "$version" || -z "$url" ]]; then
-		echo "Erreur : impossible de récupérer les informations pour la version $choice."
+		echo -e "Erreur : impossible de récupérer les informations pour la version $choice."
 		sleep 2
 		continue
 	fi
 
 # Sauvegarder la version dans un fichier temporaire
-	echo "$version" > /tmp/version.txt
+	echo -e "$version" > /tmp/version.txt
 
 # Récupérer la version depuis le fichier temporaire pour l'utiliser plus tard
 	version=$(cat /tmp/version.txt)
 
 # Vérification que la version a été correctement récupérée depuis le fichier
-	echo "DEBUG: version récupérée depuis le fichier temporaire: $version"
+	echo -e "DEBUG: version récupérée depuis le fichier temporaire: $version"
 
 
 	response=$(dialog --yesno "\nVoulez-vous télécharger et installer ${version} ?" 7 60 2>&1 >/dev/tty)
-
+	clear
 	if [[ $? -ne 0 ]]; then
 		(
 			dialog --infobox "\nTéléchargement annulé pour ${version}." 5 60
 			sleep 2
 		) 2>&1 >/dev/tty
 		continue
+		clear
 	fi
 
-    clear
     # Création du répertoire de destination
     WINE_DIR="${INSTALL_DIR}${version}"
     mkdir -p "$WINE_DIR"
@@ -110,12 +110,12 @@ while true; do
     clear
 
     # Téléchargement du fichier avec reprise possible
-    echo "Téléchargement de ${version}..."
+    echo -e "Téléchargement de ${version}..."
     wget -q --tries=10 --no-check-certificate --no-cache --no-cookies --show-progress -O "${WINE_DIR}/${version}.tar.xz" "$url"
 
     # Vérification du téléchargement
     if [ ! -f "${WINE_DIR}/${version}.tar.xz" ]; then
-        echo "Erreur : échec du téléchargement de ${version}."
+        echo -e "Erreur : échec du téléchargement de ${version}."
         sleep 2
         continue
     fi
@@ -129,7 +129,7 @@ while true; do
     COUNT=0
 
     # Extraction avec progression
-    echo "Décompression de ${version} dans ${WINE_DIR}..."
+    echo -e "Décompression de ${version} dans ${WINE_DIR}..."
     if tar --strip-components=1 -xJf "$ARCHIVE" -C "$WINE_DIR" | while read line; do
         COUNT=$((COUNT + 1))
         PERCENT=$((COUNT * 100 / TOTAL_FILES))
@@ -139,11 +139,11 @@ while true; do
         echo -e "\nDécompression réussie et archive supprimée."
         sleep 1
     else
-        echo "Erreur : extraction de ${version} échouée."
+        echo -e "Erreur : extraction de ${version} échouée."
         rm "$ARCHIVE"
     fi
 
-    echo "Installation de ${version} terminée."
-    echo "Pour l'utiliser, selectionnez le dans les options avancées windows runner."
+    echo -e "Installation de ${version} terminée."
+    echo -e "Pour l'utiliser, selectionnez le dans les options avancées windows runner."
     sleep 2
 done
