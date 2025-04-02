@@ -23,24 +23,19 @@ fi
 while true; do
     # Préparation des options pour le menu
     options=()
-    i=0
+    i=1
 
     # Construire la liste des options (index et name)
-	while IFS= read -r line; do
-		tag=$(echo "$line" | jq -r '.name')
-		
-		# Vérifier si le nom contient "staging-tkg"
-		if [[ "$tag" == *"staging-tkg"* ]]; then
-			options+=("$i" "$tag")
-			((i++))
-		fi
-	done < <(echo "$release_data" | jq -c '.[]')
+	while IFS= read -r tag; do
+		options+=("$i" "$tag")
+		((i++))
+	done < <(jq -r '.[] | select(.name | contains("staging-tkg")) | .name' <<< "$release_data")
 
-    # Vérifier que des options existent
-    if [[ ${#options[@]} -eq 0 ]]; then
-        echo -e "Erreur : aucune version disponible."
-        exit 1
-    fi
+	# Vérifier si des versions ont été trouvées
+	if [[ ${#options[@]} -eq 0 ]]; then
+		echo "❌ Aucune version 'staging-tkg' trouvée."
+		exit 1
+	fi
 
     # Affichage du menu et récupération du choix
     choice=$(dialog --clear --backtitle "Foclabroc Toolbox" --title "Wine-proton" --menu "\nChoisissez une version à télécharger :\n " 22 76 16 "${options[@]}" 2>&1 >/dev/tty)
