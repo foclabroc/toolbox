@@ -28,10 +28,8 @@ while true; do
     # Construire la liste des options (index et name) avec ajout de "-staging-tkg"
     while IFS= read -r line; do
         tag=$(echo "$line" | jq -r '.name')
-
         # Ajouter "-staging-tkg" à la version
         tag="${tag}-staging-tkg"
-
         options+=("$i" "$tag")
         ((i++))
     done < <(echo "$release_data" | jq -c '.[]')
@@ -77,7 +75,7 @@ while true; do
 
 # Extraire la version et l'URL
 	version=$(echo "$release_data" | jq -r ".[$choice-1].name" 2>/dev/null)
-	version="${version}-staging-tkg"
+	version="${version}-tkg"
     url=$(echo "$release_data" | jq -r ".[$choice-1].assets[] | select(.name | contains(\"staging-tkg\") and endswith(\"amd64.tar.xz\")).browser_download_url" | head -n1 2>/dev/null)
 
 # Vérifier si la version est bien récupérée
@@ -122,7 +120,7 @@ while true; do
 				echo "$PERCENT"  # La progression est envoyée à la boîte de dialogue
 			fi
 		done
-	) | dialog --backtitle "Foclabroc Toolbox" --gauge "\nTéléchargement et extraction de ${version} Patientez..." 8 70 0 2>&1 >/dev/tty
+	) | dialog --backtitle "Foclabroc Toolbox" --gauge "\nTéléchargement et extraction de ${version} Patientez..." 8 75 0 2>&1 >/dev/tty
 
 	# Vérification du téléchargement
 	if [ ! -f "$ARCHIVE" ]; then
