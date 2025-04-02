@@ -102,7 +102,7 @@ while true; do
 		continue
 	fi
 
-
+    clear
     # Création du répertoire de destination
     WINE_DIR="${INSTALL_DIR}${version}"
     mkdir -p "$WINE_DIR"
@@ -144,6 +144,6 @@ while true; do
     fi
 
     echo "Installation de ${version} terminée."
-    echo "Pour l'utiliser, selectionnez le dans les options avancées windows -> runner."
+    echo "Pour l'utiliser, selectionnez le dans les options avancées windows runner."
     sleep 2
 done
