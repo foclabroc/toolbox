@@ -9,7 +9,7 @@ mkdir -p "$INSTALL_DIR"
 
 # Récupération des versions disponibles
 (
-  dialog --infobox "\nRécupération des versions de Wine Vanilla/Regular..." 5 60
+  dialog --backtitle "Foclabroc Toolbox" --infobox "\nRécupération des versions de Wine Vanilla/Regular..." 5 60
   sleep 1
 ) 2>&1 >/dev/tty
 release_data=$(curl -s "$REPO_URL")
@@ -47,7 +47,7 @@ while true; do
 # Si l'utilisateur appuie sur "Annuler" (retourne 1)
 	if [[ $? -eq 1 ]]; then
 		(
-			dialog --infobox "\nRetour Menu Wine Tools..." 5 60
+			dialog --backtitle "Foclabroc Toolbox" --infobox "\nRetour Menu Wine Tools..." 5 60
 			sleep 1
 		) 2>&1 >/dev/tty
 		curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
@@ -57,7 +57,7 @@ while true; do
 # Si l'utilisateur annule la sélection (choix vide)
 	if [[ -z "$choice" ]]; then
 		(
-			dialog --infobox "\nRetour Menu Wine Tools..." 5 60
+			dialog --backtitle "Foclabroc Toolbox" --infobox "\nRetour Menu Wine Tools..." 5 60
 			sleep 1
 		) 2>&1 >/dev/tty
 		curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
@@ -88,10 +88,10 @@ while true; do
 # Récupérer la version depuis le fichier temporaire pour l'utiliser plus tard
 	version=$(cat /tmp/version.txt)
 
-	response=$(dialog --yesno "\nVoulez-vous télécharger et installer ${version} ?" 7 60 2>&1 >/dev/tty)
+	response=$(dialog --backtitle "Foclabroc Toolbox" --yesno "\nVoulez-vous télécharger et installer ${version} ?" 7 60 2>&1 >/dev/tty)
 	if [[ $? -ne 0 ]]; then
 		(
-			dialog --infobox "\nTéléchargement de ${version} annulé." 5 60
+			dialog --backtitle "Foclabroc Toolbox" --infobox "\nTéléchargement de ${version} annulé." 5 60
 			sleep 1
 		) 2>&1 >/dev/tty
 		continue
@@ -117,7 +117,7 @@ while true; do
 				echo "$PERCENT"  # La progression est envoyée à la boîte de dialogue
 			fi
 		done
-	) | dialog --gauge "\nTéléchargement et extraction de ${version} Patientez..." 8 70 0 2>&1 >/dev/tty
+	) | dialog --backtitle "Foclabroc Toolbox" --gauge "\nTéléchargement et extraction de ${version} Patientez..." 8 70 0 2>&1 >/dev/tty
 
 	# Vérification du téléchargement
 	if [ ! -f "$ARCHIVE" ]; then
@@ -145,7 +145,7 @@ while true; do
         rm "$ARCHIVE"
     fi
     (
-      dialog --infobox "\nTéléchargement et extraction du runner ${version} terminé avec succès " 6 60
+      dialog --backtitle "Foclabroc Toolbox" --infobox "\nTéléchargement et extraction du runner ${version} terminé avec succès " 6 60
       sleep 1
     ) 2>&1 >/dev/tty
     sleep 2
