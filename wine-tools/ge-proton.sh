@@ -134,37 +134,56 @@ while true; do
         exit 1
     fi
 
-    # Création du FIFO pour suivre l'extraction
-    TMP_PROGRESS="/tmp/extract_progress"
-    rm -f "$TMP_PROGRESS"
-    mkfifo "$TMP_PROGRESS"
+# Création du FIFO pour suivre l'extraction
+	TMP_PROGRESS="/tmp/extract_progress"
+	rm -f "$TMP_PROGRESS"
+	mkfifo "$TMP_PROGRESS"
 
-    # Processus d'extraction en arrière-plan
-    COUNT=0
-    (
-        tar --strip-components=2 -xzf "$ARCHIVE" -C "$WINE_DIR" "files/*" --checkpoint=10 --checkpoint-action=echo="%u" > "$TMP_PROGRESS" 2>/dev/null &
-        TAR_PID=$!
+	# Vérifier si un dossier "files" existe dans l'archive
+	if tar -tf "$ARCHIVE" | grep -q "^files/"; then
+		# Si le dossier "files" existe, extraction de son contenu à la racine du répertoire
+		COUNT=0
+		(
+			tar --strip-components=2 -xzf "$ARCHIVE" -C "$WINE_DIR" "files/*" --checkpoint=10 --checkpoint-action=echo="%u" > "$TMP_PROGRESS" 2>/dev/null &
+			TAR_PID=$!
+			while read -r CHECKPOINT; do
+				COUNT=$((COUNT + 10))  
+				PERCENT=$((COUNT * 100 / TOTAL_FILES))
+				echo "$PERCENT"
+			done < "$TMP_PROGRESS"
+			
+			wait "$TAR_PID"
+			echo 100
+		) | dialog --gauge "Extraction de ${version} en cours..." 7 60 0 2>&1 >/dev/tty
+	else
+		# Si le dossier "files" n'existe pas, extraction normale
+		COUNT=0
+		(
+			tar --strip-components=1 -xzf "$ARCHIVE" -C "$WINE_DIR" --checkpoint=10 --checkpoint-action=echo="%u" > "$TMP_PROGRESS" 2>/dev/null &
+			TAR_PID=$!
+			while read -r CHECKPOINT; do
+				COUNT=$((COUNT + 10))  
+				PERCENT=$((COUNT * 100 / TOTAL_FILES))
+				echo "$PERCENT"
+			done < "$TMP_PROGRESS"
+			
+			wait "$TAR_PID"
+			echo 100
+		) | dialog --gauge "Extraction de ${version} en cours..." 7 60 0 2>&1 >/dev/tty
+	fi
 
-        while read -r CHECKPOINT; do
-            COUNT=$((COUNT + 10))  
-            PERCENT=$((COUNT * 100 / TOTAL_FILES))
-            echo "$PERCENT"
-        done < "$TMP_PROGRESS"
-        
-        wait "$TAR_PID"
-        echo 100
-    ) | dialog --gauge "Extraction de ${version} en cours..." 7 60 0 2>&1 >/dev/tty
+	# Nettoyage du FIFO
+	rm -f "$TMP_PROGRESS"
 
-    rm -f "$TMP_PROGRESS"
-
-    if [ $? -eq 0 ]; then
-        rm "$ARCHIVE"
-        dialog --backtitle "Foclabroc Toolbox" --infobox "\nTéléchargement et extraction de ${version} terminé avec succès." 7 60 2>&1 >/dev/tty
-        sleep 2
-    else
-        rm "$ARCHIVE"
-        dialog --msgbox "Erreur lors de l'extraction." 7 60
-    fi
+	# Vérification si l'extraction s'est bien passée
+	if [ $? -eq 0 ]; then
+		rm "$ARCHIVE"
+		dialog --backtitle "Foclabroc Toolbox" --infobox "\nTéléchargement et extraction de ${version} terminé avec succès." 7 60 2>&1 >/dev/tty
+		sleep 2
+	else
+		rm "$ARCHIVE"
+		dialog --msgbox "Erreur lors de l'extraction." 7 60
+	fi
 done
 
 
