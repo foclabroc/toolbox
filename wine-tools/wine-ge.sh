@@ -150,7 +150,7 @@ while true; do
     # Processus d'extraction en arrière-plan
     COUNT=0
     (
-        tar --strip-components=1 --xJf "$ARCHIVE" -C "$WINE_DIR" --checkpoint=10 --checkpoint-action=echo="%u" > "$TMP_PROGRESS" 2>/dev/null &
+        tar --strip-components=1 -xJf "$ARCHIVE" -C "$WINE_DIR" --checkpoint=10 --checkpoint-action=echo="%u" > "$TMP_PROGRESS" 2>/dev/null &
         TAR_PID=$!
 
         while read -r CHECKPOINT; do
