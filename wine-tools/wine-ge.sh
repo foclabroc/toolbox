@@ -2,7 +2,7 @@
 
 #info
 (
-  dialog --backtitle "Foclabroc Toolbox" --title "Wine-GE-Custom" --msgbox "\nInfo : les version superieur à 8.15 semblent ne pas fonctionner sous batocera" 6 60
+  dialog --backtitle "Foclabroc Toolbox" --title "Wine-GE-Custom" --msgbox "\nInfo : les version superieur à 8.15 semblent ne pas fonctionner sous batocera" 8 60
   sleep 3
 ) 2>&1 >/dev/tty
 
@@ -34,7 +34,7 @@ while true; do
     # Construire la liste des options (index et name) avec ajout de "-staging-tkg"
     while IFS= read -r line; do
         tag=$(echo "$line" | jq -r '.name')
-        # Ajouter "-staging-tkg" à la version
+        tag="(ge-custom)${tag}"
         options+=("$i" "$tag")
         ((i++))
     done < <(echo "$release_data" | jq -c '.[]')
@@ -46,7 +46,7 @@ while true; do
     fi
 
     # Affichage du menu et récupération du choix
-    choice=$(dialog --clear --backtitle "Foclabroc Toolbox" --title "Wine-GE-Custom" --menu "\nChoisissez une version à télécharger :\n " 22 76 16 "${options[@]}" 2>&1 >/dev/tty)
+    choice=$(dialog --clear --backtitle "Foclabroc Toolbox" --title "GE-Custom" --menu "\nChoisissez une version à télécharger :\n " 22 76 16 "${options[@]}" 2>&1 >/dev/tty)
 
     # Nettoyage de l'affichage
     clear

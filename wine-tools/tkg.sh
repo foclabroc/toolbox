@@ -29,7 +29,7 @@ while true; do
     while IFS= read -r line; do
         tag=$(echo "$line" | jq -r '.name')
         # Ajouter "-staging-tkg" à la version
-        tag="${tag}-staging-tkg"
+        tag="(staging-tkg)${tag}"
         options+=("$i" "$tag")
         ((i++))
     done < <(echo "$release_data" | jq -c '.[]')

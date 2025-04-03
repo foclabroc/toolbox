@@ -28,7 +28,7 @@ while true; do
     # Construire la liste des options (index et name) avec ajout de "-staging-tkg"
     while IFS= read -r line; do
         tag=$(echo "$line" | jq -r '.name')
-        # Ajouter "-staging-tkg" à la version
+        tag="(ge-proton)${tag}"
         options+=("$i" "$tag")
         ((i++))
     done < <(echo "$release_data" | jq -c '.[]')
@@ -40,7 +40,7 @@ while true; do
     fi
 
     # Affichage du menu et récupération du choix
-    choice=$(dialog --clear --backtitle "Foclabroc Toolbox" --title "Proton-GE" --menu "\nChoisissez une version à télécharger :\n " 22 76 16 "${options[@]}" 2>&1 >/dev/tty)
+    choice=$(dialog --clear --backtitle "Foclabroc Toolbox" --title "GE-Proton" --menu "\nChoisissez une version à télécharger :\n " 22 76 16 "${options[@]}" 2>&1 >/dev/tty)
 
     # Nettoyage de l'affichage
     clear
