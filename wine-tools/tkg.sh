@@ -129,27 +129,43 @@ while true; do
 		continue
 	fi
 
-    # Taille de l'archive pour calcul du pourcentage
-    ARCHIVE="${WINE_DIR}/${version}.tar.xz"
-    SIZE=$(du -b "$ARCHIVE" | cut -f1)
-
-    # Total de fichiers à extraire (via tar -tf)
+######################################################################
+    # Taille totale de l'archive
     TOTAL_FILES=$(tar -tf "$ARCHIVE" | wc -l)
-    COUNT=0
+    if [[ "$TOTAL_FILES" -eq 0 ]]; then
+        dialog --msgbox "Erreur : archive vide ou illisible." 7 60
+        exit 1
+    fi
 
-    # Extraction avec progression
-    if tar --strip-components=1 -xJf "$ARCHIVE" -C "$WINE_DIR" | while read line; do
-        COUNT=$((COUNT + 1))
-        PERCENT=$((COUNT * 100 / TOTAL_FILES))
-    done; then
+    # Création du FIFO pour suivre l'extraction
+    TMP_PROGRESS="/tmp/extract_progress"
+    rm -f "$TMP_PROGRESS"
+    mkfifo "$TMP_PROGRESS"
+
+    # Processus d'extraction en arrière-plan
+    COUNT=0
+    (
+        tar --strip-components=1 --xJf "$ARCHIVE" -C "$WINE_DIR" --checkpoint=10 --checkpoint-action=echo="%u" > "$TMP_PROGRESS" 2>/dev/null &
+        TAR_PID=$!
+
+        while read -r CHECKPOINT; do
+            COUNT=$((COUNT + 10))  
+            PERCENT=$((COUNT * 100 / TOTAL_FILES))
+            echo "$PERCENT"
+        done < "$TMP_PROGRESS"
+        
+        wait "$TAR_PID"
+        echo 100
+    ) | dialog --gauge "Extraction de ${version} en cours..." 7 60 0 2>&1 >/dev/tty
+
+    rm -f "$TMP_PROGRESS"
+
+    if [ $? -eq 0 ]; then
         rm "$ARCHIVE"
-        sleep 1
+        dialog --backtitle "Foclabroc Toolbox" --infobox "\nTéléchargement et extraction de ${version} terminé avec succès." 7 60
+        sleep 2
     else
         rm "$ARCHIVE"
+        dialog --msgbox "Erreur lors de l'extraction." 7 60
     fi
-    (
-      dialog --backtitle "Foclabroc Toolbox" --infobox "\nTéléchargement et extraction du runner ${version} terminé avec succès " 6 60
-      sleep 1
-    ) 2>&1 >/dev/tty
-    sleep 2
 done
