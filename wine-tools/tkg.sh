@@ -41,7 +41,7 @@ while true; do
     fi
 
     # Affichage du menu et récupération du choix
-    choice=$(dialog --clear --backtitle "Foclabroc Toolbox" --title "Wine-proton" --menu "\nChoisissez une version à télécharger :\n " 22 76 16 "${options[@]}" 2>&1 >/dev/tty)
+    choice=$(dialog --clear --backtitle "Foclabroc Toolbox" --title "Wine-Tkg" --menu "\nChoisissez une version à télécharger :\n " 22 76 16 "${options[@]}" 2>&1 >/dev/tty)
 
     # Nettoyage de l'affichage
     clear
