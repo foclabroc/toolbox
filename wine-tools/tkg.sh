@@ -75,7 +75,7 @@ while true; do
 
 # Extraire la version et l'URL
 	version=$(echo "$release_data" | jq -r ".[$choice-1].name" 2>/dev/null)
-	version="${version}-tkg"
+	version="Stag-tkg-${version}"
     url=$(echo "$release_data" | jq -r ".[$choice-1].assets[] | select(.name | contains(\"staging-tkg\") and endswith(\"amd64.tar.xz\")).browser_download_url" | head -n1 2>/dev/null)
 
 # Vérifier si la version est bien récupérée
@@ -162,7 +162,7 @@ while true; do
 
     if [ $? -eq 0 ]; then
         rm "$ARCHIVE"
-        dialog --backtitle "Foclabroc Toolbox" --infobox "\nTéléchargement et extraction de ${version} terminé avec succès." 7 60
+        dialog --backtitle "Foclabroc Toolbox" --infobox "\nTéléchargement et extraction de ${version} terminé avec succès." 7 60 2>&1 >/dev/tty
         sleep 2
     else
         rm "$ARCHIVE"
