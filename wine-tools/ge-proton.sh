@@ -127,33 +127,55 @@ while true; do
 		sleep 2
 		continue
 	fi
+######################################################################
+    # Création du FIFO pour la jauge d'extraction
+    TMP_PROGRESS="/tmp/extract_progress"
+    rm -f "$TMP_PROGRESS"
+    mkfifo "$TMP_PROGRESS"
 
-    # Taille de l'archive pour calcul du pourcentage
-	ARCHIVE="${WINE_DIR}/${version}.tar.xz"
-	SIZE=$(du -b "$ARCHIVE" | cut -f1)
+    # Calcul du nombre total de fichiers
+    TOTAL_FILES=$(tar -tf "$ARCHIVE" | wc -l)
+    COUNT=0
 
-	# Total de fichiers à extraire
-	TOTAL_FILES=$(tar -tf "$ARCHIVE" | wc -l)
-	COUNT=0
-	clear
-	# Extraction avec progression
-	(
-		tar --strip-components=1 -xzf "$ARCHIVE" -C "$WINE_DIR" | while read -r line; do
-			COUNT=$((COUNT + 1))
-			PERCENT=$((COUNT * 100 / TOTAL_FILES))
-			echo "$PERCENT"  # Envoi de la progression à la jauge
-		done
-	) | dialog --gauge "Extraction de ${version} en cours..." 7 60 0 2>&1 >/dev/tty
-	clear
-	# Nettoyage et confirmation
-	if [ $? -eq 0 ]; then
-		rm "$ARCHIVE"
-		dialog --backtitle "Foclabroc Toolbox" --infobox "\nTéléchargement et extraction du runner ${version} terminé avec succès " 7 60
-		sleep 2
-	else
-		rm "$ARCHIVE"
-		dialog --msgbox "Erreur lors de l'extraction." 7 60
-	fi
+    if [[ "$TOTAL_FILES" -eq 0 ]]; then
+        dialog --msgbox "Erreur : archive vide ou illisible." 7 60
+        exit 1
+    fi
+
+    # Extraction en arrière-plan avec mise à jour de la jauge
+    (
+        tar --strip-components=1 -xzf "$ARCHIVE" -C "$WINE_DIR" | while read -r line; do
+            COUNT=$((COUNT + 1))
+            PERCENT=$((COUNT * 100 / TOTAL_FILES))
+            echo "$PERCENT" > "$TMP_PROGRESS"
+        done
+        echo 100 > "$TMP_PROGRESS"
+    ) &
+
+    # Affichage de la jauge
+    (
+        while true; do
+            if read -r PERCENT < "$TMP_PROGRESS"; then
+                echo "$PERCENT"
+                if [ "$PERCENT" -ge 100 ]; then
+                    break
+                fi
+            fi
+        done
+    ) | dialog --gauge "Extraction de ${version} en cours..." 7 60 0 2>&1 >/dev/tty
+
+    # Nettoyage
+    rm -f "$TMP_PROGRESS"
+
+    # Vérification et confirmation
+    if [ $? -eq 0 ]; then
+        rm "$ARCHIVE"
+        dialog --backtitle "Foclabroc Toolbox" --infobox "\nTéléchargement et extraction de ${version} terminé avec succès." 7 60
+        sleep 2
+    else
+        rm "$ARCHIVE"
+        dialog --msgbox "Erreur lors de l'extraction." 7 60
+    fi
 done
 
 
