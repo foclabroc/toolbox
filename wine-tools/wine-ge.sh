@@ -2,8 +2,8 @@
 
 #info
 (
-  dialog --backtitle "Foclabroc Toolbox" --title "Wine-GE-Custom" --infobox "\nInfo : les version superieur à 8.15 semblent ne pas fonctionner sous batocera" 6 60
-  sleep 1
+  dialog --backtitle "Foclabroc Toolbox" --title "Wine-GE-Custom" --msgbox "\nInfo : les version superieur à 8.15 semblent ne pas fonctionner sous batocera" 6 60
+  sleep 3
 ) 2>&1 >/dev/tty
 
 # API endpoint pour récupérer les versions
@@ -125,7 +125,7 @@ while true; do
 				echo "$PERCENT"  # La progression est envoyée à la boîte de dialogue
 			fi
 		done
-	) | dialog --backtitle "Foclabroc Toolbox" --gauge "\nTéléchargement et extraction de ${version} Patientez..." 8 75 0 2>&1 >/dev/tty
+	) | dialog --backtitle "Foclabroc Toolbox" --gauge "\nTéléchargement et extraction de ${version} Patientez..." 9 75 0 2>&1 >/dev/tty
 
 	# Vérification du téléchargement
 	if [ ! -f "$ARCHIVE" ]; then
@@ -153,7 +153,7 @@ while true; do
         rm "$ARCHIVE"
     fi
     (
-      dialog --backtitle "Foclabroc Toolbox" --infobox "\nTéléchargement et extraction du runner ${version} terminé avec succès " 6 60
+      dialog --backtitle "Foclabroc Toolbox" --infobox "\nTéléchargement et extraction du runner ${version} terminé avec succès " 7 60
       sleep 1
     ) 2>&1 >/dev/tty
     sleep 2

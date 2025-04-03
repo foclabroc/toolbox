@@ -39,8 +39,8 @@ case $CHOICE in
         curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine-ge.sh | bash
         ;;
     4)
-        echo "You chose GE-Proton."
-        curl -L https://github.com/trashbus99/profork/raw/master/wine-custom/ge-proton.sh | bash
+        #echo "Liste GE-Proton."
+        curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/ge-proton.sh | bash
         ;;
     5)
         echo "You chose Prepare installers next run."

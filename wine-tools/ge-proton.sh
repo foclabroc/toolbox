@@ -1,105 +1,159 @@
 #!/bin/bash
 
-# API endpoint for GitHub releases with 100 releases per page
+# API endpoint pour récupérer les versions
 REPO_URL="https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases?per_page=100"
 
-# Directory to store custom Wine (Proton-GE) versions
+# Répertoire d'installation des versions Wine personnalisées
 INSTALL_DIR="/userdata/system/wine/custom/"
 mkdir -p "$INSTALL_DIR"
 
-# Check for required commands
-for cmd in jq dialog wget curl tar; do
-    if ! command -v $cmd &> /dev/null; then
-        echo "Error: $cmd is not installed."
-        exit 1
-    fi
-done
-
-# Fetch release data from GitHub (up to 100 releases)
-echo "Fetching release information..."
+# Récupération des versions disponibles
+(
+  dialog --backtitle "Foclabroc Toolbox" --infobox "\nRécupération des versions de Proton-GE..." 5 60
+  sleep 1
+) 2>&1 >/dev/tty
 release_data=$(curl -s "$REPO_URL")
 
-# Check if curl succeeded
+# Vérification du succès de la requête
 if [[ $? -ne 0 || -z "$release_data" ]]; then
-    echo "Failed to fetch release data."
+    echo -e "Erreur : impossible de récupérer les informations depuis GitHub."
     exit 1
 fi
 
-# Prepare the selection menu using dialog
-cmd=(dialog --separate-output --checklist "Select Proton-GE versions to download:" 22 76 16)
-options=()
-i=1
+while true; do
+    # Préparation des options pour le menu
+    options=()
+    i=1
 
-# Parse JSON and build options array
-while IFS= read -r line; do
-    name=$(echo "$line" | jq -r '.name')
-    tag=$(echo "$line" | jq -r '.tag_name')
-    description="${name} - ${tag}"
-    options+=($i "$description" off)
-    ((i++))
-done < <(echo "$release_data" | jq -c '.[]')
+    # Construire la liste des options (index et name) avec ajout de "-staging-tkg"
+    while IFS= read -r line; do
+        tag=$(echo "$line" | jq -r '.name')
+        # Ajouter "-staging-tkg" à la version
+        options+=("$i" "$tag")
+        ((i++))
+    done < <(echo "$release_data" | jq -c '.[]')
 
-# Show dialog, capture selections
-choices=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
+    # Vérifier que des options existent
+    if [[ ${#options[@]} -eq 0 ]]; then
+        echo -e "Erreur : aucune version disponible."
+        exit 1
+    fi
 
-# Clear up the dialog artifacts
-clear
+    # Affichage du menu et récupération du choix
+    choice=$(dialog --clear --backtitle "Foclabroc Toolbox" --title "Proton-GE" --menu "\nChoisissez une version à télécharger :\n " 22 76 16 "${options[@]}" 2>&1 >/dev/tty)
 
-# Process selections
-for choice in $choices; do
-    version=$(echo "$release_data" | jq -r ".[$choice-1].tag_name")
-    url=$(echo "$release_data" | jq -r ".[$choice-1].assets[] | select(.name | endswith(\".tar.gz\")).browser_download_url" | head -n1)
+    # Nettoyage de l'affichage
+    clear
 
-    if [[ -z "$url" ]]; then
-        echo "No compatible download found for Proton ${version}."
+# Si l'utilisateur appuie sur "Annuler" (retourne 1)
+	if [[ $? -eq 1 ]]; then
+		(
+			dialog --backtitle "Foclabroc Toolbox" --infobox "\nRetour Menu Wine Tools..." 5 60
+			sleep 1
+		) 2>&1 >/dev/tty
+		curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
+		exit 0
+	fi
+
+# Si l'utilisateur annule la sélection (choix vide)
+	if [[ -z "$choice" ]]; then
+		(
+			dialog --backtitle "Foclabroc Toolbox" --infobox "\nRetour Menu Wine Tools..." 5 60
+			sleep 1
+		) 2>&1 >/dev/tty
+		curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
+		exit 0
+	fi
+
+    # Vérification que le choix est bien un nombre
+    if ! [[ "$choice" =~ ^[0-9]+$ ]]; then
+        echo -e "Erreur : choix invalide ($choice)."
+        sleep 2
         continue
     fi
 
-    # Create directory for the selected version
-    version_dir="${INSTALL_DIR}proton-${version}"
-    mkdir -p "$version_dir"
-    cd "$version_dir" || { echo "Failed to change directory."; exit 1; }
+# Extraire la version et l'URL
+	version=$(echo "$release_data" | jq -r ".[$choice-1].name" 2>/dev/null)
+	# version="${version}-tkg"
+    url=$(echo "$release_data" | jq -r ".[$choice-1].assets[] | select(.name | endswith(\".tar.gz\")).browser_download_url" | head -n1 2>/dev/null)
 
-    # Download the selected version
-    echo "Downloading Proton-GE ${version} from $url"
-    wget -q --tries=10 --no-check-certificate --no-cache --no-cookies --show-progress -O "${version_dir}/proton-${version}.tar.gz" "$url"
+# Vérifier si la version est bien récupérée
+	if [[ -z "$version" || -z "$url" ]]; then
+		echo -e "Erreur : impossible de récupérer les informations pour la version $choice."
+		sleep 2
+		continue
+	fi
 
-    # Check if the download was successful
-    if [ -f "${version_dir}/proton-${version}.tar.gz" ]; then
-        echo "Unpacking Proton-GE ${version} in ${version_dir}..."
-        
-        # Unpack the .tar.gz file
-        tar -xzf "${version_dir}/proton-${version}.tar.gz" --strip-components=1
-        
-        # Check if extraction was successful
-        if [ "$(ls -A "$version_dir")" ]; then
-            echo "Unpacking successful."
-            rm "proton-${version}.tar.gz"
+# Sauvegarder la version dans un fichier temporaire
+	echo -e "$version" > /tmp/version.txt
 
-            # Check if a "files" folder exists
-            if [ -d "${version_dir}/files" ]; then
-                echo "Moving files from 'files' folder to parent directory..."
-                
-                # Move files from the "files" folder to the parent directory
-                mv "${version_dir}/files/"* "${version_dir}/"
-                
-                # Remove the "files" folder
-                rmdir "${version_dir}/files"
-                
-                echo "'files' folder processed and deleted."
-            fi
-        else
-            echo "Unpacking failed, directory is empty."
-        fi
-        
-        echo "Installation of Proton-GE ${version} complete."
-    else
-        echo "Failed to download Proton-GE ${version}."
-    fi
+# Récupérer la version depuis le fichier temporaire pour l'utiliser plus tard
+	version=$(cat /tmp/version.txt)
 
-    # Return to the initial directory
-    cd - > /dev/null
+	response=$(dialog --backtitle "Foclabroc Toolbox" --yesno "\nVoulez-vous télécharger et installer ${version} ?" 7 60 2>&1 >/dev/tty)
+	if [[ $? -ne 0 ]]; then
+		(
+			dialog --backtitle "Foclabroc Toolbox" --infobox "\nTéléchargement de ${version} annulé." 5 60
+			sleep 1
+		) 2>&1 >/dev/tty
+		continue
+	fi
+
+	# Création du répertoire de destination
+	WINE_DIR="${INSTALL_DIR}${version}"
+	mkdir -p "$WINE_DIR"
+	cd "${WINE_DIR}"
+	clear
+
+	# Préparer le fichier de téléchargement
+	ARCHIVE="${WINE_DIR}/${version}.tar.xz"
+
+	# Télécharger le fichier avec wget et afficher la progression dans une boîte dialog
+	(
+		wget --tries=10 --no-check-certificate --no-cache --no-cookies --show-progress -O "$ARCHIVE" "$url" 2>&1 | \
+		while read -r line; do
+			# Si la ligne contient un pourcentage, extrait la valeur
+			if [[ "$line" =~ ([0-9]+)% ]]; then
+				PERCENT=${BASH_REMATCH[1]}  # Récupère le pourcentage
+				# Envoie la progression à la boîte dialog --gauge
+				echo "$PERCENT"  # La progression est envoyée à la boîte de dialogue
+			fi
+		done
+	) | dialog --backtitle "Foclabroc Toolbox" --gauge "\nTéléchargement de ${version} Patientez..." 9 75 0 2>&1 >/dev/tty
+
+	# Vérification du téléchargement
+	if [ ! -f "$ARCHIVE" ]; then
+		echo -e "Erreur : échec du téléchargement de ${version}."
+		sleep 2
+		continue
+	fi
+
+    # Taille de l'archive pour calcul du pourcentage
+	ARCHIVE="${WINE_DIR}/${version}.tar.xz"
+	SIZE=$(du -b "$ARCHIVE" | cut -f1)
+
+	# Total de fichiers à extraire
+	TOTAL_FILES=$(tar -tf "$ARCHIVE" | wc -l)
+	COUNT=0
+
+	# Extraction avec progression
+	(
+		tar --strip-components=1 -xJf "$ARCHIVE" -C "$WINE_DIR" | while read -r line; do
+			COUNT=$((COUNT + 1))
+			PERCENT=$((COUNT * 100 / TOTAL_FILES))
+			echo "$PERCENT"  # Envoi de la progression à la jauge
+		done
+	) | dialog --gauge "Extraction de ${version} en cours..." 7 60 0 2>&1 >/dev/tty
+
+	# Nettoyage et confirmation
+	if [ $? -eq 0 ]; then
+		rm "$ARCHIVE"
+		dialog --backtitle "Foclabroc Toolbox" --infobox "\nTéléchargement et extraction du runner ${version} terminé avec succès " 7 60
+		sleep 2
+	else
+		rm "$ARCHIVE"
+		dialog --msgbox "Erreur lors de l'extraction." 7 60
+	fi
 done
 
-echo "All selected versions have been processed."
 
