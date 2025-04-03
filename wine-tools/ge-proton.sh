@@ -128,46 +128,36 @@ while true; do
 		continue
 	fi
 ######################################################################
-    # Création du FIFO pour la jauge d'extraction
-    TMP_PROGRESS="/tmp/extract_progress"
-    rm -f "$TMP_PROGRESS"
-    mkfifo "$TMP_PROGRESS"
-
-    # Calcul du nombre total de fichiers
+    # Taille totale de l'archive
     TOTAL_FILES=$(tar -tf "$ARCHIVE" | wc -l)
-    COUNT=0
-
     if [[ "$TOTAL_FILES" -eq 0 ]]; then
         dialog --msgbox "Erreur : archive vide ou illisible." 7 60
         exit 1
     fi
 
-    # Extraction en arrière-plan avec mise à jour de la jauge
-    (
-        tar --strip-components=1 -xzf "$ARCHIVE" -C "$WINE_DIR" | while read -r line; do
-            COUNT=$((COUNT + 1))
-            PERCENT=$((COUNT * 100 / TOTAL_FILES))
-            echo "$PERCENT" > "$TMP_PROGRESS"
-        done
-        echo 100 > "$TMP_PROGRESS"
-    ) &
+    # Création du FIFO pour suivre l'extraction
+    TMP_PROGRESS="/tmp/extract_progress"
+    rm -f "$TMP_PROGRESS"
+    mkfifo "$TMP_PROGRESS"
 
-    # Affichage de la jauge
+    # Processus d'extraction en arrière-plan
+    COUNT=0
     (
-        while true; do
-            if read -r PERCENT < "$TMP_PROGRESS"; then
-                echo "$PERCENT"
-                if [ "$PERCENT" -ge 100 ]; then
-                    break
-                fi
-            fi
-        done
+        tar --strip-components=1 -xJf "$ARCHIVE" -C "$WINE_DIR" --checkpoint=10 --checkpoint-action=echo="%u" > "$TMP_PROGRESS" 2>/dev/null &
+        TAR_PID=$!
+
+        while read -r CHECKPOINT; do
+            COUNT=$((COUNT + 10))  
+            PERCENT=$((COUNT * 100 / TOTAL_FILES))
+            echo "$PERCENT"
+        done < "$TMP_PROGRESS"
+        
+        wait "$TAR_PID"
+        echo 100
     ) | dialog --gauge "Extraction de ${version} en cours..." 7 60 0 2>&1 >/dev/tty
 
-    # Nettoyage
     rm -f "$TMP_PROGRESS"
 
-    # Vérification et confirmation
     if [ $? -eq 0 ]; then
         rm "$ARCHIVE"
         dialog --backtitle "Foclabroc Toolbox" --infobox "\nTéléchargement et extraction de ${version} terminé avec succès." 7 60
