@@ -1,5 +1,11 @@
 #!/bin/bash
 
+#info
+(
+  dialog --backtitle "Foclabroc Toolbox" --title "Wine-GE-Custom" --infobox "\nInfo : les version superieur à 8.15 semblent ne pas fonctionner sous batocera" 6 60
+  sleep 1
+) 2>&1 >/dev/tty
+
 # API endpoint pour récupérer les versions
 REPO_URL="https://api.github.com/repos/GloriousEggroll/wine-ge-custom/releases?per_page=100"
 
