@@ -9,7 +9,7 @@ mkdir -p "$INSTALL_DIR"
 
 # Récupération des versions disponibles
 (
-  dialog --backtitle "Foclabroc Toolbox" --infobox "\nRécupération des versions de Proton-GE..." 5 60
+  dialog --backtitle "Foclabroc Toolbox" --infobox "\nRécupération des versions de GE-Proton..." 5 60
   sleep 1
 ) 2>&1 >/dev/tty
 release_data=$(curl -s "$REPO_URL")
@@ -142,7 +142,7 @@ while true; do
     # Processus d'extraction en arrière-plan
     COUNT=0
     (
-        tar --strip-components=1 -xzf "$ARCHIVE" -C "$WINE_DIR" --checkpoint=10 --checkpoint-action=echo="%u" > "$TMP_PROGRESS" 2>/dev/null &
+        tar --strip-components=2 -xzf "$ARCHIVE" -C "$WINE_DIR" "files/*" --checkpoint=10 --checkpoint-action=echo="%u" > "$TMP_PROGRESS" 2>/dev/null &
         TAR_PID=$!
 
         while read -r CHECKPOINT; do
