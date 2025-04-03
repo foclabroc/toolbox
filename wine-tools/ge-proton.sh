@@ -135,16 +135,16 @@ while true; do
 	# Total de fichiers à extraire
 	TOTAL_FILES=$(tar -tf "$ARCHIVE" | wc -l)
 	COUNT=0
-
+	clear
 	# Extraction avec progression
 	(
-		tar --strip-components=1 -xJf "$ARCHIVE" -C "$WINE_DIR" | while read -r line; do
+		tar --strip-components=1 -xzf "$ARCHIVE" -C "$WINE_DIR" | while read -r line; do
 			COUNT=$((COUNT + 1))
 			PERCENT=$((COUNT * 100 / TOTAL_FILES))
 			echo "$PERCENT"  # Envoi de la progression à la jauge
 		done
 	) | dialog --gauge "Extraction de ${version} en cours..." 7 60 0 2>&1 >/dev/tty
-
+	clear
 	# Nettoyage et confirmation
 	if [ $? -eq 0 ]; then
 		rm "$ARCHIVE"
