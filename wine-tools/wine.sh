@@ -43,8 +43,8 @@ case $CHOICE in
         curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/ge-proton.sh | bash
         ;;
     5)
-        echo "You chose Prepare installers next run."
-        curl -L https://github.com/trashbus99/profork/raw/master/wine-custom/deps.sh | bash
+        #echo "Ge-custom V40."
+        curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/v40wine.sh | bash
         ;;
     6)
         echo "You chose Easy Batocera Wine Tricks."
