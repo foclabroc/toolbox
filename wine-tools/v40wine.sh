@@ -39,7 +39,7 @@ fi
 extract_file() {
     local file=$1
     local target_dir=$2
-    tar -xf "$file" -C "$target_dir" | \
+    xz -d "$file" -C "$target_dir" | \
     dialog --gauge "Extraction en cours..." 10 70 0
 }
 
