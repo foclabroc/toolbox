@@ -13,12 +13,12 @@ mkdir -p "$DOWNLOAD_DIR"
 mkdir -p "$EXTRACT_DIR"
 
 # Demander à l'utilisateur s'il souhaite lancer le téléchargement
-dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nSouhaitez-vous télécharger et installer ge-custom V40 ?" 7 60
+dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nSouhaitez-vous télécharger et installer ge-custom V40 ?" 7 60 2>&1 >/dev/tty
 
 # Si l'utilisateur appuie sur "Non" (retourne 1)
 if [[ $? -eq 1 ]]; then
     (
-        dialog --backtitle "Foclabroc Toolbox" --infobox "\nRetour Menu Wine Tools..." 5 60
+        dialog --backtitle "Foclabroc Toolbox" --infobox "\nRetour Menu Wine Tools..." 5 60 2>&1 >/dev/tty
         sleep 1
     ) 2>&1 >/dev/tty
     # Lancer le script précédent (ici tu retournes dans le menu Wine Tools)
@@ -30,35 +30,35 @@ fi
 (
   echo 10 ; curl -Ls -o "$DOWNLOAD_DIR/ge-customv40.tar.xz.001" "$URL_PART1" --progress-bar && echo 50
   curl -Ls -o "$DOWNLOAD_DIR/ge-customv40.tar.xz.002" "$URL_PART2" --progress-bar && echo 100
-) | dialog --gauge "Téléchargement de ge-custom v40 en cours..." 7 55 0
+) | dialog --gauge "Téléchargement de ge-custom v40 en cours..." 7 55 0 2>&1 >/dev/tty
 
 # Vérification de la réussite des téléchargements
 if [[ ! -f "$DOWNLOAD_DIR/ge-customv40.tar.xz.001" || ! -f "$DOWNLOAD_DIR/ge-customv40.tar.xz.002" ]]; then
-    dialog --backtitle "Foclabroc Toolbox" --infobox "\nErreur lors du téléchargement des fichiers!" 5 55
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nErreur lors du téléchargement des fichiers!" 5 55 2>&1 >/dev/tty
     exit 1
 fi
 
 # Assemblage des 2 parties
 cd "$DOWNLOAD_DIR"
-dialog --backtitle "Foclabroc Toolbox" --infobox "\nAssemblage des 2 parties en cours..." 5 55
+dialog --backtitle "Foclabroc Toolbox" --infobox "\nAssemblage des 2 parties en cours..." 5 55 2>&1 >/dev/tty
 sleep 2
 cat ge-customv40.tar.xz.001 ge-customv40.tar.xz.002 > ge-customv40.tar.xz
 
 # Vérification de l'assemblage
 if [[ ! -f "ge-customv40.tar.xz" ]]; then
-    dialog --backtitle "Foclabroc Toolbox" --infobox "\nEchec de l'assemblage des 2 parties !!!" 5 55
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nEchec de l'assemblage des 2 parties !!!" 5 55 2>&1 >/dev/tty
 	sleep 2
     exit 1
 fi
 
 # Décompression du .xz
-dialog --backtitle "Foclabroc Toolbox" --infobox "\nDécompression du .xz en cours..." 5 55
+dialog --backtitle "Foclabroc Toolbox" --infobox "\nDécompression du .xz en cours..." 5 55 2>&1 >/dev/tty
 sleep 2
 xz -d ge-customv40.tar.xz
 
 # Vérification du fichier décompressé
 if [[ ! -f "ge-customv40.tar" ]]; then
-    dialog --backtitle "Foclabroc Toolbox" --infobox "\nEchec de la décompression du .xz !!!" 5 55
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nEchec de la décompression du .xz !!!" 5 55 2>&1 >/dev/tty
     exit 1
 fi
 
@@ -66,15 +66,15 @@ fi
 rm -rf /userdata/system/wine/custom/ge-custom
 
 # Décompression du .tar
-dialog --backtitle "Foclabroc Toolbox" --infobox "\nDécompression du .tar en cours..." 5 55
+dialog --backtitle "Foclabroc Toolbox" --infobox "\nDécompression du .tar en cours..." 5 55 2>&1 >/dev/tty
 tar -xf ge-customv40.tar -C "$EXTRACT_DIR"
 
 # Vérification du fichier extrait
 if [[ $? -eq 0 ]]; then
-    dialog --backtitle "Foclabroc Toolbox" --infobox "\nInstallation de ge-custom V40 terminée avec succès dans $EXTRACT_DIR." 6 60
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nInstallation de ge-custom V40 terminée avec succès dans $EXTRACT_DIR." 6 60 2>&1 >/dev/tty
     sleep 3
 else
-    dialog --backtitle "Foclabroc Toolbox" --infobox "\nEchec de l'installation de ge-custom V40 !!!" 4 55
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nEchec de l'installation de ge-custom V40 !!!" 4 55 2>&1 >/dev/tty
     exit 1
 fi
 
@@ -84,7 +84,7 @@ rm -rf "$DOWNLOAD_DIR"
 
 # Retourner au script précédent (Menu Wine Tools)
 (
-    dialog --backtitle "Foclabroc Toolbox" --infobox "\nRetour Menu Wine Tools..." 5 60
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nRetour Menu Wine Tools..." 5 60 2>&1 >/dev/tty
     sleep 1
 ) 2>&1 >/dev/tty
 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
