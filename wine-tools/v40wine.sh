@@ -62,6 +62,9 @@ if [[ ! -f "ge-customv40.tar" ]]; then
     exit 1
 fi
 
+# Suppression ancien dossier
+rm -rf /userdata/system/wine/custom/ge-custom
+
 # Décompression du .tar
 dialog --backtitle "Foclabroc Toolbox" --infobox "\nDécompression du .tar en cours..." 5 55
 tar -xf ge-customv40.tar -C "$EXTRACT_DIR"
@@ -69,13 +72,14 @@ tar -xf ge-customv40.tar -C "$EXTRACT_DIR"
 # Vérification du fichier extrait
 if [[ $? -eq 0 ]]; then
     dialog --backtitle "Foclabroc Toolbox" --infobox "\nInstallation de ge-custom V40 terminée avec succès dans $EXTRACT_DIR." 6 60
-    sleep 2
+    sleep 3
 else
     dialog --backtitle "Foclabroc Toolbox" --infobox "\nEchec de l'installation de ge-custom V40 !!!" 4 55
     exit 1
 fi
 
 # Nettoyage des fichiers temporaires
+cd /tmp || exit 1
 rm -rf "$DOWNLOAD_DIR"
 
 # Retourner au script précédent (Menu Wine Tools)
