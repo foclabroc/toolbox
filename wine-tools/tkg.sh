@@ -9,7 +9,7 @@ mkdir -p "$INSTALL_DIR"
 
 # Récupération des versions disponibles
 (
-  dialog --backtitle "Foclabroc Toolbox" --infobox "\nRécupération des versions de Wine tkg-staging..." 5 60
+  dialog --backtitle "Foclabroc Toolbox" --infobox "\nRécupération des versions de Wine tkg-staging..." 5 60 2>&1 >/dev/tty
   sleep 1
 ) 2>&1 >/dev/tty
 release_data=$(curl -s "$REPO_URL")
@@ -95,10 +95,10 @@ while true; do
 # Récupérer la version depuis le fichier temporaire pour l'utiliser plus tard
 	version=$(cat /tmp/version.txt)
 
-	response=$(dialog --backtitle "Foclabroc Toolbox" --yesno "\nVoulez-vous télécharger et installer ${version} ?" 7 60 2>&1 >/dev/tty)
+	response=$(dialog --backtitle "Foclabroc Toolbox" --yesno "\nVoulez-vous télécharger et installer ${version} ?" 8 60 2>&1 >/dev/tty)
 	if [[ $? -ne 0 ]]; then
 		(
-			dialog --backtitle "Foclabroc Toolbox" --infobox "\nTéléchargement de ${version} annulé." 5 60
+			dialog --backtitle "Foclabroc Toolbox" --infobox "\nTéléchargement de ${version} annulé." 5 60 2>&1 >/dev/tty
 			sleep 1
 		) 2>&1 >/dev/tty
 		continue
@@ -145,7 +145,7 @@ while true; do
     # Taille totale de l'archive
     TOTAL_FILES=$(tar -tf "$ARCHIVE" | wc -l)
     if [[ "$TOTAL_FILES" -eq 0 ]]; then
-        dialog --msgbox "Erreur : archive vide ou illisible." 7 60
+        dialog --msgbox "Erreur : archive vide ou illisible." 7 60 2>&1 >/dev/tty
         exit 1
     fi
 
@@ -168,16 +168,16 @@ while true; do
         
         wait "$TAR_PID"
         echo 100
-    ) | dialog --gauge "Extraction de ${version} en cours..." 7 60 0 2>&1 >/dev/tty
+    ) | dialog --gauge "\nExtraction de ${version} en cours..." 8 60 0 2>&1 >/dev/tty
 
     rm -f "$TMP_PROGRESS"
 
     if [ $? -eq 0 ]; then
         rm "$ARCHIVE"
-        dialog --backtitle "Foclabroc Toolbox" --infobox "\nTéléchargement et extraction de ${version} terminé avec succès." 7 60 2>&1 >/dev/tty
+        dialog --backtitle "Foclabroc Toolbox" --infobox "\nTéléchargement et extraction de ${version} terminé avec succès." 8 60 2>&1 >/dev/tty
         sleep 2
     else
         rm "$ARCHIVE"
-        dialog --msgbox "Erreur lors de l'extraction." 7 60
+        dialog --msgbox "Erreur lors de l'extraction." 7 60 2>&1 >/dev/tty
     fi
 done
