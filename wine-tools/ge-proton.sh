@@ -148,26 +148,20 @@ while true; do
 
 	COUNT=0
 	(
-		# Extraction en mode verbose (-v) et redirection des fichiers extraits vers le FIFO
-		tar --strip-components=1 -xvzf "$ARCHIVE" -C "$WINE_DIR" 2>/dev/null | while read -r FILE; do
-			echo "$FILE" > "$TMP_PROGRESS"
-		done &
-		TAR_PID=$!
-
-		while read -r FILE; do
+		# Extraction avec checkpoints
+		tar --strip-components=1 -xvzf "$ARCHIVE" -C "$WINE_DIR" --checkpoint=1 --checkpoint-action=echo="%u" 2>/dev/null | while read -r _; do
 			COUNT=$((COUNT + 1))
 			PERCENT=$((COUNT * 100 / TOTAL_FILES))
 			echo "$PERCENT"
-		done < "$TMP_PROGRESS"
+		done &
+		TAR_PID=$!
 
 		wait "$TAR_PID"
 		echo 100
 	) | dialog --gauge "Extraction de ${version} en cours..." 7 60 0 2>&1 >/dev/tty
 
-	# Suppression manuelle après exécution réussie
+	# Suppression après exécution réussie
 	rm -f "$TMP_PROGRESS" "$TMP_FILE_LIST"
-
-
 
 	# Vérification si l'extraction a réussi
 	if [ $? -eq 0 ]; then
