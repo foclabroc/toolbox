@@ -51,9 +51,9 @@ while true; do
     NOM=$(echo "$CHOIX" | sed 's/^-> \[\(.*\)\]$/\1/')
 
     # Confirmation
-    dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nVoulez-vous vraiment supprimer le dossier '$NOM' ?" 8 50 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nVoulez-vous vraiment supprimer le runner '$NOM' ?" 8 50 2>&1 >/dev/tty
     REPONSE=$?
-
+    cd /tmp || exit 1
     if [ "$REPONSE" -eq 0 ]; then
         if [[ -n "$NOM" && "$NOM" != "/" && -d "$CUSTOM/$NOM" ]]; then
             rm -rf "$CUSTOM/$NOM"
