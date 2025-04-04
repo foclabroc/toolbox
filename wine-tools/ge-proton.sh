@@ -73,7 +73,7 @@ while true; do
 
 # Extraire la version et l'URL
 	version=$(echo "$release_data" | jq -r ".[$choice-1].name" 2>/dev/null)
-	version="Ge-proton-${version}"
+	version="${version}"
     url=$(echo "$release_data" | jq -r ".[$choice-1].assets[] | select(.name | endswith(\".tar.gz\")).browser_download_url" | head -n1 2>/dev/null)
 
 # Vérifier si la version est bien récupérée
