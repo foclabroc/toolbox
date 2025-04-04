@@ -7,17 +7,18 @@ OPTIONS=(
   "3" "Telechargement Runner Wine-GE Custom builds"
   "4" "Telechargement Runner GE-Proton builds"
   "5" "Telechargement Runner GE-Custom de la V40 (pour garder vos anciennes bottles/sauvegarde)"
-  "6" "Installation de Winetricks automatique"
-  "7" "Convertir dossier .pc en dossier .wine"
-  "8" "Compresser dossier .wine en fichier .wsquashfs ou .tgz"
-  "9" "Decompresser fichiers .wsquashfs ou .tgz en dossier .wine"
+  "6" "Séléctionnez et supprimer les runner custom inutiles"
+  "7" "Installation de Winetricks automatique"
+  "8" "Convertir dossier .pc en dossier .wine"
+  "9" "Compresser dossier .wine en fichier .wsquashfs ou .tgz"
+  "10" "Decompresser fichiers .wsquashfs ou .tgz en dossier .wine"
 )
 
 # Use dialog to display the menu
 CHOICE=$(dialog --clear --backtitle "Foclabroc Toolbox" \
                 --title "Wine Toolbox" \
                 --menu "\nChoisissez une option:\n " \
-               30 100 9 \
+               30 100 10 \
                 "${OPTIONS[@]}" \
                 2>&1 >/dev/tty)
 
@@ -47,18 +48,22 @@ case $CHOICE in
         curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/v40wine.sh | bash
         ;;
     6)
+        #echo "Suppression runner."
+        curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/delete-runner.sh | bash
+        ;;
+    7)
         echo "You chose Easy Batocera Wine Tricks."
         curl -L https://github.com/trashbus99/profork/raw/master/wine-custom/tricks.sh | bash
         ;;
-    7)
+    8)
         echo "You chose Easy autorun.cmd creator."
         curl -L https://github.com/trashbus99/profork/raw/master/wine-custom/ar.sh | bash
         ;;
-    8)
+    9)
         echo "You chose to convert a .pc folder to a .wine folder."
         curl -L https://github.com/trashbus99/profork/raw/master/wine-custom/wc.sh | bash
         ;;
-    9)
+    10)
         echo "You chose to compress a .wine folder to a .wsquashfs or .tgz file."
         curl -L https://github.com/trashbus99/profork/raw/master/wine-custom/squash.sh | bash
         ;;
