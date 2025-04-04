@@ -126,8 +126,7 @@ while true; do
 
     # Une fois que le téléchargement est terminé, forcer la barre de progression à 100 %
     echo "100"
-) | dialog --backtitle "Foclabroc Toolbox" --gauge "\nTéléchargement de ${version} Patientez..." 9 75 0 2>&1 >/dev/tty
-
+	) | dialog --backtitle "Foclabroc Toolbox" --gauge "\nTéléchargement de ${version} Patientez..." 9 75 0 2>&1 >/dev/tty
 
 	# Vérification du téléchargement
 	if [ ! -f "$ARCHIVE" ]; then

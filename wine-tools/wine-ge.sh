@@ -115,16 +115,24 @@ while true; do
 
 	# Télécharger le fichier avec wget et afficher la progression dans une boîte dialog
 	(
-		wget --tries=10 --no-check-certificate --no-cache --no-cookies --show-progress -O "$ARCHIVE" "$url" 2>&1 | \
+		# Lancer wget avec l'option --progress=dot pour avoir des mises à jour fréquentes
+		wget --tries=10 --no-check-certificate --no-cache --no-cookies --progress=dot --timeout=60 -O "$ARCHIVE" "$url" 2>&1 | \
 		while read -r line; do
-			# Si la ligne contient un pourcentage, extrait la valeur
+			# Chercher le pourcentage dans la sortie de wget
 			if [[ "$line" =~ ([0-9]+)% ]]; then
 				PERCENT=${BASH_REMATCH[1]}  # Récupère le pourcentage
-				# Envoie la progression à la boîte dialog --gauge
-				echo "$PERCENT"  # La progression est envoyée à la boîte de dialogue
+            
+				# Mettez à jour la progression de la boîte de dialogue toutes les 10 %
+				# Assure-toi que la progression est un multiple de 10
+				if (( PERCENT % 10 == 0 )); then
+					echo "$PERCENT"  # Envoie la progression à la boîte de dialogue
+				fi
 			fi
 		done
-	) | dialog --backtitle "Foclabroc Toolbox" --gauge "\nTéléchargement et extraction de ${version} Patientez..." 9 75 0 2>&1 >/dev/tty
+
+    # Une fois que le téléchargement est terminé, forcer la barre de progression à 100 %
+    echo "100"
+	) | dialog --backtitle "Foclabroc Toolbox" --gauge "\nTéléchargement de ${version} Patientez..." 9 75 0 2>&1 >/dev/tty
 
 	# Vérification du téléchargement
 	if [ ! -f "$ARCHIVE" ]; then
