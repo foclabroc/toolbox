@@ -135,6 +135,7 @@ while true; do
 		sleep 2
 		continue
 	fi
+	
 ######################################################################
 	# Extraction de l'archive
 	TOTAL_FILES=$(tar -tf "$ARCHIVE" | wc -l)
@@ -165,13 +166,13 @@ while true; do
 	) | dialog --gauge "Extraction de ${version} en cours..." 7 60 0 2>&1 >/dev/tty
 
 	rm -f "$TMP_PROGRESS"
-
+###########################################################################################
 	# Vérification si l'extraction a réussi
 	if [ $? -eq 0 ]; then
 		# Déplacement du contenu de "files" si le dossier existe
 		if [ -d "$WINE_DIR/files" ]; then
 			rsync -av --remove-source-files "$WINE_DIR/files/" "$WINE_DIR/"
-			rmdir "$WINE_DIR/files"  # Supprime le dossier "files" si vide après le déplacement
+			rm -rf "$WINE_DIR/files"  # Supprime le dossier "files" si vide après le déplacement
 		fi
 		rm "$ARCHIVE"
 		dialog --backtitle "Foclabroc Toolbox" --infobox "\nTéléchargement et extraction de ${version} terminé avec succès." 7 60 2>&1 >/dev/tty
