@@ -7,6 +7,7 @@ URL_PART2="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/w
 # Définir le répertoire de téléchargement et le chemin de destination pour l'extraction
 DOWNLOAD_DIR="/tmp/ge-custom-download"
 EXTRACT_DIR="/userdata/system/wine/custom"
+GE_CUSTOM_DIR="$EXTRACT_DIR/ge-custom"
 
 # Créer les répertoires
 mkdir -p "$DOWNLOAD_DIR" "$EXTRACT_DIR"
@@ -21,7 +22,7 @@ download_file() {
     wget --progress=bar:force:noscroll -O "$output" "$url" 2>&1 | \
     dialog --gauge "Téléchargement en cours..." 10 70 0
 }
-rm -rf /userdata/system/wine/custom/ge-custom
+
 # Télécharger les fichiers
 download_file "$URL_PART1" "$DOWNLOAD_DIR/ge-customv40.tar.xz.001"
 download_file "$URL_PART2" "$DOWNLOAD_DIR/ge-customv40.tar.xz.002"
@@ -29,11 +30,15 @@ download_file "$URL_PART2" "$DOWNLOAD_DIR/ge-customv40.tar.xz.002"
 # Combiner les fichiers
 cat "$DOWNLOAD_DIR/ge-customv40.tar.xz.001" "$DOWNLOAD_DIR/ge-customv40.tar.xz.002" > "$DOWNLOAD_DIR/ge-customv40.tar.xz"
 
+# Supprimer l'ancien dossier GE-Custom s'il existe
+if [ -d "$GE_CUSTOM_DIR" ]; then
+    rm -rf "$GE_CUSTOM_DIR"
+fi
+
 # Fonction d'extraction avec progression
 extract_file() {
     local file=$1
     local target_dir=$2
-	rm 
     tar -xf "$file" -C "$target_dir" | \
     dialog --gauge "Extraction en cours..." 10 70 0
 }
@@ -42,5 +47,4 @@ extract_file() {
 extract_file "$DOWNLOAD_DIR/ge-customv40.tar.xz" "$EXTRACT_DIR"
 
 # Afficher un message de fin
-dialog --backtitle "Foclabroc Toolbox" --title "GE-Custom V40" --infobox "Téléchargement et extraction terminés avec succès !" 6 50
-
+dialog --backtitle "Foclabroc Toolbox" --title "GE-Custom V40" --msgbox "Téléchargement et extraction terminés avec succès !" 6 50
