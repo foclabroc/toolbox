@@ -5,7 +5,7 @@ CUSTOM="/userdata/system/wine/custom"
 
 # Vérifie si le dossier existe
 if [ ! -d "$CUSTOM" ]; then
-    dialog --backtitle "Foclabroc Toolbox" --infobox "Le dossier $CUSTOM n'existe pas." 7 50
+    dialog --backtitle "Foclabroc Toolbox" --infobox "Le dossier $CUSTOM n'existe pas." 7 50 2>&1 >/dev/tty
     clear
     exit 1
 fi
@@ -16,7 +16,7 @@ while true; do
 
     # Vérifie s'il y a des dossiers
     if [ ${#DOSSIERS[@]} -eq 0 ]; then
-        dialog --backtitle "Foclabroc Toolbox" --infobox "Aucun runner trouvé dans $CUSTOM." 7 50
+        dialog --backtitle "Foclabroc Toolbox" --infobox "Aucun runner trouvé dans $CUSTOM." 7 50 2>&1 >/dev/tty
         break
     fi
 
@@ -29,9 +29,9 @@ while true; do
 
     # Affiche le menu de sélection
     CHOIX=$(dialog --clear --backtitle "Foclabroc Toolbox" --title "Suppression de runner custom" \
-        --menu "\nSélectionnez un runner à supprimer :\n" 15 50 6 \
+        --menu "\nSélectionnez un runner à supprimer :\n" 25 80 15 \
         "${LISTE[@]}" \
-        3>&1 1>&2 2>&3)
+        3>&1 1>&2 2>&3 2>&1 >/dev/tty)
 
     # Si annulation (ESC ou bouton Annuler)
     if [ -z "$CHOIX" ]; then
@@ -43,15 +43,15 @@ while true; do
     fi
 
     # Confirmation
-    dialog --yesno "Voulez-vous vraiment supprimer le dossier '$CHOIX' ?" 7 50
+    dialog --yesno "Voulez-vous vraiment supprimer le dossier '$CHOIX' ?" 7 50 2>&1 >/dev/tty
     REPONSE=$?
 
     if [ "$REPONSE" -eq 0 ]; then
         rm -rf "$CUSTOM/$CHOIX"
-        dialog --backtitle "Foclabroc Toolbox" --infobox "\nLe Runner '$CHOIX' a été supprimé." 6 50
+        dialog --backtitle "Foclabroc Toolbox" --infobox "\nLe Runner '$CHOIX' a été supprimé." 6 50 2>&1 >/dev/tty
 		sleep 2
     else
-        dialog --backtitle "Foclabroc Toolbox" --infobox "Suppression annulée." 6 50
+        dialog --backtitle "Foclabroc Toolbox" --infobox "Suppression annulée." 6 50 2>&1 >/dev/tty
 		sleep 1
     fi
 done
