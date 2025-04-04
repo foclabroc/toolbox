@@ -149,7 +149,9 @@ while true; do
 	COUNT=0
 	(
 		# Extraction en mode verbose (-v) et redirection des fichiers extraits vers le FIFO
-		tar --strip-components=1 -xvzf "$ARCHIVE" -C "$WINE_DIR" > "$TMP_PROGRESS" 2>/dev/null &
+		tar --strip-components=1 -xvzf "$ARCHIVE" -C "$WINE_DIR" 2>/dev/null | while read -r FILE; do
+			echo "$FILE" > "$TMP_PROGRESS"
+		done &
 		TAR_PID=$!
 
 		while read -r FILE; do
