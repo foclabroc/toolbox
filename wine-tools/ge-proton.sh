@@ -170,8 +170,8 @@ while true; do
 	if [ $? -eq 0 ]; then
 		# Déplacement du contenu de "files" si le dossier existe
 		if [ -d "$WINE_DIR/files" ]; then
-			mv "$WINE_DIR/files"/* "$WINE_DIR"  # Déplace le contenu à la racine
-			rmdir "$WINE_DIR/files"  # Supprime le dossier "files" s'il est maintenant vide
+			rsync -av --remove-source-files "$WINE_DIR/files/" "$WINE_DIR/"
+			rmdir "$WINE_DIR/files"  # Supprime le dossier "files" si vide après le déplacement
 		fi
 		rm "$ARCHIVE"
 		dialog --backtitle "Foclabroc Toolbox" --infobox "\nTéléchargement et extraction de ${version} terminé avec succès." 7 60 2>&1 >/dev/tty
