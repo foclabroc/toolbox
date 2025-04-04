@@ -171,7 +171,7 @@ while true; do
 	if [ $? -eq 0 ]; then
 		# Déplacement du contenu de "files" si le dossier existe
 		if [ -d "$WINE_DIR/files" ]; then
-			rsync -av --remove-source-files "$WINE_DIR/files/" "$WINE_DIR/"
+			rsync -a --remove-source-files "$WINE_DIR/files/" "$WINE_DIR/"
 			rm -rf "$WINE_DIR/files"  # Supprime le dossier "files" si vide après le déplacement
 		fi
 		rm "$ARCHIVE"
