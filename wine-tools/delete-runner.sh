@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+
 # Chemin des dossiers à lister
 CUSTOM="/userdata/system/wine/custom"
 
@@ -50,7 +50,7 @@ while true; do
 
     # Extraire le numéro de la sélection (si applicable)
     if [[ "$CHOIX" =~ ^[0-9]+$ ]]; then
-        DOSSIER_SELECTIONNE="${DOSSIERS[$CHOIX-1]}"
+        DOSSIER_SELECTIONNE="$DOSSIERS"
         NOM=$(basename "$DOSSIER_SELECTIONNE")
     else
         DOSSIER_SELECTIONNE="$CHOIX"
