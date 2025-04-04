@@ -13,33 +13,35 @@ mkdir -p "$DOWNLOAD_DIR"
 mkdir -p "$EXTRACT_DIR"
 
 # Download the split files
-dialog --backtitle "Foclabroc Toolbox" --infobox "Téléchargement de ge-custom v40 en cours..." 5 60
+dialog --backtitle "Foclabroc Toolbox" --infobox "\nTéléchargement de ge-custom v40 en cours..." 4 55
 curl -Ls -o "$DOWNLOAD_DIR/ge-customv40.tar.xz.001" "$URL_PART1" --progress-bar
 curl -Ls -o "$DOWNLOAD_DIR/ge-customv40.tar.xz.002" "$URL_PART2" --progress-bar
 
 # Combine the files into a single archive
 cd "$DOWNLOAD_DIR"
-dialog --backtitle "Foclabroc Toolbox" --infobox "Assemblage des 2 parties en cours..." 5 60
+dialog --backtitle "Foclabroc Toolbox" --infobox "\nAssemblage des 2 parties en cours..." 4 55
+sleep 1
 cat ge-customv40.tar.xz.001 ge-customv40.tar.xz.002 > ge-customv40.tar.xz
 
 # Verify the combined file exists
 if [[ ! -f "ge-customv40.tar.xz" ]]; then
-    dialog --backtitle "Foclabroc Toolbox" --infobox "Echec de l'assemblage des 2 parties !!!" 5 60
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nEchec de l'assemblage des 2 parties !!!" 4 55
+	sleep 2
     exit 1
 fi
 
 # Decompress the .xz file
-dialog --backtitle "Foclabroc Toolbox" --infobox "Décompression du .xz en cours..." 5 60
+dialog --backtitle "Foclabroc Toolbox" --infobox "\nDécompression du .xz en cours..." 4 55
 xz -d ge-customv40.tar.xz
 
 # Verify the decompressed file exists
 if [[ ! -f "ge-customv40.tar" ]]; then
-    dialog --backtitle "Foclabroc Toolbox" --infobox "Echec de la décompression du .xz !!!" 5 60
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nEchec de la décompression du .xz !!!" 4 55
     exit 1
 fi
 
 # Extract the .tar archive
-dialog --backtitle "Foclabroc Toolbox" --infobox "Décompression du .tar en cours..." 5 60
+dialog --backtitle "Foclabroc Toolbox" --infobox "\nDécompression du .tar en cours..." 4 55
 tar -xf ge-customv40.tar -C "$EXTRACT_DIR"
 
 # Check if extraction was successful
@@ -47,7 +49,7 @@ if [[ $? -eq 0 ]]; then
 	dialog --backtitle "Foclabroc Toolbox" --infobox "Installation de ge-custom V40 terminé avec succès dans $EXTRACT_DIR." 5 60
 	sleep 2
 else
-	dialog --backtitle "Foclabroc Toolbox" --infobox "Echec de l'Installation de ge-custom V40 !!!" 5 60
+	dialog --backtitle "Foclabroc Toolbox" --infobox "\nEchec de l'Installation de ge-custom V40 !!!" 4 55
     exit 1
 fi
 
