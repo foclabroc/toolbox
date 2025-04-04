@@ -127,35 +127,41 @@ while true; do
 		continue
 	fi
 ######################################################################
-	# Extraction de l'archive
-	TOTAL_FILES=$(tar -tf "$ARCHIVE" | wc -l)
+	# Liste des fichiers à extraire
+	FILES_LIST=$(mktemp)
+	tar -tf "$ARCHIVE" | grep "^files/" > "$FILES_LIST"
+	TOTAL_FILES=$(wc -l < "$FILES_LIST")
+
 	if [[ "$TOTAL_FILES" -eq 0 ]]; then
 		dialog --msgbox "Erreur : archive vide ou illisible." 7 60
+		rm -f "$FILES_LIST"
 		exit 1
 	fi
 
-	# Création du FIFO pour suivre l'extraction
 	TMP_PROGRESS="/tmp/extract_progress"
 	rm -f "$TMP_PROGRESS"
 	mkfifo "$TMP_PROGRESS"
 
-	# Processus d'extraction en arrière-plan
+	# Extraction fichier par fichier avec suivi
 	COUNT=0
 	(
-		tar --strip-components=1 -xzf "$ARCHIVE" -C "$WINE_DIR" --checkpoint=10 --checkpoint-action=echo="%u" > "$TMP_PROGRESS" 2>/dev/null &
-		TAR_PID=$!
-
-		while read -r CHECKPOINT; do
-			COUNT=$((COUNT + 10))
+		while read -r FILE; do
+			tar --strip-components=1 -xzf "$ARCHIVE" -C "$WINE_DIR" 2>/dev/null
+			COUNT=$((COUNT + 1))
 			PERCENT=$((COUNT * 100 / TOTAL_FILES))
 			echo "$PERCENT"
-		done < "$TMP_PROGRESS"
-
-		wait "$TAR_PID"
+		done < "$FILES_LIST"
 		echo 100
+	) > "$TMP_PROGRESS" &
+
+	# Affichage de la gauge
+	(
+		while read -r PERCENT; do
+			echo "$PERCENT"
+		done < "$TMP_PROGRESS"
 	) | dialog --gauge "Extraction de ${version} en cours..." 7 60 0 2>&1 >/dev/tty
 
-	rm -f "$TMP_PROGRESS"
+	rm -f "$TMP_PROGRESS" "$FILES_LIST"
 
 	# Vérification si l'extraction a réussi
 	if [ $? -eq 0 ]; then
