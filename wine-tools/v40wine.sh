@@ -14,13 +14,24 @@ mkdir -p "$DOWNLOAD_DIR" "$EXTRACT_DIR"
 
 # Afficher un message de téléchargement
 dialog --backtitle "Foclabroc Toolbox" --title "GE-Custom V40" --infobox "Téléchargement et extraction de GE-Custom V40..." 6 50
-
-# Fonction de téléchargement avec progression
+sleep 2
+# Fonction de téléchargement avec affichage de la progression
 download_file() {
     local url=$1
     local output=$2
-    wget --progress=bar:force:noscroll -O "$output" "$url" 2>&1 | \
-    dialog --gauge "Téléchargement en cours..." 10 70 0
+    (
+        wget --progress=dot "$url" -O "$output" 2>&1 | \
+        while read -r line; do
+            percent=$(echo "$line" | awk '/[0-9]%/ {print $2}' | tr -d '%')
+            if [[ "$percent" =~ ^[0-9]+$ ]]; then
+                echo $percent
+            fi
+        done
+    ) | dialog --gauge "Téléchargement en cours..." 10 70 0
+    if [ $? -ne 0 ]; then
+        dialog --title "Erreur" --msgbox "Échec du téléchargement de $output." 6 50
+        exit 1
+    fi
 }
 
 # Télécharger les fichiers
@@ -29,22 +40,29 @@ download_file "$URL_PART2" "$DOWNLOAD_DIR/ge-customv40.tar.xz.002"
 
 # Combiner les fichiers
 cat "$DOWNLOAD_DIR/ge-customv40.tar.xz.001" "$DOWNLOAD_DIR/ge-customv40.tar.xz.002" > "$DOWNLOAD_DIR/ge-customv40.tar.xz"
-
-# Supprimer l'ancien dossier GE-Custom s'il existe
-if [ -d "$GE_CUSTOM_DIR" ]; then
-    rm -rf "$GE_CUSTOM_DIR"
+if [ $? -ne 0 ]; then
+    dialog --title "Erreur" --msgbox "Échec de l'assemblage des fichiers." 6 50
+    exit 1
 fi
 
-# Fonction d'extraction avec progression
-extract_file() {
-    local file=$1
-    local target_dir=$2
-    xz -d "$file" -C "$target_dir" | \
-    dialog --gauge "Extraction en cours..." 10 70 0
-}
+# Décompression du .xz pour obtenir le .tar
+dialog --gauge "Décompression du fichier .xz en cours..." 10 70 0
+unxz -f "$DOWNLOAD_DIR/ge-customv40.tar.xz"
+if [ $? -ne 0 ]; then
+    dialog --title "Erreur" --msgbox "Échec de la décompression du fichier .xz." 6 50
+    exit 1
+fi
 
-# Extraire le fichier
-extract_file "$DOWNLOAD_DIR/ge-customv40.tar.xz" "$EXTRACT_DIR"
+# Extraction du .tar dans le dossier de destination
+dialog --gauge "Extraction du fichier .tar en cours..." 10 70 0
+tar -xf "$DOWNLOAD_DIR/ge-customv40.tar" -C "$EXTRACT_DIR"
+if [ $? -ne 0 ]; then
+    dialog --title "Erreur" --msgbox "Échec de l'extraction du fichier .tar." 6 50
+    exit 1
+fi
+
+# Suppression des fichiers temporaires
+rm -rf "$DOWNLOAD_DIR"
 
 # Afficher un message de fin
-dialog --backtitle "Foclabroc Toolbox" --title "GE-Custom V40" --msgbox "Téléchargement et extraction terminés avec succès !" 6 50
+dialog --backtitle "Foclabroc Toolbox" --title "GE-Custom V40" --msgbox "Téléchargement et extraction de Ge-custom V40 terminés avec succès !" 6 50
