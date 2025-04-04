@@ -11,8 +11,9 @@ if [ ! -d "$CUSTOM" ]; then
 fi
 
 while true; do
-    # Récupère la liste des dossiers
-    DOSSIERS=($(find "$CUSTOM" -mindepth 1 -maxdepth 1 -type d | sort))
+    # Récupère la liste des dossiers avec gestion des espaces
+    IFS=$'\n' DOSSIERS=($(find "$CUSTOM" -mindepth 1 -maxdepth 1 -type d | sort))
+    unset IFS
 
     # Vérifie s'il y a des dossiers
     if [ ${#DOSSIERS[@]} -eq 0 ]; then
@@ -31,7 +32,7 @@ while true; do
     CHOIX=$(dialog --clear --backtitle "Foclabroc Toolbox" --title "Suppression de runner custom" \
         --menu "\nSélectionnez un runner à supprimer :\n" 25 80 15 \
         "${LISTE[@]}" \
-        3>&1 1>&2 2>&3 2>&1 >/dev/tty)
+        3>&1 1>&2 2>&3)
 
     # Si annulation (ESC ou bouton Annuler)
     if [ -z "$CHOIX" ]; then
@@ -49,10 +50,10 @@ while true; do
     if [ "$REPONSE" -eq 0 ]; then
         rm -rf "$CUSTOM/$CHOIX"
         dialog --backtitle "Foclabroc Toolbox" --infobox "\nLe Runner '$CHOIX' a été supprimé." 6 50 2>&1 >/dev/tty
-		sleep 2
+        sleep 2
     else
         dialog --backtitle "Foclabroc Toolbox" --infobox "Suppression annulée." 6 50 2>&1 >/dev/tty
-		sleep 1
+        sleep 1
     fi
 done
 
