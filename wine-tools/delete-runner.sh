@@ -52,7 +52,7 @@ while true; do
 
     if [ "$REPONSE" -eq 0 ]; then
         if [[ -n "$CHOIX" && "$CHOIX" != "/" && -d "$CUSTOM/$CHOIX" ]]; then
-            rm -rf "$CUSTOM/$CHOIX"
+            rm -rf "$CUSTOM/$NOM"
             dialog --backtitle "Foclabroc Toolbox" --infobox "\nLe Runner '$NOM' a été supprimé." 6 50 2>&1 >/dev/tty
             sleep 2
         else
