@@ -134,7 +134,7 @@ while true; do
 	TOTAL_FILES=$(wc -l < "$TMP_FILE_LIST")
 	if [[ "$TOTAL_FILES" -eq 0 ]]; then
 		dialog --msgbox "Erreur : archive vide ou illisible." 7 60
-		rm -f "$TMP_FILE_LIST"  # Suppression manuelle si erreur
+		rm -f "$TMP_FILE_LIST"  # Suppression en cas d'erreur
 		exit 1
 	fi
 
@@ -143,13 +143,13 @@ while true; do
 	rm -f "$TMP_PROGRESS"
 	mkfifo "$TMP_PROGRESS"
 
-	# Nettoyage automatique en fin de script ou interruption
+	# Nettoyage automatique à la fin du script ou en cas d'interruption
 	trap "rm -f '$TMP_PROGRESS' '$TMP_FILE_LIST'" EXIT
 
 	COUNT=0
 	(
-		# Extraction en arrière-plan avec suivi des fichiers extraits
-		tar --strip-components=1 -xzf "$ARCHIVE" -C "$WINE_DIR" --to-command="echo \$TAR_FILENAME > $TMP_PROGRESS" 2>/dev/null &
+		# Extraction en mode verbose (-v) et redirection des fichiers extraits vers le FIFO
+		tar --strip-components=1 -xvzf "$ARCHIVE" -C "$WINE_DIR" > "$TMP_PROGRESS" 2>/dev/null &
 		TAR_PID=$!
 
 		while read -r FILE; do
@@ -164,6 +164,7 @@ while true; do
 
 	# Suppression manuelle après exécution réussie
 	rm -f "$TMP_PROGRESS" "$TMP_FILE_LIST"
+
 
 
 	# Vérification si l'extraction a réussi
