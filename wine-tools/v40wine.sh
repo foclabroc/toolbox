@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Définir les URLs pour les fichiers split
-URL_PART1="https://github.com/foclabroc/toolbox/blob/main/wine-tools/ge-customv40.tar.xz.001"
-URL_PART2="https://github.com/foclabroc/toolbox/blob/main/wine-tools/ge-customv40.tar.xz.002"
+URL_PART1="https://github.com/foclabroc/toolbox/raw/refs/heads/main/wine-tools/ge-customv40.tar.xz.001"
+URL_PART2="https://github.com/foclabroc/toolbox/raw/refs/heads/main/wine-tools/ge-customv40.tar.xz.002"
 
 # Définir le répertoire de téléchargement et le chemin de destination pour l'extraction
 DOWNLOAD_DIR="/tmp/ge-custom-download"
