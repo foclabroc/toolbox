@@ -23,19 +23,21 @@ while true; do
 
     # Préparer la liste pour dialog
     LISTE=()
+    NUMERO=1
     for DOSSIER in "${DOSSIERS[@]}"; do
         NOM=$(basename "$DOSSIER")
         TAILLE=$(du -sh "$DOSSIER" | cut -f1)
         DATE=$(stat -c "%y" "$DOSSIER" 2>/dev/null | cut -d'.' -f1) # Format : YYYY-MM-DD HH:MM:SS
-        LISTE+=("$NOM" "Taille: $TAILLE | Créé le: $DATE")
+        LISTE+=("$NUMERO) $NOM" "-->|Taille: $TAILLE | Créé le: $DATE")
+        ((NUMERO++))
     done
 
     # Ajout de l'option retour
-    LISTE+=("RETOUR" "Retour au menu précédent")
+    LISTE+=("Retour" "Retour au menu précédent")
 
     # Affiche le menu de sélection
     CHOIX=$(dialog --clear --backtitle "Foclabroc Toolbox" --title "Suppression de runner custom" \
-        --menu "\nSélectionnez un runner à supprimer :" 25 70 15 \
+        --menu "\nSélectionnez un runner à supprimer :\n " 25 80 15 \
         "${LISTE[@]}" \
         3>&1 1>&2 2>&3)
 
@@ -46,14 +48,22 @@ while true; do
         exec bash <(curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh)
     fi
 
+    # Extraire le numéro de la sélection (si applicable)
+    if [[ "$CHOIX" =~ ^[0-9]+$ ]]; then
+        DOSSIER_SELECTIONNE="${DOSSIERS[$CHOIX-1]}"
+        NOM=$(basename "$DOSSIER_SELECTIONNE")
+    else
+        DOSSIER_SELECTIONNE="$CHOIX"
+    fi
+
     # Confirmation
-    dialog --yesno "Voulez-vous vraiment supprimer le dossier '$CHOIX' ?" 7 50 2>&1 >/dev/tty
+    dialog --yesno "Voulez-vous vraiment supprimer le dossier '$NOM' ?" 7 50 2>&1 >/dev/tty
     REPONSE=$?
 
     if [ "$REPONSE" -eq 0 ]; then
-        if [[ -n "$CHOIX" && "$CHOIX" != "/" && -d "$CUSTOM/$CHOIX" ]]; then
-            rm -rf "$CUSTOM/$CHOIX"
-            dialog --backtitle "Foclabroc Toolbox" --infobox "\nLe Runner '$CHOIX' a été supprimé." 6 50 2>&1 >/dev/tty
+        if [[ -n "$DOSSIER_SELECTIONNE" && -d "$DOSSIER_SELECTIONNE" ]]; then
+            rm -rf "$DOSSIER_SELECTIONNE"
+            dialog --backtitle "Foclabroc Toolbox" --infobox "\nLe Runner '$NOM' a été supprimé." 6 50 2>&1 >/dev/tty
             sleep 2
         else
             dialog --backtitle "Foclabroc Toolbox" --msgbox "Suppression échouée ou dossier invalide." 6 50 2>&1 >/dev/tty
