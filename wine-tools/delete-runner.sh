@@ -5,29 +5,30 @@ CUSTOM="/userdata/system/wine/custom"
 
 # Vérifie si le dossier existe
 if [ ! -d "$CUSTOM" ]; then
-    dialog --backtitle "Foclabroc Toolbox" --infobox "\nLe dossier $CUSTOM n'existe pas." 7 50 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --infobox "Le dossier $CUSTOM n'existe pas." 7 50 2>&1 >/dev/tty
     clear
     exit 1
 fi
 
 while true; do
-    # Récupère la liste des dossiers avec gestion des espaces
+    # Récupère la liste des dossiers
     IFS=$'\n' DOSSIERS=($(find "$CUSTOM" -mindepth 1 -maxdepth 1 -type d | sort))
     unset IFS
 
     # Vérifie s'il y a des dossiers
     if [ ${#DOSSIERS[@]} -eq 0 ]; then
         dialog --backtitle "Foclabroc Toolbox" --infobox "\nAucun runner trouvé dans $CUSTOM." 7 50 2>&1 >/dev/tty
+        sleep 2
         break
     fi
 
-    # Préparer la liste pour dialog
+    # Construire la liste pour dialog
     LISTE=()
     for DOSSIER in "${DOSSIERS[@]}"; do
         NOM=$(basename "$DOSSIER")
         TAILLE=$(du -sh "$DOSSIER" | cut -f1)
         DATE=$(stat -c "%y" "$DOSSIER" 2>/dev/null | cut -d'.' -f1)
-        LISTE+=("$NOM" "-->| Taille: $TAILLE | Créé le: $DATE")
+        LISTE+=("-> [$NOM]" "-->| Taille: $TAILLE | Créé le: $DATE")
     done
 
     # Ajout de l'option retour
@@ -46,17 +47,21 @@ while true; do
         exec bash <(curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh)
     fi
 
+    # Extraire le nom réel sans la déco "-> [ ... ]"
+    NOM=$(echo "$CHOIX" | sed 's/^-> \[\(.*\)\]$/\1/')
+
     # Confirmation
-    dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nVoulez-vous vraiment supprimer le dossier '$NOM' ?" 7 50 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nVoulez-vous vraiment supprimer le dossier '$NOM' ?" 8 50 2>&1 >/dev/tty
     REPONSE=$?
 
     if [ "$REPONSE" -eq 0 ]; then
-        if [[ -n "$CHOIX" && "$CHOIX" != "/" && -d "$CUSTOM/$CHOIX" ]]; then
-            rm -rf "$CUSTOM/$CHOIX"
+        if [[ -n "$NOM" && "$NOM" != "/" && -d "$CUSTOM/$NOM" ]]; then
+            rm -rf "$CUSTOM/$NOM"
             dialog --backtitle "Foclabroc Toolbox" --infobox "\nLe Runner '$NOM' a été supprimé." 6 50 2>&1 >/dev/tty
             sleep 2
         else
             dialog --backtitle "Foclabroc Toolbox" --infobox "\nSuppression échouée ou dossier invalide." 6 50 2>&1 >/dev/tty
+            sleep 3
         fi
     else
         dialog --backtitle "Foclabroc Toolbox" --infobox "\nSuppression annulée." 6 50 2>&1 >/dev/tty
