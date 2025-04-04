@@ -42,7 +42,7 @@ while true; do
         3>&1 1>&2 2>&3)
 
     # Si annulation ou retour
-    if [ -z "$CHOIX" ] || [ "$CHOIX" = "RETOUR" ]; then
+    if [ -z "$CHOIX" ] || [ "$CHOIX" = "Retour" ]; then
         dialog --backtitle "Foclabroc Toolbox" --infobox "\nRetour Menu Wine Tools..." 5 60 2>&1 >/dev/tty
         sleep 1
         exec bash <(curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh)
