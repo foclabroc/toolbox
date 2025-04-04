@@ -111,13 +111,15 @@ while true; do
 	(
 		wget --tries=10 --no-check-certificate --no-cache --no-cookies --show-progress -O "$ARCHIVE" "$url" 2>&1 | \
 		while read -r line; do
-			# Si la ligne contient un pourcentage, extrait la valeur
+			# Cherche la ligne contenant le pourcentage
 			if [[ "$line" =~ ([0-9]+)% ]]; then
 				PERCENT=${BASH_REMATCH[1]}  # Récupère le pourcentage
-				# Envoie la progression à la boîte dialog --gauge
+				# Envoie la progression à la boîte de dialogue --gauge
 				echo "$PERCENT"  # La progression est envoyée à la boîte de dialogue
 			fi
 		done
+		# Après le téléchargement, forcer à 100% pour fermer proprement la boîte de dialogue
+		echo "100"
 	) | dialog --backtitle "Foclabroc Toolbox" --gauge "\nTéléchargement de ${version} Patientez..." 9 75 0 2>&1 >/dev/tty
 
 	# Vérification du téléchargement
@@ -127,41 +129,35 @@ while true; do
 		continue
 	fi
 ######################################################################
-	# Lister les fichiers de l'archive et les stocker
-	TMP_FILE_LIST="/tmp/archive_file_list.txt"
-	tar -tzf "$ARCHIVE" > "$TMP_FILE_LIST" 2>/dev/null
-
-	TOTAL_FILES=$(wc -l < "$TMP_FILE_LIST")
+	# Extraction de l'archive
+	TOTAL_FILES=$(tar -tf "$ARCHIVE" | wc -l)
 	if [[ "$TOTAL_FILES" -eq 0 ]]; then
 		dialog --msgbox "Erreur : archive vide ou illisible." 7 60
-		rm -f "$TMP_FILE_LIST"  # Suppression en cas d'erreur
 		exit 1
 	fi
 
-	# FIFO pour le suivi de l'extraction
+	# Création du FIFO pour suivre l'extraction
 	TMP_PROGRESS="/tmp/extract_progress"
 	rm -f "$TMP_PROGRESS"
 	mkfifo "$TMP_PROGRESS"
 
-	# Nettoyage automatique à la fin du script ou en cas d'interruption
-	trap "rm -f '$TMP_PROGRESS' '$TMP_FILE_LIST'" EXIT
-
+	# Processus d'extraction en arrière-plan
 	COUNT=0
 	(
-		# Extraction avec checkpoints
-		tar --strip-components=1 -xvzf "$ARCHIVE" -C "$WINE_DIR" --checkpoint=1 --checkpoint-action=echo="%u" 2>/dev/null | while read -r _; do
-			COUNT=$((COUNT + 1))
+		tar --strip-components=1 -xzf "$ARCHIVE" -C "$WINE_DIR" --checkpoint=10 --checkpoint-action=echo="%u" > "$TMP_PROGRESS" 2>/dev/null &
+		TAR_PID=$!
+
+		while read -r CHECKPOINT; do
+			COUNT=$((COUNT + 10))
 			PERCENT=$((COUNT * 100 / TOTAL_FILES))
 			echo "$PERCENT"
-		done &
-		TAR_PID=$!
+		done < "$TMP_PROGRESS"
 
 		wait "$TAR_PID"
 		echo 100
 	) | dialog --gauge "Extraction de ${version} en cours..." 7 60 0 2>&1 >/dev/tty
 
-	# Suppression après exécution réussie
-	rm -f "$TMP_PROGRESS" "$TMP_FILE_LIST"
+	rm -f "$TMP_PROGRESS"
 
 	# Vérification si l'extraction a réussi
 	if [ $? -eq 0 ]; then
