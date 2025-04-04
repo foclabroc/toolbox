@@ -13,7 +13,7 @@ mkdir -p "$DOWNLOAD_DIR"
 mkdir -p "$EXTRACT_DIR"
 
 # Demander à l'utilisateur s'il souhaite lancer le téléchargement
-dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "Souhaitez-vous télécharger et installer ge-custom V40 ?" 7 60
+dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nSouhaitez-vous télécharger et installer ge-custom V40 ?" 7 60
 
 # Si l'utilisateur appuie sur "Non" (retourne 1)
 if [[ $? -eq 1 ]]; then
