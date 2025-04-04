@@ -25,22 +25,25 @@ while true; do
     LISTE=()
     for DOSSIER in "${DOSSIERS[@]}"; do
         NOM=$(basename "$DOSSIER")
-        LISTE+=("$NOM" "")
+        TAILLE=$(du -sh "$DOSSIER" | cut -f1)
+        DATE=$(stat -c "%y" "$DOSSIER" 2>/dev/null | cut -d'.' -f1) # Format : YYYY-MM-DD HH:MM:SS
+        LISTE+=("$NOM" "Taille: $TAILLE | Créé le: $DATE")
     done
+
+    # Ajout de l'option retour
+    LISTE+=("RETOUR" "Retour au menu précédent")
 
     # Affiche le menu de sélection
     CHOIX=$(dialog --clear --backtitle "Foclabroc Toolbox" --title "Suppression de runner custom" \
-        --menu "\nSélectionnez un runner à supprimer :\n" 25 80 15 \
+        --menu "\nSélectionnez un runner à supprimer :" 25 70 15 \
         "${LISTE[@]}" \
         3>&1 1>&2 2>&3)
 
-    # Si annulation (ESC ou bouton Annuler)
-    if [ -z "$CHOIX" ]; then
+    # Si annulation ou retour
+    if [ -z "$CHOIX" ] || [ "$CHOIX" = "RETOUR" ]; then
         dialog --backtitle "Foclabroc Toolbox" --infobox "\nRetour Menu Wine Tools..." 5 60 2>&1 >/dev/tty
         sleep 1
-        curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
-        clear
-        exit 0
+        exec bash <(curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh)
     fi
 
     # Confirmation
@@ -48,9 +51,13 @@ while true; do
     REPONSE=$?
 
     if [ "$REPONSE" -eq 0 ]; then
-        rm -rf "$CUSTOM/$CHOIX"
-        dialog --backtitle "Foclabroc Toolbox" --infobox "\nLe Runner '$CHOIX' a été supprimé." 6 50 2>&1 >/dev/tty
-        sleep 2
+        if [[ -n "$CHOIX" && "$CHOIX" != "/" && -d "$CUSTOM/$CHOIX" ]]; then
+            rm -rf "$CUSTOM/$CHOIX"
+            dialog --backtitle "Foclabroc Toolbox" --infobox "\nLe Runner '$CHOIX' a été supprimé." 6 50 2>&1 >/dev/tty
+            sleep 2
+        else
+            dialog --backtitle "Foclabroc Toolbox" --msgbox "Suppression échouée ou dossier invalide." 6 50 2>&1 >/dev/tty
+        fi
     else
         dialog --backtitle "Foclabroc Toolbox" --infobox "Suppression annulée." 6 50 2>&1 >/dev/tty
         sleep 1
