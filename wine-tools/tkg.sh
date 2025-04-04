@@ -27,7 +27,7 @@ while true; do
 
     # Construire la liste des options (index et name) avec ajout de "-staging-tkg"
     while IFS= read -r line; do
-        tag=$(echo "$line" | jq -r 'select(.name | contains("Proton") | not) | select(.name != null and .name != "") | .name')
+        tag=$(echo "$line" | jq -r 'select(.name | contains("Proton") | not) | .name' | sed '/^$/d')
         # Ajouter "-staging-tkg" à la version
         tag="(staging-tkg)${tag}"
         options+=("$i" "$tag")
