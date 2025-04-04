@@ -7,7 +7,7 @@ OPTIONS=(
   "3" "Telechargement Runner Wine-GE Custom builds"
   "4" "Telechargement Runner GE-Proton builds"
   "5" "Telechargement Runner GE-Custom de la V40 (pour garder vos anciennes bottles/sauvegarde)"
-  "6" "Séléctionnez et supprimer les runner custom inutiles"
+  "6" "Sélectionnez et supprimer les runner custom inutiles"
   "7" "Installation de Winetricks automatique"
   "8" "Convertir dossier .pc en dossier .wine"
   "9" "Compresser dossier .wine en fichier .wsquashfs ou .tgz"
