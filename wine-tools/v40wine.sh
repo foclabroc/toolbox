@@ -4,47 +4,49 @@
 URL_PART1="https://github.com/foclabroc/toolbox/raw/refs/heads/main/wine-tools/ge-customv40.tar.xz.001"
 URL_PART2="https://github.com/foclabroc/toolbox/raw/refs/heads/main/wine-tools/ge-customv40.tar.xz.002"
 
-# Define the download directory and target extraction path
+# Définir le répertoire de téléchargement et le chemin de destination pour l'extraction
 DOWNLOAD_DIR="/tmp/ge-custom-download"
 EXTRACT_DIR="/userdata/system/wine/custom"
 
-# Create the directories
+# Créer les répertoires
 mkdir -p "$DOWNLOAD_DIR"
 mkdir -p "$EXTRACT_DIR"
 
-# Download the split files
-dialog --backtitle "Foclabroc Toolbox" --infobox "\nTéléchargement de ge-custom v40 en cours..." 4 55
-curl -Ls -o "$DOWNLOAD_DIR/ge-customv40.tar.xz.001" "$URL_PART1" --progress-bar
-curl -Ls -o "$DOWNLOAD_DIR/ge-customv40.tar.xz.002" "$URL_PART2" --progress-bar
+# Telechargement des 2 parties
+(
+  echo 10 ; curl -Ls -o "$DOWNLOAD_DIR/ge-customv40.tar.xz.001" "$URL_PART1" --progress-bar && echo 50
+  curl -Ls -o "$DOWNLOAD_DIR/ge-customv40.tar.xz.002" "$URL_PART2" --progress-bar && echo 100
+) | dialog --gauge "Téléchargement de ge-custom v40 en cours..." 7 55 0
 
-# Combine the files into a single archive
+# Assemblage des 2 parties
 cd "$DOWNLOAD_DIR"
-dialog --backtitle "Foclabroc Toolbox" --infobox "\nAssemblage des 2 parties en cours..." 4 55
-sleep 1
+dialog --backtitle "Foclabroc Toolbox" --infobox "\nAssemblage des 2 parties en cours..." 5 55
+sleep 2
 cat ge-customv40.tar.xz.001 ge-customv40.tar.xz.002 > ge-customv40.tar.xz
 
-# Verify the combined file exists
+# Verification de l'assemblage
 if [[ ! -f "ge-customv40.tar.xz" ]]; then
-    dialog --backtitle "Foclabroc Toolbox" --infobox "\nEchec de l'assemblage des 2 parties !!!" 4 55
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nEchec de l'assemblage des 2 parties !!!" 5 55
 	sleep 2
     exit 1
 fi
 
-# Decompress the .xz file
-dialog --backtitle "Foclabroc Toolbox" --infobox "\nDécompression du .xz en cours..." 4 55
+# Décompression du .xz
+dialog --backtitle "Foclabroc Toolbox" --infobox "\nDécompression du .xz en cours..." 5 55
+sleep 2
 xz -d ge-customv40.tar.xz
 
-# Verify the decompressed file exists
+# Verification du fichier
 if [[ ! -f "ge-customv40.tar" ]]; then
-    dialog --backtitle "Foclabroc Toolbox" --infobox "\nEchec de la décompression du .xz !!!" 4 55
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nEchec de la décompression du .xz !!!" 5 55
     exit 1
 fi
 
-# Extract the .tar archive
-dialog --backtitle "Foclabroc Toolbox" --infobox "\nDécompression du .tar en cours..." 4 55
+# Décompression du .tar
+dialog --backtitle "Foclabroc Toolbox" --infobox "\nDécompression du .tar en cours..." 5 55
 tar -xf ge-customv40.tar -C "$EXTRACT_DIR"
 
-# Check if extraction was successful
+# Vérification du fichier extrait
 if [[ $? -eq 0 ]]; then
 	dialog --backtitle "Foclabroc Toolbox" --infobox "Installation de ge-custom V40 terminé avec succès dans $EXTRACT_DIR." 5 60
 	sleep 2
