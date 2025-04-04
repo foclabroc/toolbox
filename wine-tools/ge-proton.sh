@@ -89,7 +89,7 @@ while true; do
 # Récupérer la version depuis le fichier temporaire pour l'utiliser plus tard
 	version=$(cat /tmp/version.txt)
 
-	response=$(dialog --backtitle "Foclabroc Toolbox" --yesno "\nVoulez-vous télécharger et installer ${version} ?" 7 60 2>&1 >/dev/tty)
+	response=$(dialog --backtitle "Foclabroc Toolbox" --yesno "\nVoulez-vous télécharger et installer ${version} ?" 8 60 2>&1 >/dev/tty)
 	if [[ $? -ne 0 ]]; then
 		(
 			dialog --backtitle "Foclabroc Toolbox" --infobox "\nTéléchargement de ${version} annulé." 5 60
@@ -127,56 +127,43 @@ while true; do
 		continue
 	fi
 ######################################################################
-    # Taille totale de l'archive
-    TOTAL_FILES=$(tar -tf "$ARCHIVE" | wc -l)
-    if [[ "$TOTAL_FILES" -eq 0 ]]; then
-        dialog --msgbox "Erreur : archive vide ou illisible." 7 60
-        exit 1
-    fi
+	# Extraction de l'archive
+	TOTAL_FILES=$(tar -tf "$ARCHIVE" | wc -l)
+	if [[ "$TOTAL_FILES" -eq 0 ]]; then
+		dialog --msgbox "Erreur : archive vide ou illisible." 7 60
+		exit 1
+	fi
 
-# Création du FIFO pour suivre l'extraction
+	# Création du FIFO pour suivre l'extraction
 	TMP_PROGRESS="/tmp/extract_progress"
 	rm -f "$TMP_PROGRESS"
 	mkfifo "$TMP_PROGRESS"
 
-	# Vérifier si un dossier "files" existe dans l'archive
-	if tar -tf "$ARCHIVE" | grep -q "^files/"; then
-		# Si le dossier "files" existe, extraction de son contenu à la racine du répertoire
-		COUNT=0
-		(
-			tar --strip-components=2 -xzf "$ARCHIVE" -C "$WINE_DIR" "files/*" --checkpoint=10 --checkpoint-action=echo="%u" > "$TMP_PROGRESS" 2>/dev/null &
-			TAR_PID=$!
-			while read -r CHECKPOINT; do
-				COUNT=$((COUNT + 10))  
-				PERCENT=$((COUNT * 100 / TOTAL_FILES))
-				echo "$PERCENT"
-			done < "$TMP_PROGRESS"
-			
-			wait "$TAR_PID"
-			echo 100
-		) | dialog --gauge "Extraction de ${version} en cours..." 7 60 0 2>&1 >/dev/tty
-	else
-		# Si le dossier "files" n'existe pas, extraction normale
-		COUNT=0
-		(
-			tar --strip-components=1 -xzf "$ARCHIVE" -C "$WINE_DIR" --checkpoint=10 --checkpoint-action=echo="%u" > "$TMP_PROGRESS" 2>/dev/null &
-			TAR_PID=$!
-			while read -r CHECKPOINT; do
-				COUNT=$((COUNT + 10))  
-				PERCENT=$((COUNT * 100 / TOTAL_FILES))
-				echo "$PERCENT"
-			done < "$TMP_PROGRESS"
-			
-			wait "$TAR_PID"
-			echo 100
-		) | dialog --gauge "Extraction de ${version} en cours..." 7 60 0 2>&1 >/dev/tty
-	fi
+	# Processus d'extraction en arrière-plan
+	COUNT=0
+	(
+		tar --strip-components=1 -xzf "$ARCHIVE" -C "$WINE_DIR" --checkpoint=10 --checkpoint-action=echo="%u" > "$TMP_PROGRESS" 2>/dev/null &
+		TAR_PID=$!
 
-	# Nettoyage du FIFO
+		while read -r CHECKPOINT; do
+			COUNT=$((COUNT + 10))
+			PERCENT=$((COUNT * 100 / TOTAL_FILES))
+			echo "$PERCENT"
+		done < "$TMP_PROGRESS"
+
+		wait "$TAR_PID"
+		echo 100
+	) | dialog --gauge "Extraction de ${version} en cours..." 7 60 0 2>&1 >/dev/tty
+
 	rm -f "$TMP_PROGRESS"
 
-	# Vérification si l'extraction s'est bien passée
+	# Vérification si l'extraction a réussi
 	if [ $? -eq 0 ]; then
+		# Déplacement du contenu de "files" si le dossier existe
+		if [ -d "$WINE_DIR/files" ]; then
+			mv "$WINE_DIR/files"/* "$WINE_DIR"  # Déplace le contenu à la racine
+			rmdir "$WINE_DIR/files"  # Supprime le dossier "files" s'il est maintenant vide
+		fi
 		rm "$ARCHIVE"
 		dialog --backtitle "Foclabroc Toolbox" --infobox "\nTéléchargement et extraction de ${version} terminé avec succès." 7 60 2>&1 >/dev/tty
 		sleep 2
