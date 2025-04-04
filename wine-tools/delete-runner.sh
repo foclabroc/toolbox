@@ -17,7 +17,7 @@ while true; do
 
     # Vérifie s'il y a des dossiers
     if [ ${#DOSSIERS[@]} -eq 0 ]; then
-        dialog --backtitle "Foclabroc Toolbox" --infobox "Aucun runner trouvé dans $CUSTOM." 7 50 2>&1 >/dev/tty
+        dialog --backtitle "Foclabroc Toolbox" --infobox "\nAucun runner trouvé dans $CUSTOM." 7 50 2>&1 >/dev/tty
         break
     fi
 
@@ -27,8 +27,8 @@ while true; do
     for DOSSIER in "${DOSSIERS[@]}"; do
         NOM=$(basename "$DOSSIER")
         TAILLE=$(du -sh "$DOSSIER" | cut -f1)
-        DATE=$(stat -c "%y" "$DOSSIER" 2>/dev/null | cut -d'.' -f1) # Format : YYYY-MM-DD HH:MM:SS
-        LISTE+=("$NUMERO) $NOM" "-->|Taille: $TAILLE | Créé le: $DATE")
+        DATE=$(stat -c "%y" "$DOSSIER" 2>/dev/null | cut -d'.' -f1)
+        LISTE+=("$NUMERO $NOM" "-->|Taille: $TAILLE | Créé le: $DATE")
         ((NUMERO++))
     done
 
@@ -37,7 +37,7 @@ while true; do
 
     # Affiche le menu de sélection
     CHOIX=$(dialog --clear --backtitle "Foclabroc Toolbox" --title "Suppression de runner custom" \
-        --menu "\nSélectionnez un runner à supprimer :\n " 25 80 15 \
+        --menu "\nSélectionnez un runner à supprimer :\n " 25 95 15 \
         "${LISTE[@]}" \
         3>&1 1>&2 2>&3)
 
@@ -57,7 +57,7 @@ while true; do
     fi
 
     # Confirmation
-    dialog --yesno "Voulez-vous vraiment supprimer le dossier '$NOM' ?" 7 50 2>&1 >/dev/tty
+    dialog --yesno "\nVoulez-vous vraiment supprimer le dossier '$NOM' ?" 8 50 2>&1 >/dev/tty
     REPONSE=$?
 
     if [ "$REPONSE" -eq 0 ]; then
@@ -66,10 +66,10 @@ while true; do
             dialog --backtitle "Foclabroc Toolbox" --infobox "\nLe Runner '$NOM' a été supprimé." 6 50 2>&1 >/dev/tty
             sleep 2
         else
-            dialog --backtitle "Foclabroc Toolbox" --msgbox "Suppression échouée ou dossier invalide." 6 50 2>&1 >/dev/tty
+            dialog --backtitle "Foclabroc Toolbox" --msgbox "\nSuppression échouée ou dossier invalide." 6 50 2>&1 >/dev/tty
         fi
     else
-        dialog --backtitle "Foclabroc Toolbox" --infobox "Suppression annulée." 6 50 2>&1 >/dev/tty
+        dialog --backtitle "Foclabroc Toolbox" --infobox "\nSuppression annulée." 6 50 2>&1 >/dev/tty
         sleep 1
     fi
 done
