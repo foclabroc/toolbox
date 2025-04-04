@@ -27,7 +27,7 @@ while true; do
         NOM=$(basename "$DOSSIER")
         TAILLE=$(du -sh "$DOSSIER" | cut -f1)
         DATE=$(stat -c "%y" "$DOSSIER" 2>/dev/null | cut -d'.' -f1)
-        LISTE+=("->[$NOM]" "-->| Taille: $TAILLE | Créé le: $DATE")
+        LISTE+=("$NOM" "-->| Taille: $TAILLE | Créé le: $DATE")
     done
 
     # Ajout de l'option retour
@@ -52,7 +52,7 @@ while true; do
 
     if [ "$REPONSE" -eq 0 ]; then
         if [[ -n "$CHOIX" && "$CHOIX" != "/" && -d "$CUSTOM/$CHOIX" ]]; then
-            rm -rf "$CUSTOM/$NOM"
+            rm -rf "$CUSTOM/$CHOIX"
             dialog --backtitle "Foclabroc Toolbox" --infobox "\nLe Runner '$NOM' a été supprimé." 6 50 2>&1 >/dev/tty
             sleep 2
         else
