@@ -28,24 +28,17 @@ while true; do
     # Construire la liste des options (index et name) avec ajout de "-staging-tkg"
     while IFS= read -r line; do
         tag=$(echo "$line" | jq -r 'select(.name | contains("Proton") | not) | select(.name != null and .name != "") | .name')
-        
-        # Vérifier si 'tag' n'est pas vide avant de l'ajouter aux options
-        if [[ -n "$tag" ]]; then
-            # Ajouter "-staging-tkg" à la version
-            tag="(staging-tkg)${tag}"
-            options+=("$i" "$tag")
-            ((i++))
-        fi
+        # Ajouter "-staging-tkg" à la version
+        tag="(staging-tkg)${tag}"
+        options+=("$i" "$tag")
+        ((i++))
     done < <(echo "$release_data" | jq -c '.[]')
 
-    # Si aucune option n'est disponible
+    # Vérifier que des options existent
     if [[ ${#options[@]} -eq 0 ]]; then
-        dialog --backtitle "Foclabroc Toolbox" --infobox "\nAucune version valide n'a été trouvée." 5 60
-        break  # Ou exit si tu veux sortir du script
+        echo -e "Erreur : aucune version disponible."
+        exit 1
     fi
-
-    # Affichage du menu et récupération du choix (reste de ton code pour afficher le menu)
-done
 
     # Affichage du menu et récupération du choix
     choice=$(dialog --clear --backtitle "Foclabroc Toolbox" --title "Wine-Tkg" --menu "\nChoisissez une version à télécharger :\n " 22 76 16 "${options[@]}" 2>&1 >/dev/tty)
