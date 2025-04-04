@@ -21,7 +21,7 @@ download_file() {
     wget --progress=bar:force:noscroll -O "$output" "$url" 2>&1 | \
     dialog --gauge "Téléchargement en cours..." 10 70 0
 }
-
+rm -rf /userdata/system/wine/custom/ge-custom
 # Télécharger les fichiers
 download_file "$URL_PART1" "$DOWNLOAD_DIR/ge-customv40.tar.xz.001"
 download_file "$URL_PART2" "$DOWNLOAD_DIR/ge-customv40.tar.xz.002"
@@ -33,6 +33,7 @@ cat "$DOWNLOAD_DIR/ge-customv40.tar.xz.001" "$DOWNLOAD_DIR/ge-customv40.tar.xz.0
 extract_file() {
     local file=$1
     local target_dir=$2
+	rm 
     tar -xf "$file" -C "$target_dir" | \
     dialog --gauge "Extraction en cours..." 10 70 0
 }
@@ -41,5 +42,5 @@ extract_file() {
 extract_file "$DOWNLOAD_DIR/ge-customv40.tar.xz" "$EXTRACT_DIR"
 
 # Afficher un message de fin
-dialog --backtitle "Foclabroc Toolbox" --title "GE-Custom V40" --msgbox "Téléchargement et extraction terminés avec succès !" 6 50
+dialog --backtitle "Foclabroc Toolbox" --title "GE-Custom V40" --infobox "Téléchargement et extraction terminés avec succès !" 6 50
 
