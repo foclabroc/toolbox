@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -x
 # Chemin des dossiers à lister
 CUSTOM="/userdata/system/wine/custom"
 
@@ -28,7 +28,7 @@ while true; do
         NOM=$(basename "$DOSSIER")
         TAILLE=$(du -sh "$DOSSIER" | cut -f1)
         DATE=$(stat -c "%y" "$DOSSIER" 2>/dev/null | cut -d'.' -f1)
-        LISTE+=("$NUMERO $NOM" "-->|Taille: $TAILLE | Créé le: $DATE")
+        LISTE+=("$NUMERO [$NOM]" "-->|Taille: $TAILLE | Créé le: $DATE")
         ((NUMERO++))
     done
 
