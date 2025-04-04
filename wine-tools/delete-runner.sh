@@ -28,7 +28,7 @@ while true; do
         NOM=$(basename "$DOSSIER")
         TAILLE=$(du -sh "$DOSSIER" | cut -f1)
         DATE=$(stat -c "%y" "$DOSSIER" 2>/dev/null | cut -d'.' -f1)
-        LISTE+=("$NUMERO $NOM" "-->|Taille: $TAILLE | Créé le: $DATE")
+        LISTE+=("$NUMERO [$NOM]" "-->|Taille: $TAILLE | Créé le: $DATE")
         ((NUMERO++))
     done
 
@@ -37,7 +37,7 @@ while true; do
 
     # Affiche le menu de sélection
     CHOIX=$(dialog --clear --backtitle "Foclabroc Toolbox" --title "Suppression de runner custom" \
-        --menu "\nSélectionnez un runner à supprimer :\n " 25 95 15 \
+        --menu "\nSélectionnez un runner à supprimer :\n " 25 105 15 \
         "${LISTE[@]}" \
         3>&1 1>&2 2>&3)
 
@@ -57,7 +57,7 @@ while true; do
     fi
 
     # Confirmation
-    dialog --yesno "\nVoulez-vous vraiment supprimer le dossier '$NOM' ?" 8 50 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nVoulez-vous vraiment supprimer le dossier '$NOM' ?" 8 50 2>&1 >/dev/tty
     REPONSE=$?
 
     if [ "$REPONSE" -eq 0 ]; then
@@ -66,7 +66,7 @@ while true; do
             dialog --backtitle "Foclabroc Toolbox" --infobox "\nLe Runner '$NOM' a été supprimé." 6 50 2>&1 >/dev/tty
             sleep 2
         else
-            dialog --backtitle "Foclabroc Toolbox" --msgbox "\nSuppression échouée ou dossier invalide." 6 50 2>&1 >/dev/tty
+            dialog --backtitle "Foclabroc Toolbox" --infobox "\nSuppression échouée ou dossier invalide." 6 50 2>&1 >/dev/tty
         fi
     else
         dialog --backtitle "Foclabroc Toolbox" --infobox "\nSuppression annulée." 6 50 2>&1 >/dev/tty
