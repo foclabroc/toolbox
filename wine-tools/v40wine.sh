@@ -4,65 +4,52 @@
 URL_PART1="https://github.com/foclabroc/toolbox/raw/refs/heads/main/wine-tools/ge-customv40.tar.xz.001"
 URL_PART2="https://github.com/foclabroc/toolbox/raw/refs/heads/main/wine-tools/ge-customv40.tar.xz.002"
 
-# Définir le répertoire de téléchargement et le chemin de destination pour l'extraction
+# Define the download directory and target extraction path
 DOWNLOAD_DIR="/tmp/ge-custom-download"
 EXTRACT_DIR="/userdata/system/wine/custom"
-GE_CUSTOM_DIR="$EXTRACT_DIR/ge-custom"
 
-# Créer les répertoires
-mkdir -p "$DOWNLOAD_DIR" "$EXTRACT_DIR"
+# Create the directories
+mkdir -p "$DOWNLOAD_DIR"
+mkdir -p "$EXTRACT_DIR"
 
-# Afficher un message de téléchargement
-dialog --backtitle "Foclabroc Toolbox" --title "GE-Custom V40" --infobox "Téléchargement et extraction de GE-Custom V40..." 6 50
-sleep 2
-# Fonction de téléchargement avec affichage de la progression
-download_file() {
-    local url=$1
-    local output=$2
-    (
-        wget --progress=dot "$url" -O "$output" 2>&1 | \
-        while read -r line; do
-            percent=$(echo "$line" | awk '/[0-9]%/ {print $2}' | tr -d '%')
-            if [[ "$percent" =~ ^[0-9]+$ ]]; then
-                echo $percent
-            fi
-        done
-    ) | dialog --gauge "Téléchargement en cours..." 10 70 0
-    if [ $? -ne 0 ]; then
-        dialog --title "Erreur" --msgbox "Échec du téléchargement de $output." 6 50
-        exit 1
-    fi
-}
+# Download the split files
+dialog --backtitle "Foclabroc Toolbox" --infobox "Téléchargement de ge-custom v40 en cours..." 5 60
+curl -Ls -o "$DOWNLOAD_DIR/ge-customv40.tar.xz.001" "$URL_PART1" --progress-bar
+curl -Ls -o "$DOWNLOAD_DIR/ge-customv40.tar.xz.002" "$URL_PART2" --progress-bar
 
-# Télécharger les fichiers
-download_file "$URL_PART1" "$DOWNLOAD_DIR/ge-customv40.tar.xz.001"
-download_file "$URL_PART2" "$DOWNLOAD_DIR/ge-customv40.tar.xz.002"
+# Combine the files into a single archive
+cd "$DOWNLOAD_DIR"
+dialog --backtitle "Foclabroc Toolbox" --infobox "Assemblage des 2 parties en cours..." 5 60
+cat ge-customv40.tar.xz.001 ge-customv40.tar.xz.002 > ge-customv40.tar.xz
 
-# Combiner les fichiers
-cat "$DOWNLOAD_DIR/ge-customv40.tar.xz.001" "$DOWNLOAD_DIR/ge-customv40.tar.xz.002" > "$DOWNLOAD_DIR/ge-customv40.tar.xz"
-if [ $? -ne 0 ]; then
-    dialog --title "Erreur" --msgbox "Échec de l'assemblage des fichiers." 6 50
+# Verify the combined file exists
+if [[ ! -f "ge-customv40.tar.xz" ]]; then
+    dialog --backtitle "Foclabroc Toolbox" --infobox "Echec de l'assemblage des 2 parties !!!" 5 60
     exit 1
 fi
 
-# Décompression du .xz pour obtenir le .tar
-dialog --gauge "Décompression du fichier .xz en cours..." 10 70 0
-unxz -f "$DOWNLOAD_DIR/ge-customv40.tar.xz"
-if [ $? -ne 0 ]; then
-    dialog --title "Erreur" --msgbox "Échec de la décompression du fichier .xz." 6 50
+# Decompress the .xz file
+dialog --backtitle "Foclabroc Toolbox" --infobox "Décompression du .xz en cours..." 5 60
+xz -d ge-customv40.tar.xz
+
+# Verify the decompressed file exists
+if [[ ! -f "ge-customv40.tar" ]]; then
+    dialog --backtitle "Foclabroc Toolbox" --infobox "Echec de la décompression du .xz !!!" 5 60
     exit 1
 fi
 
-# Extraction du .tar dans le dossier de destination
-dialog --gauge "Extraction du fichier .tar en cours..." 10 70 0
-tar -xf "$DOWNLOAD_DIR/ge-customv40.tar" -C "$EXTRACT_DIR"
-if [ $? -ne 0 ]; then
-    dialog --title "Erreur" --msgbox "Échec de l'extraction du fichier .tar." 6 50
+# Extract the .tar archive
+dialog --backtitle "Foclabroc Toolbox" --infobox "Décompression du .tar en cours..." 5 60
+tar -xf ge-customv40.tar -C "$EXTRACT_DIR"
+
+# Check if extraction was successful
+if [[ $? -eq 0 ]]; then
+	dialog --backtitle "Foclabroc Toolbox" --infobox "Installation de ge-custom V40 terminé avec succès dans $EXTRACT_DIR." 5 60
+	sleep 2
+else
+	dialog --backtitle "Foclabroc Toolbox" --infobox "Echec de l'Installation de ge-custom V40 !!!" 5 60
     exit 1
 fi
 
-# Suppression des fichiers temporaires
+# Clean up temporary files
 rm -rf "$DOWNLOAD_DIR"
-
-# Afficher un message de fin
-dialog --backtitle "Foclabroc Toolbox" --title "GE-Custom V40" --msgbox "Téléchargement et extraction de Ge-custom V40 terminés avec succès !" 6 50
