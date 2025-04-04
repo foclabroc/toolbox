@@ -12,11 +12,31 @@ EXTRACT_DIR="/userdata/system/wine/custom"
 mkdir -p "$DOWNLOAD_DIR"
 mkdir -p "$EXTRACT_DIR"
 
-# Telechargement des 2 parties
+# Demander à l'utilisateur s'il souhaite lancer le téléchargement
+dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "Souhaitez-vous télécharger et installer ge-custom V40 ?" 7 60
+
+# Si l'utilisateur appuie sur "Non" (retourne 1)
+if [[ $? -eq 1 ]]; then
+    (
+        dialog --backtitle "Foclabroc Toolbox" --infobox "\nRetour Menu Wine Tools..." 5 60
+        sleep 1
+    ) 2>&1 >/dev/tty
+    # Lancer le script précédent (ici tu retournes dans le menu Wine Tools)
+    curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
+    exit 0
+fi
+
+# Téléchargement des 2 parties
 (
   echo 10 ; curl -Ls -o "$DOWNLOAD_DIR/ge-customv40.tar.xz.001" "$URL_PART1" --progress-bar && echo 50
   curl -Ls -o "$DOWNLOAD_DIR/ge-customv40.tar.xz.002" "$URL_PART2" --progress-bar && echo 100
 ) | dialog --gauge "Téléchargement de ge-custom v40 en cours..." 7 55 0
+
+# Vérification de la réussite des téléchargements
+if [[ ! -f "$DOWNLOAD_DIR/ge-customv40.tar.xz.001" || ! -f "$DOWNLOAD_DIR/ge-customv40.tar.xz.002" ]]; then
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nErreur lors du téléchargement des fichiers!" 5 55
+    exit 1
+fi
 
 # Assemblage des 2 parties
 cd "$DOWNLOAD_DIR"
@@ -24,7 +44,7 @@ dialog --backtitle "Foclabroc Toolbox" --infobox "\nAssemblage des 2 parties en 
 sleep 2
 cat ge-customv40.tar.xz.001 ge-customv40.tar.xz.002 > ge-customv40.tar.xz
 
-# Verification de l'assemblage
+# Vérification de l'assemblage
 if [[ ! -f "ge-customv40.tar.xz" ]]; then
     dialog --backtitle "Foclabroc Toolbox" --infobox "\nEchec de l'assemblage des 2 parties !!!" 5 55
 	sleep 2
@@ -36,7 +56,7 @@ dialog --backtitle "Foclabroc Toolbox" --infobox "\nDécompression du .xz en cou
 sleep 2
 xz -d ge-customv40.tar.xz
 
-# Verification du fichier
+# Vérification du fichier décompressé
 if [[ ! -f "ge-customv40.tar" ]]; then
     dialog --backtitle "Foclabroc Toolbox" --infobox "\nEchec de la décompression du .xz !!!" 5 55
     exit 1
@@ -48,12 +68,20 @@ tar -xf ge-customv40.tar -C "$EXTRACT_DIR"
 
 # Vérification du fichier extrait
 if [[ $? -eq 0 ]]; then
-	dialog --backtitle "Foclabroc Toolbox" --infobox "Installation de ge-custom V40 terminé avec succès dans $EXTRACT_DIR." 5 60
-	sleep 2
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nInstallation de ge-custom V40 terminée avec succès dans $EXTRACT_DIR." 6 60
+    sleep 2
 else
-	dialog --backtitle "Foclabroc Toolbox" --infobox "\nEchec de l'Installation de ge-custom V40 !!!" 4 55
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nEchec de l'installation de ge-custom V40 !!!" 4 55
     exit 1
 fi
 
-# Clean up temporary files
+# Nettoyage des fichiers temporaires
 rm -rf "$DOWNLOAD_DIR"
+
+# Retourner au script précédent (Menu Wine Tools)
+(
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nRetour Menu Wine Tools..." 5 60
+    sleep 1
+) 2>&1 >/dev/tty
+curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
+exit 0
