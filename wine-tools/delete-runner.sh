@@ -28,7 +28,7 @@ while true; do
         NOM=$(basename "$DOSSIER")
         TAILLE=$(du -sh "$DOSSIER" | cut -f1)
         DATE=$(stat -c "%y" "$DOSSIER" 2>/dev/null | cut -d'.' -f1)
-        LISTE+=("$NUMERO [$NOM]" "-->|Taille: $TAILLE | Créé le: $DATE")
+        LISTE+=("$NUMERO $NOM" "-->|Taille: $TAILLE | Créé le: $DATE")
         ((NUMERO++))
     done
 
@@ -67,6 +67,7 @@ while true; do
             sleep 2
         else
             dialog --backtitle "Foclabroc Toolbox" --infobox "\nSuppression échouée ou dossier invalide." 6 50 2>&1 >/dev/tty
+			sleep 3
         fi
     else
         dialog --backtitle "Foclabroc Toolbox" --infobox "\nSuppression annulée." 6 50 2>&1 >/dev/tty
