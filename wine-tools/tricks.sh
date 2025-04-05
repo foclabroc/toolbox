@@ -51,9 +51,10 @@ while true; do
         "d3dx9_43" "DirectX9 (d3dx9_43)")
       FINAL_PACKAGE=$COMMON_WT
     else
-      # Sélection d'un paquet Winetricks supplémentaire
-      dialog --backtitle "Foclabroc Toolbox" --yesno "\nSouhaitez-vous installer un autre composant depuis la liste officielle de Winetricks ?" 10 60 2>&1 >/dev/tty
-      if [ $? -eq 0 ]; then
+      # # Sélection d'un paquet Winetricks supplémentaire
+      # dialog --backtitle "Foclabroc Toolbox" --yesno "\nSouhaitez-vous installer un autre composant depuis la liste officielle de Winetricks ?" 10 60 2>&1 >/dev/tty
+      # if [ $? -eq 0 ]; then
+	    dialog --backtitle "Foclabroc Toolbox" --infobox "\nChargement de la liste officiel winetricks patientez..." 8 60 2>&1 >/dev/tty
         WT_URL="https://raw.githubusercontent.com/Winetricks/winetricks/master/files/verbs/all.txt"
         TEMP_LIST=$(mktemp)
         curl -sL "$WT_URL" -o "$TEMP_LIST"
@@ -71,7 +72,7 @@ while true; do
             OPTIONS+=("$pkg" "$desc")
           done < "$PARSED_LIST"
 
-          FINAL_PACKAGE=$(dialog --backtitle "Foclabroc Toolbox" --stdout --radiolist "\nSélectionnez un composant Winetricks à installer :\n " 35 105 10 "${OPTIONS[@]}")
+          FINAL_PACKAGE=$(dialog --backtitle "Foclabroc Toolbox" --stdout --menu "\nSélectionnez un composant Winetricks à installer :\n " 35 100 10 "${OPTIONS[@]}")
 
           rm -f "$TEMP_LIST" "$PARSED_LIST"
         fi
