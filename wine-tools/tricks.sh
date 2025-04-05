@@ -39,7 +39,7 @@ while true; do
   while true; do
     FINAL_PACKAGE=""
     # Installation d'une dépendance courante VC++ ou DirectX
-    dialog --backtitle "Foclabroc Toolbox" --title "Dépendances VC++ / DirectX" --yesno "\nSouhaitez-vous installer une dépendance courante comme Visual C++ ou DirectX9 ?\n\n Oui = Affichage liste tricks courant.\n\n Non = Affichage liste winetricks officiel complete.\n " 13 80 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --title "Dépendances VC++ / DirectX" --yesno "\nSouhaitez-vous installer une dépendance courante comme Visual C++ ou DirectX9 ?\n\n Oui = Affichage liste tricks courant.\n\n Non = Affichage liste winetricks officiel complete.\n " 12 80 2>&1 >/dev/tty
 	if [ $? -eq 0 ]; then
 	COMMON_WT=$(dialog --backtitle "Foclabroc Toolbox" --stdout --menu "\nChoisissez une dépendance à installer :\n " 16 80 6 \
 		"vcrun2008" "Visual C++ 2008" \
@@ -54,7 +54,7 @@ while true; do
 		# Confirmation avant installation
 		dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nVoulez-vous vraiment installer :\n\nLe Tricks : [$FINAL_PACKAGE]\n\nDans la Bouteille :\n\n[$selected_bottle] ?" 13 95 2>&1 >/dev/tty
 		if [ $? -ne 0 ]; then
-		dialog --backtitle "Foclabroc Toolbox" --infobox "\nInstallation annulée par l'utilisateur." 6 60 2>&1 >/dev/tty
+		dialog --backtitle "Foclabroc Toolbox" --infobox "\nInstallation annulée par l'utilisateur..." 5 60 2>&1 >/dev/tty
 		sleep 2
 		break
 		fi
@@ -83,7 +83,7 @@ while true; do
 		    # Confirmation avant installation
 		    dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nVoulez-vous vraiment installer :\n\nLe Tricks : [$FINAL_PACKAGE]\n\nDans la Bouteille :\n\n[$selected_bottle] ?" 13 95 2>&1 >/dev/tty
 		    if [ $? -ne 0 ]; then
-			  dialog --backtitle "Foclabroc Toolbox" --infobox "\nInstallation annulée par l'utilisateur." 6 60 2>&1 >/dev/tty
+			  dialog --backtitle "Foclabroc Toolbox" --infobox "\nInstallation annulée par l'utilisateur..." 5 60 2>&1 >/dev/tty
 			  sleep 2
 			  break
 		    fi
