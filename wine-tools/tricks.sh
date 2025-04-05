@@ -89,13 +89,14 @@ while true; do
 	clear
     export DISPLAY=:0.0
     unclutter-remote -s
-    dialog --backtitle "Foclabroc Toolbox" --infobox "\nApplication de Winetricks...\n\nBouteille : $selected_bottle\nComposant : $FINAL_PACKAGE\n " 12 60 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nApplication de Winetricks...\n\nBouteille : $selected_bottle\n\nComposant : $FINAL_PACKAGE\n " 12 60 2>&1 >/dev/tty
+	clear
     batocera-wine windows tricks "$selected_bottle" "$FINAL_PACKAGE" unattended
-    dialog --backtitle "Foclabroc Toolbox" --msgbox "Installation de $FINAL_PACKAGE terminée avec succès." 8 40 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --msgbox "\nInstallation de $FINAL_PACKAGE terminée avec succès." 8 40 2>&1 >/dev/tty
     unclutter-remote -h
 
     # --- ÉTAPE 6 : Nouvelle action sur la même bouteille ? ---
-    dialog --backtitle "Foclabroc Toolbox" --yesno "Souhaitez-vous installer un autre composant sur cette même bouteille ?" 8 50 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --yesno "\nSouhaitez-vous installer un autre composant sur cette même bouteille ?" 8 50 2>&1 >/dev/tty
     [ $? -eq 0 ] || break
     clear
   done
@@ -110,7 +111,7 @@ while true; do
 done
 
 # --- Fin : retour au menu Wine Tools ---
-dialog --backtitle "Foclabroc Toolbox" --infobox "Retour au menu Wine Tools..." 5 40 2>&1 >/dev/tty
+dialog --backtitle "Foclabroc Toolbox" --infobox "\nRetour au menu Wine Tools..." 5 40 2>&1 >/dev/tty
 sleep 2
 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
 
