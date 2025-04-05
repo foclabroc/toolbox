@@ -88,9 +88,11 @@ while true; do
     dialog --backtitle "Foclabroc Toolbox" --msgbox "\nRegardez l'écran principal pour suivre l'installation." 8 40 2>&1 >/dev/tty
 	clear
     #export DISPLAY=:0.0
+	DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c
     unclutter-remote -s
     dialog --backtitle "Foclabroc Toolbox" --infobox "\nApplication de Winetricks...\n\nBouteille : $selected_bottle\n\nComposant : $FINAL_PACKAGE\n " 12 60 2>&1 >/dev/tty
-	clear
+clear
+    DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c
     batocera-wine windows tricks "$selected_bottle" "$FINAL_PACKAGE" unattended
     dialog --backtitle "Foclabroc Toolbox" --msgbox "\nInstallation de $FINAL_PACKAGE terminée avec succès." 8 40 2>&1 >/dev/tty
     unclutter-remote -h
