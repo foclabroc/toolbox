@@ -3,7 +3,7 @@
 # Boucle principale
 while true; do
 
-  # --- ÉTAPE 1 : Rechercher les dossiers .wine ---
+  # Rechercher les dossiers .wine
   wine_bottles=()
 
   # Recherche récursive dans /userdata/system/wine-bottles
@@ -22,7 +22,7 @@ while true; do
     exit 1
   fi
 
-  # --- ÉTAPE 2 : Sélection de la bouteille Wine ---
+  # Sélection de la bouteille Wine
   selected_bottle=$(dialog --backtitle "Foclabroc Toolbox" --clear --title "Sélection d'une bouteille Wine" \
     --menu "\nChoisissez une bouteille (.wine) pour appliquer un Winetricks :\n " 25 100 6 "${wine_bottles[@]}" 3>&1 1>&2 2>&3)
 
@@ -39,10 +39,10 @@ while true; do
   while true; do
     FINAL_PACKAGE=""
 
-    # --- ÉTAPE 3 : Installation d'une dépendance courante VC++ ou DirectX ---
+    # Installation d'une dépendance courante VC++ ou DirectX
     dialog --backtitle "Foclabroc Toolbox" --yesno "Dépendances VC++ / DirectX\n\nSouhaitez-vous installer une dépendance courante comme Visual C++ ou DirectX9 ?\n\n Oui : affichage des tricks courant.\n\n Non : affichage de la liste winetricks complete.\n " 15 80 2>&1 >/dev/tty
     if [ $? -eq 0 ]; then
-      COMMON_WT=$(dialog --stdout --menu "\nChoisissez une dépendance à installer :\n " 15 60 6 \
+      COMMON_WT=$(dialog --stdout --menu "\nChoisissez une dépendance à installer :\n " 16 80 6 \
         "vcrun2008" "Visual C++ 2008" \
         "vcrun2010" "Visual C++ 2010" \
         "vcrun2012" "Visual C++ 2012" \
@@ -51,7 +51,7 @@ while true; do
         "d3dx9_43" "DirectX9 (d3dx9_43)")
       FINAL_PACKAGE=$COMMON_WT
     else
-      # --- ÉTAPE 4 : Sélection d'un paquet Winetricks supplémentaire ---
+      # Sélection d'un paquet Winetricks supplémentaire
       dialog --backtitle "Foclabroc Toolbox" --yesno "\nSouhaitez-vous installer un autre composant depuis la liste officielle de Winetricks ?" 10 60 2>&1 >/dev/tty
       if [ $? -eq 0 ]; then
         WT_URL="https://raw.githubusercontent.com/Winetricks/winetricks/master/files/verbs/all.txt"
@@ -71,39 +71,37 @@ while true; do
             OPTIONS+=("$pkg" "$desc")
           done < "$PARSED_LIST"
 
-          FINAL_PACKAGE=$(dialog --backtitle "Foclabroc Toolbox" --stdout --menu "\nSélectionnez un composant Winetricks à installer :\n " 30 85 10 "${OPTIONS[@]}")
+          FINAL_PACKAGE=$(dialog --backtitle "Foclabroc Toolbox" --stdout --menu "\nSélectionnez un composant Winetricks à installer :\n " 35 105 10 "${OPTIONS[@]}")
 
           rm -f "$TEMP_LIST" "$PARSED_LIST"
         fi
       fi
     fi
 
-    # --- Aucune sélection effectuée ---
+    # Aucune sélection effectuée
     if [ -z "$FINAL_PACKAGE" ]; then
       dialog --backtitle "Foclabroc Toolbox" --infobox "\nAucun composant sélectionné. Retour à la sélection de bouteille." 8 50 2>&1 >/dev/tty
       break
     fi
 
-    # --- ÉTAPE 5 : Application du Winetricks ---
+    # Application du Winetricks
     dialog --backtitle "Foclabroc Toolbox" --msgbox "\nRegardez l'écran principal pour suivre l'installation." 8 40 2>&1 >/dev/tty
-	clear
-    #export DISPLAY=:0.0
-	DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c
+    export DISPLAY=:0.0
     unclutter-remote -s
     dialog --backtitle "Foclabroc Toolbox" --infobox "\nApplication de Winetricks...\n\nBouteille : $selected_bottle\n\nComposant : $FINAL_PACKAGE\n " 12 60 2>&1 >/dev/tty
-clear
-    DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c
+	clear
     batocera-wine windows tricks "$selected_bottle" "$FINAL_PACKAGE" unattended
+	clear
     dialog --backtitle "Foclabroc Toolbox" --msgbox "\nInstallation de $FINAL_PACKAGE terminée avec succès." 8 40 2>&1 >/dev/tty
     unclutter-remote -h
 
-    # --- ÉTAPE 6 : Nouvelle action sur la même bouteille ? ---
+    # Nouvelle action sur la même bouteille ?
     dialog --backtitle "Foclabroc Toolbox" --yesno "\nSouhaitez-vous installer un autre composant sur cette même bouteille ?" 8 50 2>&1 >/dev/tty
     [ $? -eq 0 ] || break
     clear
   done
 
-  # --- ÉTAPE 7 : Traiter une autre bouteille ? ---
+  # Traiter une autre bouteille ?
   dialog --backtitle "Foclabroc Toolbox" --yesno "\nSouhaitez-vous traiter une autre bouteille Wine ?" 8 50 2>&1 >/dev/tty
   [ $? -eq 0 ] || {
     clear
@@ -112,7 +110,7 @@ clear
   clear
 done
 
-# --- Fin : retour au menu Wine Tools ---
+# retour au menu Wine Tools
 dialog --backtitle "Foclabroc Toolbox" --infobox "\nRetour au menu Wine Tools..." 5 40 2>&1 >/dev/tty
 sleep 2
 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash

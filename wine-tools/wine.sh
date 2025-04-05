@@ -8,7 +8,7 @@ OPTIONS=(
   "4" "Telechargement Runner GE-Proton builds"
   "5" "Telechargement Runner GE-Custom de la V40 (pour garder vos anciennes bottles/sauvegarde)"
   "6" "Sélectionnez et supprimer les runner custom inutiles"
-  "7" "Installation de Winetricks personnalisé"
+  "7" "Installation de Winetricks personnalisé (FONCTIONNE UNIQUEMENT via SSH, pas via le menu port!)"
   "8" "Convertir dossier .pc en dossier .wine"
   "9" "Compresser dossier .wine en fichier .wsquashfs ou .tgz"
   "10" "Decompresser fichiers .wsquashfs ou .tgz en dossier .wine"
@@ -18,7 +18,7 @@ OPTIONS=(
 CHOICE=$(dialog --clear --backtitle "Foclabroc Toolbox" \
                 --title "Wine Toolbox" \
                 --menu "\nChoisissez une option:\n " \
-               30 100 10 \
+               30 105 10 \
                 "${OPTIONS[@]}" \
                 2>&1 >/dev/tty)
 
