@@ -8,7 +8,7 @@ OPTIONS=(
   "4" "Telechargement Runner GE-Proton builds"
   "5" "Telechargement Runner GE-Custom de la V40 (pour garder vos anciennes bottles/sauvegarde)"
   "6" "Sélectionnez et supprimer les runner custom inutiles"
-  "7" "Installation de Winetricks automatique"
+  "7" "Installation de Winetricks personnalisé"
   "8" "Convertir dossier .pc en dossier .wine"
   "9" "Compresser dossier .wine en fichier .wsquashfs ou .tgz"
   "10" "Decompresser fichiers .wsquashfs ou .tgz en dossier .wine"
@@ -52,8 +52,8 @@ case $CHOICE in
         curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/delete-runner.sh | bash
         ;;
     7)
-        echo "You chose Easy Batocera Wine Tricks."
-        curl -L https://github.com/trashbus99/profork/raw/master/wine-custom/tricks.sh | bash
+        #echo "Winetricks."
+        curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/tricks.sh | bash
         ;;
     8)
         echo "You chose Easy autorun.cmd creator."
