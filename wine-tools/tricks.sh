@@ -87,7 +87,7 @@ while true; do
     # --- ÉTAPE 5 : Application du Winetricks ---
     dialog --backtitle "Foclabroc Toolbox" --msgbox "\nRegardez l'écran principal pour suivre l'installation." 8 40 2>&1 >/dev/tty
 	clear
-    export DISPLAY=:0.0
+    #export DISPLAY=:0.0
     unclutter-remote -s
     dialog --backtitle "Foclabroc Toolbox" --infobox "\nApplication de Winetricks...\n\nBouteille : $selected_bottle\n\nComposant : $FINAL_PACKAGE\n " 12 60 2>&1 >/dev/tty
 	clear
