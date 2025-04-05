@@ -38,7 +38,6 @@ while true; do
   # Boucle interne : appliquer plusieurs tricks sur la même bouteille
   while true; do
     FINAL_PACKAGE=""
-
     # Installation d'une dépendance courante VC++ ou DirectX
     dialog --backtitle "Foclabroc Toolbox" --title "Dépendances VC++ / DirectX" --yesno "\nSouhaitez-vous installer une dépendance courante comme Visual C++ ou DirectX9 ?\n\n Oui = Affichage liste tricks courant.\n\n Non = Affichage liste winetricks officiel complete.\n " 13 80 2>&1 >/dev/tty
 	if [ $? -eq 0 ]; then
@@ -49,20 +48,18 @@ while true; do
 		"vcrun2013" "Visual C++ 2013" \
 		"vcrun2022" "Visual C++ 2015 à 2022" \
 		"d3dx9_43" "DirectX9 (d3dx9_43)")
-	FINAL_PACKAGE=$COMMON_WT
 
-	# Confirmation avant installation
-	dialog --backtitle "Foclabroc Toolbox" --title "Confirmation"--yesno "\nVoulez-vous vraiment installer\n\nLe tricks : $FINAL_PACKAGE\n\nDans la bouteille :\n\n$selected_bottle ?" 16 60 2>&1 >/dev/tty
-	if [ $? -ne 0 ]; then
+	if [ -n "$COMMON_WT" ]; then
+		FINAL_PACKAGE=$COMMON_WT
+		# Confirmation avant installation
+		dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nVoulez-vous vraiment installer\n\nLe tricks : $FINAL_PACKAGE\n\nDans la bouteille :\n\n$selected_bottle ?" 16 60 2>&1 >/dev/tty
+		if [ $? -ne 0 ]; then
 		dialog --backtitle "Foclabroc Toolbox" --infobox "\nInstallation annulée par l'utilisateur." 5 40 2>&1 >/dev/tty
 		sleep 2
-		break
+		continue  # Retour au menu sans casser la boucle
+		fi
 	fi
-	  
     else
-      # # Sélection d'un paquet Winetricks supplémentaire
-      # dialog --backtitle "Foclabroc Toolbox" --yesno "\nSouhaitez-vous installer un autre composant depuis la liste officielle de Winetricks ?" 10 60 2>&1 >/dev/tty
-      # if [ $? -eq 0 ]; then
 	    dialog --backtitle "Foclabroc Toolbox" --infobox "\nChargement de la liste officiel winetricks patientez..." 5 60 2>&1 >/dev/tty
         WT_URL="https://raw.githubusercontent.com/Winetricks/winetricks/master/files/verbs/all.txt"
         TEMP_LIST=$(mktemp)
@@ -80,10 +77,17 @@ while true; do
             desc=$(echo "$line" | cut -d' ' -f2-)
             OPTIONS+=("$pkg" "$desc")
           done < "$PARSED_LIST"
-
           FINAL_PACKAGE=$(dialog --backtitle "Foclabroc Toolbox" --stdout --menu "\nSélectionnez un composant Winetricks à installer :\n " 35 100 10 "${OPTIONS[@]}")
-
           rm -f "$TEMP_LIST" "$PARSED_LIST"
+		  if [ -n "$FINAL_PACKAGE" ]; then
+		    # Confirmation avant installation
+		    dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nVoulez-vous vraiment installer\n\nLe tricks : $FINAL_PACKAGE\n\nDans la bouteille :\n\n$selected_bottle ?" 16 60 2>&1 >/dev/tty
+		    if [ $? -ne 0 ]; then
+			  dialog --backtitle "Foclabroc Toolbox" --infobox "\nInstallation annulée par l'utilisateur." 5 40 2>&1 >/dev/tty
+			  sleep 2
+			  continue
+		    fi
+		  fi
         fi
     fi
 
