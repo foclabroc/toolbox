@@ -29,7 +29,7 @@ while true; do
   exit_status=$?
   clear
   if [ $exit_status -ne 0 ]; then
-    dialog --backtitle "Foclabroc Toolbox" --infobox "\Retour au menu Wine Tools..." 5 40 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nRetour au menu Wine Tools..." 5 40 2>&1 >/dev/tty
     sleep 2
     curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
     exit 1
@@ -43,12 +43,12 @@ while true; do
     dialog --backtitle "Foclabroc Toolbox" --yesno "Dépendances VC++ / DirectX\n\nSouhaitez-vous installer une dépendance courante comme Visual C++ ou DirectX9 ?\n\n Oui : affichage des tricks courant.\n\n Non : affichage de la liste winetricks complete.\n " 15 80 2>&1 >/dev/tty
     if [ $? -eq 0 ]; then
       COMMON_WT=$(dialog --stdout --menu "\nChoisissez une dépendance à installer :\n " 15 60 6 \
-        "vcrun2008" "Visual C++ 2008" off \
-        "vcrun2010" "Visual C++ 2010" off \
-        "vcrun2012" "Visual C++ 2012" off \
-        "vcrun2013" "Visual C++ 2013" off \
-        "vcrun2022" "Visual C++ 2015 à 2022" off \
-        "d3dx9_43" "DirectX9 (d3dx9_43)" off)
+        "vcrun2008" "Visual C++ 2008" \
+        "vcrun2010" "Visual C++ 2010" \
+        "vcrun2012" "Visual C++ 2012" \
+        "vcrun2013" "Visual C++ 2013" \
+        "vcrun2022" "Visual C++ 2015 à 2022" \
+        "d3dx9_43" "DirectX9 (d3dx9_43)")
       FINAL_PACKAGE=$COMMON_WT
     else
       # --- ÉTAPE 4 : Sélection d'un paquet Winetricks supplémentaire ---
