@@ -24,7 +24,7 @@ while true; do
 
   # Sélection de la bouteille Wine
   selected_bottle=$(dialog --backtitle "Foclabroc Toolbox" --clear --title "Sélection d'une bouteille Wine" \
-    --radiolist "\nChoisissez une bouteille (.wine) pour appliquer un Winetricks :\n " 25 100 6 "${wine_bottles[@]}" 3>&1 1>&2 2>&3)
+    --menu "\nChoisissez une bouteille (.wine) pour appliquer un Winetricks :\n " 25 100 6 "${wine_bottles[@]}" 3>&1 1>&2 2>&3)
 
   exit_status=$?
   clear
