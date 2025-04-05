@@ -201,7 +201,7 @@ main_menu() {
     while true; do
         main_menu=$(dialog --clear --backtitle "Foclabroc Toolbox" \
             --title "Menu Principal" \
-            --menu "\nSélectionnez une option :\n " 25 86 12 \
+            --menu "\nSélectionnez une option :\n " 20 86 12 \
             1 "[Nintendo Switch] -> Installer l'émulation Switch sur Batocera (foclabroc)" \
             2 "[Youtube TV]      -> Installer Youtube TV" \
             3 "[Gparted]         -> Installer Gparted" \
