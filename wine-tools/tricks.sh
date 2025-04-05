@@ -41,12 +41,14 @@ while true; do
     # Installation d'une dépendance courante VC++ ou DirectX
     dialog --backtitle "Foclabroc Toolbox" --title "Dépendances VC++ / DirectX" --yesno "\nSouhaitez-vous installer une dépendance courante comme Visual C++ ou DirectX9 ?\n\n Oui = Affichage liste tricks courant.\n\n Non = Affichage liste winetricks officiel complete.\n " 12 80 2>&1 >/dev/tty
 	if [ $? -eq 0 ]; then
-	COMMON_WT=$(dialog --backtitle "Foclabroc Toolbox" --stdout --menu "\nChoisissez une dépendance à installer :\n " 16 80 6 \
+	COMMON_WT=$(dialog --backtitle "Foclabroc Toolbox" --stdout --menu "\nChoisissez une dépendance à installer :\n " 18 80 8 \
 		"vcrun2008" "Visual C++ 2008" \
 		"vcrun2010" "Visual C++ 2010" \
 		"vcrun2012" "Visual C++ 2012" \
 		"vcrun2013" "Visual C++ 2013" \
 		"vcrun2022" "Visual C++ 2015 à 2022" \
+		"openal" "OpenAL Runtime Creative 2023" \
+		"directplay" "MS DirectPlay from DirectX" \
 		"d3dx9_43" "DirectX9 (d3dx9_43)")
 
 	if [ -n "$COMMON_WT" ]; then
@@ -98,7 +100,7 @@ while true; do
     fi
 
     # Application du Winetricks
-    dialog --backtitle "Foclabroc Toolbox" --infobox "\nRegardez l'écran principal pour suivre l'installation." 8 40 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nRegardez l'écran principal pour suivre l'installation." 6 40 2>&1 >/dev/tty
 	sleep 3
     export DISPLAY=:0.0
     unclutter-remote -s
