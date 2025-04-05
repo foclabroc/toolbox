@@ -40,7 +40,7 @@ while true; do
     FINAL_PACKAGE=""
 
     # Installation d'une dépendance courante VC++ ou DirectX
-    dialog --backtitle "Foclabroc Toolbox" --yesno "Dépendances VC++ / DirectX\n\nSouhaitez-vous installer une dépendance courante comme Visual C++ ou DirectX9 ?\n\n Oui : affichage des tricks courant.\n\n Non : affichage de la liste winetricks complete.\n " 15 80 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --yesno "Dépendances VC++ / DirectX\n\nSouhaitez-vous installer une dépendance courante comme Visual C++ ou DirectX9 ?\n\n Oui : affichage des tricks courant.\n\n Non : affichage de la liste winetricks complete.\n " 12 80 2>&1 >/dev/tty
     if [ $? -eq 0 ]; then
       COMMON_WT=$(dialog --stdout --menu "\nChoisissez une dépendance à installer :\n " 16 80 6 \
         "vcrun2008" "Visual C++ 2008" \

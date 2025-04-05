@@ -18,7 +18,7 @@ OPTIONS=(
 CHOICE=$(dialog --clear --backtitle "Foclabroc Toolbox" \
                 --title "Wine Toolbox" \
                 --menu "\nChoisissez une option:\n " \
-               20 106 10 \
+               22 106 10 \
                 "${OPTIONS[@]}" \
                 2>&1 >/dev/tty)
 
