@@ -52,11 +52,11 @@ while true; do
 	if [ -n "$COMMON_WT" ]; then
 		FINAL_PACKAGE=$COMMON_WT
 		# Confirmation avant installation
-		dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nVoulez-vous vraiment installer :\n\nLe Tricks : [$FINAL_PACKAGE]\n\nDans la Bouteille :\n\n[$selected_bottle] ?" 14 95 2>&1 >/dev/tty
+		dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nVoulez-vous vraiment installer :\n\nLe Tricks : [$FINAL_PACKAGE]\n\nDans la Bouteille :\n\n[$selected_bottle] ?" 13 95 2>&1 >/dev/tty
 		if [ $? -ne 0 ]; then
 		dialog --backtitle "Foclabroc Toolbox" --infobox "\nInstallation annulée par l'utilisateur." 6 60 2>&1 >/dev/tty
 		sleep 2
-		break  # Retour au menu sans casser la boucle
+		break
 		fi
 	fi
     else
@@ -81,7 +81,7 @@ while true; do
           rm -f "$TEMP_LIST" "$PARSED_LIST"
 		  if [ -n "$FINAL_PACKAGE" ]; then
 		    # Confirmation avant installation
-		    dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nVoulez-vous vraiment installer :\n\nLe Tricks : [$FINAL_PACKAGE]\n\nDans la Bouteille :\n\n[$selected_bottle] ?" 14 95 2>&1 >/dev/tty
+		    dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nVoulez-vous vraiment installer :\n\nLe Tricks : [$FINAL_PACKAGE]\n\nDans la Bouteille :\n\n[$selected_bottle] ?" 13 95 2>&1 >/dev/tty
 		    if [ $? -ne 0 ]; then
 			  dialog --backtitle "Foclabroc Toolbox" --infobox "\nInstallation annulée par l'utilisateur." 6 60 2>&1 >/dev/tty
 			  sleep 2
