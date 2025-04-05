@@ -76,7 +76,6 @@ while true; do
 
           rm -f "$TEMP_LIST" "$PARSED_LIST"
         fi
-      fi
     fi
 
     # Aucune sélection effectuée
