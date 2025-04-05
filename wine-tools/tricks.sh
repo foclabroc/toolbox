@@ -54,7 +54,7 @@ while true; do
       # # Sélection d'un paquet Winetricks supplémentaire
       # dialog --backtitle "Foclabroc Toolbox" --yesno "\nSouhaitez-vous installer un autre composant depuis la liste officielle de Winetricks ?" 10 60 2>&1 >/dev/tty
       # if [ $? -eq 0 ]; then
-	    dialog --backtitle "Foclabroc Toolbox" --infobox "\nChargement de la liste officiel winetricks patientez..." 8 60 2>&1 >/dev/tty
+	    dialog --backtitle "Foclabroc Toolbox" --infobox "\nChargement de la liste officiel winetricks patientez..." 5 60 2>&1 >/dev/tty
         WT_URL="https://raw.githubusercontent.com/Winetricks/winetricks/master/files/verbs/all.txt"
         TEMP_LIST=$(mktemp)
         curl -sL "$WT_URL" -o "$TEMP_LIST"
