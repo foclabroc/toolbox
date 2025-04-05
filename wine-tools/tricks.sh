@@ -24,7 +24,7 @@ while true; do
 
   # Sélection de la bouteille Wine
   selected_bottle=$(dialog --backtitle "Foclabroc Toolbox" --clear --title "Sélection d'une bouteille Wine" \
-    --menu "\nChoisissez une bouteille (.wine) pour appliquer un Winetricks :\n " 25 100 6 "${wine_bottles[@]}" 3>&1 1>&2 2>&3)
+    --radiolist "\nChoisissez une bouteille (.wine) pour appliquer un Winetricks :\n " 25 100 6 "${wine_bottles[@]}" 3>&1 1>&2 2>&3)
 
   exit_status=$?
   clear
@@ -71,7 +71,7 @@ while true; do
             OPTIONS+=("$pkg" "$desc")
           done < "$PARSED_LIST"
 
-          FINAL_PACKAGE=$(dialog --backtitle "Foclabroc Toolbox" --stdout --menu "\nSélectionnez un composant Winetricks à installer :\n " 35 105 10 "${OPTIONS[@]}")
+          FINAL_PACKAGE=$(dialog --backtitle "Foclabroc Toolbox" --stdout --radiolist "\nSélectionnez un composant Winetricks à installer :\n " 35 105 10 "${OPTIONS[@]}")
 
           rm -f "$TEMP_LIST" "$PARSED_LIST"
         fi
