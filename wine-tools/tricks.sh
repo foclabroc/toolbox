@@ -104,12 +104,11 @@ while true; do
 	clear
 	sleep 3
 	{
-	export DISPLAY=:0.0
+	DISPLAY=:0.0
 	unclutter-remote -s
-	dialog --backtitle "Foclabroc Toolbox" --infobox "\nInstallation de $FINAL_PACKAGE...\n\nBouteille : $selected_bottle\n\nComposant : $FINAL_PACKAGE\n " 12 60
-	} 2>&1 >/dev/tty
 	clear
-    batocera-wine windows tricks "$selected_bottle" "$FINAL_PACKAGE" unattended 2>&1 >/dev/tty
+    batocera-wine windows tricks "$selected_bottle" "$FINAL_PACKAGE" unattended
+	} 2>&1 >/dev/tty
 	sleep 5
 	clear
     dialog --backtitle "Foclabroc Toolbox" --msgbox "\nInstallation de $FINAL_PACKAGE terminée avec succès." 8 40 2>&1 >/dev/tty
