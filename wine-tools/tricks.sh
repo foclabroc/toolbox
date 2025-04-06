@@ -112,8 +112,6 @@ while true; do
 	-e bash -c '
 		unclutter-remote -s
 		batocera-wine windows tricks "'"$selected_bottle"'" "'"$FINAL_PACKAGE"'" unattended
-		sleep 2
-		echo
 		unclutter-remote -h
 	'
 	dialog --backtitle "Foclabroc Toolbox" --msgbox "\nWinetricks installé avec succès." 6 40 2>&1 >/dev/tty
