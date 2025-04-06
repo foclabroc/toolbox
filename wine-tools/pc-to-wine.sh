@@ -1,23 +1,4 @@
 #!/bin/bash
-# Script to convert a .pc folder into a .wine folder in Batocera and optionally compress it.
-# Steps:
-#   1. Select a .pc folder from /userdata/roms/windows.
-#   2. Select the corresponding wine bottle folder (a .wine folder) from /userdata/system/wine-bottles.
-#   3. Copy the wine bottle data into the .pc folder.
-#   4. Delete the original wine bottle folder.
-#   5. Rename the .pc folder to a .wine folder (in /userdata/roms/windows).
-#   6. Optionally, offer folder compression (TGZ or SquashFS) with usage advice.
-#      After compression, the output file is renamed to remove the ".wine" part.
-#   7. Optionally, offer to delete the corresponding .wine folder in /userdata/roms/windows.
-#
-# WARNING: This script will remove directories and move data. Please back up your data first!
-
-# Check if dialog is installed
-if ! command -v dialog &> /dev/null; then
-  echo "The 'dialog' command is required but not installed. Aborting."
-  exit 1
-fi
-#!/bin/bash
 
 # Display the dialog box. Adjust height and width as needed.
 dialog --title "Game Setup Confirmation" --yesno "You must run the windows game in a .pc folder at least once for Batocera to generate a wine bottle/.wine folder for the game.  Continue?" 10 60
