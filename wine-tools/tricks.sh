@@ -112,6 +112,7 @@ while true; do
 	-e bash -c '
 		unclutter-remote -s
 		batocera-wine windows tricks "'"$selected_bottle"'" "'"$FINAL_PACKAGE"'" unattended
+		sleep 2
 		echo
 		unclutter-remote -h
 	'
