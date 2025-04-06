@@ -103,16 +103,16 @@ while true; do
     dialog --backtitle "Foclabroc Toolbox" --infobox "\nRegardez l'écran principal pour suivre l'installation." 6 40 2>&1 >/dev/tty
 	clear
 	sleep 3
-	{
-	DISPLAY=:0.0
-	unclutter-remote -s
-	clear
-    batocera-wine windows tricks "$selected_bottle" "$FINAL_PACKAGE"
-	} 2>&1 >/dev/tty
-	sleep 5
-	clear
-    dialog --backtitle "Foclabroc Toolbox" --msgbox "\nInstallation de $FINAL_PACKAGE terminée avec succès." 8 40 2>&1 >/dev/tty
-    unclutter-remote -h 2>&1 >/dev/tty
+	bash -c '
+		export DISPLAY=:0.0
+		unclutter-remote -s
+		clear
+		batocera-wine windows tricks "'"$selected_bottle"'" "'"$FINAL_PACKAGE"'"
+		sleep 5
+		clear
+		dialog --backtitle "Foclabroc Toolbox" --msgbox "\nInstallation de '"$FINAL_PACKAGE"' terminée avec succès." 8 40
+		unclutter-remote -h
+	' 2>&1 >/dev/tty
 
     # Nouvelle action sur la même bouteille ?
     dialog --backtitle "Foclabroc Toolbox" --yesno "\nSouhaitez-vous installer un autre composant sur cette même bouteille ?" 8 50 2>&1 >/dev/tty
