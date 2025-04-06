@@ -101,13 +101,11 @@ while true; do
 
     # Application du Winetricks
     dialog --backtitle "Foclabroc Toolbox" --infobox "\nRegardez l'écran principal pour suivre l'installation." 6 40 2>&1 >/dev/tty
-	clear
 	sleep 3
+	echo "Installation en cours, veuillez patienter..."
 	DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 \
 	-e bash -c '
 		unclutter-remote -s
-		clear
-		echo "Installation de : $FINAL_PACKAGE"
 		batocera-wine windows tricks "'"$selected_bottle"'" "'"$FINAL_PACKAGE"'"
 		echo
 		unclutter-remote -h
