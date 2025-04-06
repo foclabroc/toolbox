@@ -107,7 +107,7 @@ while true; do
 	DISPLAY=:0.0
 	unclutter-remote -s
 	clear
-    batocera-wine windows tricks "$selected_bottle" "$FINAL_PACKAGE" unattended
+    batocera-wine windows tricks "$selected_bottle" "$FINAL_PACKAGE"
 	} 2>&1 >/dev/tty
 	sleep 5
 	clear
