@@ -104,7 +104,7 @@ while true; do
 	clear
 	sleep 3
 	bash -c '
-		export DISPLAY=:0.0
+		DISPLAY=:0.0
 		unclutter-remote -s
 		clear
 		batocera-wine windows tricks "'"$selected_bottle"'" "'"$FINAL_PACKAGE"'"
