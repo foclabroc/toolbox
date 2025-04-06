@@ -102,7 +102,10 @@ while true; do
     # Application du Winetricks
     dialog --backtitle "Foclabroc Toolbox" --infobox "\nRegardez l'écran principal pour suivre l'installation." 6 40 2>&1 >/dev/tty
 	sleep 3
-	echo "Installation en cours, veuillez patienter..."
+	clear
+	echo 
+	echo -e "\033[1;32mINSTALLATION DU TRICKS [\033[1;34m$FINAL_PACKAGE\033[1;32m] EN COURS...\033[0m"
+	echo -e "\033[1;32mREGARDER L'ECRAN DE BATOCERA...\033[0m"
 	DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 \
 	-e bash -c '
 		unclutter-remote -s
