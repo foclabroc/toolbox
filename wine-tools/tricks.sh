@@ -109,7 +109,7 @@ while true; do
 	DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 \
 	-e bash -c '
 		unclutter-remote -s
-		batocera-wine windows tricks "'"$selected_bottle"'" "'"$FINAL_PACKAGE"'"
+		batocera-wine windows tricks "'"$selected_bottle"'" "'"$FINAL_PACKAGE"'" unattended
 		echo
 		unclutter-remote -h
 	'
