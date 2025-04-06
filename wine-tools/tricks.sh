@@ -104,8 +104,10 @@ while true; do
 	sleep 3
 	clear
 	echo 
+	echo -e "\033[1;32mFOCLABROC TOOLBOX.\033[0m"
 	echo -e "\033[1;32mINSTALLATION DU TRICKS [\033[1;34m$FINAL_PACKAGE\033[1;32m] EN COURS...\033[0m"
 	echo -e "\033[1;32mREGARDER L'ECRAN DE BATOCERA...\033[0m"
+	echo -e "\033[1;32m[NOTE : DANS DE RARE CAS CLAVIER/SOURIS PEUVENT ETRE NECESSAIRE POUR CERTAINS TRICKS.]\033[0m"
 	DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 \
 	-e bash -c '
 		unclutter-remote -s
