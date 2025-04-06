@@ -65,7 +65,7 @@ while true; do
 	    dialog --backtitle "Foclabroc Toolbox" --infobox "\nChargement de la liste officiel winetricks patientez..." 5 60 2>&1 >/dev/tty
         WT_URL="https://raw.githubusercontent.com/Winetricks/winetricks/master/files/verbs/all.txt"
         TEMP_LIST=$(mktemp)
-        curl -sL "$WT_URL" -o "$TEMP_LIST"
+        curl -Ls "$WT_URL" -o "$TEMP_LIST"
 
         if [ ! -s "$TEMP_LIST" ]; then
           dialog --backtitle "Foclabroc Toolbox" --msgbox "Erreur : impossible de récupérer la liste des composants Winetricks." 8 50 2>&1 >/dev/tty
@@ -101,12 +101,16 @@ while true; do
 
     # Application du Winetricks
     dialog --backtitle "Foclabroc Toolbox" --infobox "\nRegardez l'écran principal pour suivre l'installation." 6 40 2>&1 >/dev/tty
+	clear
 	sleep 3
-    export DISPLAY=:0.0 2>&1 >/dev/tty
-    unclutter-remote -s 2>&1 >/dev/tty
-    dialog --backtitle "Foclabroc Toolbox" --infobox "\nInstallation de $FINAL_PACKAGE...\n\nBouteille : $selected_bottle\n\nComposant : $FINAL_PACKAGE\n " 12 60 2>&1 >/dev/tty
+	{
+	export DISPLAY=:0.0
+	unclutter-remote -s
+	dialog --backtitle "Foclabroc Toolbox" --infobox "\nInstallation de $FINAL_PACKAGE...\n\nBouteille : $selected_bottle\n\nComposant : $FINAL_PACKAGE\n " 12 60
+	} 2>&1 >/dev/tty
 	clear
     batocera-wine windows tricks "$selected_bottle" "$FINAL_PACKAGE" unattended 2>&1 >/dev/tty
+	sleep 5
 	clear
     dialog --backtitle "Foclabroc Toolbox" --msgbox "\nInstallation de $FINAL_PACKAGE terminée avec succès." 8 40 2>&1 >/dev/tty
     unclutter-remote -h 2>&1 >/dev/tty
