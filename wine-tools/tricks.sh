@@ -110,11 +110,10 @@ while true; do
 		echo "Installation de : $FINAL_PACKAGE"
 		batocera-wine windows tricks "'"$selected_bottle"'" "'"$FINAL_PACKAGE"'"
 		echo
-		echo "Installation de $FINAL_PACKAGE terminée. Fermez cette fenêtre pour continuer."
-		read -p "Appuyez sur Entrée pour fermer..."
 		unclutter-remote -h
 	'
-
+	dialog --backtitle "Foclabroc Toolbox" --msgbox "\nWinetricks installé avec succès." 6 40 2>&1 >/dev/tty
+	
     # Nouvelle action sur la même bouteille ?
     dialog --backtitle "Foclabroc Toolbox" --yesno "\nSouhaitez-vous installer un autre composant sur cette même bouteille ?" 8 50 2>&1 >/dev/tty
     [ $? -eq 0 ] || break
