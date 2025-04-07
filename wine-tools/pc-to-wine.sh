@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Afficher la boîte de dialogue. Ajuster la hauteur et la largeur si nécessaire.
-dialog --backtitle "Foclabroc Toolbox" --title "Confirmation de configuration du jeu" --yesno "\nVous devez avoir lancé le jeu en .pc au moins une fois\n pour que Batocera génère la bouteille en .wine. \n\nContinuer ?" 10 60 2>&1 >/dev/tty
+dialog --backtitle "Foclabroc Toolbox" --title "Confirmation de configuration du jeu" --yesno "\nVous devez avoir lancé le jeu en .pc au moins une fois\npour que Batocera génère la bouteille en .wine. \n\nContinuer ?" 10 60 2>&1 >/dev/tty
 response=$?
 
 # Effacer l'écran (optionnel)
@@ -10,7 +10,7 @@ clear
 if [ $response -eq 0 ]; then
     echo "L'utilisateur a choisi de continuer."
 else
-    dialog --backtitle "Foclabroc Toolbox" --infobox "\nAnnulé\nRetour au menu Wine Tools..." 5 40 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nAnnulé\nRetour au menu Wine Tools..." 6 40 2>&1 >/dev/tty
     sleep 2
     curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
     exit 1
@@ -36,10 +36,9 @@ while true; do
   exit_status=$?
   clear
   if [ $exit_status -ne 0 ]; then
-    dialog --backtitle "Foclabroc Toolbox" --infobox "\nAnnulé\nRetour au menu Wine Tools..." 6 40 2>&1 >/dev/tty
+    # dialog --backtitle "Foclabroc Toolbox" --infobox "\nAnnulé\nRetour au menu Wine Tools..." 6 40 2>&1 >/dev/tty
     sleep 2
-    curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
-    exit 1
+    return 0 2>/dev/null || exit 0
   fi
 
   #Sélectionner le dossier Wine correspondant dans /userdata/system/wine-bottles
@@ -60,10 +59,9 @@ while true; do
   exit_status=$?
   clear
   if [ $exit_status -ne 0 ]; then
-    dialog --backtitle "Foclabroc Toolbox" --infobox "\nAnnulé\nRetour au menu Wine Tools..." 6 40 2>&1 >/dev/tty
+    # dialog --backtitle "Foclabroc Toolbox" --infobox "\nAnnulé\nRetour au menu Wine Tools..." 6 40 2>&1 >/dev/tty
     sleep 2
-    curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
-    exit 1
+    return 0 2>/dev/null || exit 0
   fi
 
   #Confirmer l'opération
