@@ -60,24 +60,19 @@ while true; do
   exit_status=$?
   clear
   if [ $exit_status -ne 0 ]; then
-    # dialog --backtitle "Foclabroc Toolbox" --infobox "\nAnnulé\nRetour au menu Wine Tools..." 6 40 2>&1 >/dev/tty
     continue
   fi
 
   #Confirmer l'opération
   dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nCela copiera les données depuis :\n$selected_wine\nvers :\n$selected_pc\npuis supprimera la bouteille Wine et renommera le dossier .pc en .wine.\nContinuer ?" 15 60 2>&1 >/dev/tty
   if [ $? -ne 0 ]; then
-    #dialog --backtitle "Foclabroc Toolbox" --infobox "\nAnnulé\nRetour au menu Wine Tools..." 6 40 2>&1 >/dev/tty
-    # sleep 2
-    # curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
-    # exit 1
 	continue
   fi
 
   #Copier les données Wine dans le dossier .pc
   cp -a "$selected_wine"/. "$selected_pc"/
   if [ $? -ne 0 ]; then
-    dialog --backtitle "Foclabroc Toolbox" --infobox "Erreur lors de la copie des données depuis le conteneur wine.\nRetour au menu Wine Tools..." 10 40 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nErreur lors de la copie des données depuis la bouteille wine.\nRetour au menu Wine Tools..." 10 40 2>&1 >/dev/tty
     sleep 2
     curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
     exit 1
@@ -100,13 +95,14 @@ while true; do
 
   mv "$selected_pc" "$new_path"
   if [ $? -ne 0 ]; then
-    dialog --backtitle "Foclabroc Toolbox" --infobox "Erreur lors du renommage du dossier :\n$selected_pc\nen\n$new_path\nRetour au menu Wine Tools..." 11 40 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nErreur lors du renommage du dossier :\n$selected_pc\nen\n$new_path\nRetour au menu Wine Tools..." 11 40 2>&1 >/dev/tty
     sleep 2
     curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
     exit 1
   fi
 
-  dialog --backtitle "Foclabroc Toolbox" --msgbox "Conversion terminée !\nNouveau dossier :\n$new_path" 10 40 2>&1 >/dev/tty
+  dialog --backtitle "Foclabroc Toolbox" --msgbox "\nConversion terminée !\nNouveau dossier :\n$new_path" 10 40 2>&1 >/dev/tty
+  sleep 2
 
   #Compression facultative du dossier
   dialog --backtitle "Foclabroc Toolbox" --yesno "\nSouhaitez-vous compresser le nouveau dossier .wine ?\n\nOptions de compression :\n- wtgz (TGZ) : Pour les petits jeux avec de nombreuses écritures.\n- wsquashfs (SquashFS) : Pour les jeux plus lourds avec peu d'écritures.\n\n(La compression convertira le dossier en une image en lecture seule avec l'extension .wtgz ou .wsquashfs.)" 15 70 2>&1 >/dev/tty
@@ -120,14 +116,27 @@ while true; do
     if [ $exit_status -eq 0 ]; then
       case "$compression_choice" in
         wtgz)
-          dialog --backtitle "Foclabroc Toolbox" --infobox "Conversion du dossier au format TGZ (wtgz)... Veuillez patienter." 5 50 2>&1 >/dev/tty
-          batocera-wine windows wine2winetgz "$new_path"
-          # Supposé que le fichier de sortie est créé sous : new_path.tgz (ex. : gamename.wine.tgz)
-          old_output="${new_path}.tgz"
-          final_output="${new_path%.wine}.tgz"
-          if [ -f "$old_output" ]; then
-            mv "$old_output" "$final_output"
-          fi
+		  # Affichage de la boîte de dialogue de progression avec dialog
+		  (
+		   echo "XX"  # Indication du début du processus
+		   dialog --backtitle "Foclabroc Toolbox" --gauge "Conversion du dossier au format TGZ (wtgz)... Veuillez patienter." 10 70 0
+
+		   # Lancer la commande de conversion, mettre à jour la progression en fonction de la sortie
+		   batocera-wine windows wine2winetgz "$new_path" | while read line; do
+			 # Exemple de récupération du pourcentage d'avancement (s'il est affiché dans la sortie)
+			 percent=$(echo "$line" | grep -oP '\d+(?=%)')  # Extrait le pourcentage de la ligne
+			 if [ ! -z "$percent" ]; then
+			   echo "$percent"  # Met à jour la barre de progression
+			 fi
+		   done
+		  ) 2>&1 | dialog --gauge "Conversion en cours..." 10 70 0
+
+		  # Renommage du fichier de sortie
+		  old_output="${new_path}.tgz"
+		  final_output="${new_path%.wine}.tgz"
+		  if [ -f "$old_output" ]; then
+		    mv "$old_output" "$final_output"
+		  fi
           ;;
         wsquashfs)
           dialog --backtitle "Foclabroc Toolbox" --infobox "Conversion du dossier au format SquashFS (wsquashfs)... Veuillez patienter." 5 50 2>&1 >/dev/tty
