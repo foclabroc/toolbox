@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Afficher la boîte de dialogue. Ajuster la hauteur et la largeur si nécessaire.
-dialog --backtitle "Foclabroc Toolbox" --title "Confirmation de configuration du jeu" --yesno "Vous devez avoir lancé le jeu en .pc au moins une fois\n pour que Batocera génère la bouteille en .wine. \n\nContinuer ?" 10 60 2>&1 >/dev/tty
+dialog --backtitle "Foclabroc Toolbox" --title "Confirmation de configuration du jeu" --yesno "\nVous devez avoir lancé le jeu en .pc au moins une fois\n pour que Batocera génère la bouteille en .wine. \n\nContinuer ?" 10 60 2>&1 >/dev/tty
 response=$?
 
 # Effacer l'écran (optionnel)
@@ -10,7 +10,9 @@ clear
 if [ $response -eq 0 ]; then
     echo "L'utilisateur a choisi de continuer."
 else
-    echo "L'utilisateur a choisi de quitter."
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nAnnulé\nRetour au menu Wine Tools..." 5 40 2>&1 >/dev/tty
+    sleep 2
+    curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
     exit 1
 fi
 
@@ -23,62 +25,75 @@ while true; do
   done
 
   if [ ${#pc_folders[@]} -eq 0 ]; then
-    dialog --backtitle "Foclabroc Toolbox" --msgbox "Aucun dossier .pc trouvé dans /userdata/roms/windows." 10 40 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nAucun dossier .pc trouvé dans /userdata/roms/windows.\nRetour au menu Wine Tools..." 12 40 2>&1 >/dev/tty
+    sleep 2
+    curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
     exit 1
   fi
 
   selected_pc=$(dialog --backtitle "Foclabroc Toolbox" --clear --title "Sélection du jeu en .pc" \
-    --menu "Sélectionnez le dossier .pc à convertir :" 15 80 4 "${pc_folders[@]}" 3>&1 1>&2 2>&3)
+    --menu "\nSélectionnez le dossier .pc à convertir :\n " 15 80 4 "${pc_folders[@]}" 3>&1 1>&2 2>&3)
   exit_status=$?
   clear
   if [ $exit_status -ne 0 ]; then
-    echo "Annulé."
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nAnnulé\nRetour au menu Wine Tools..." 6 40 2>&1 >/dev/tty
+    sleep 2
+    curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
     exit 1
   fi
 
-  # --- ÉTAPE 2 : Sélectionner le dossier Wine correspondant dans /userdata/system/wine-bottles ---
+  #Sélectionner le dossier Wine correspondant dans /userdata/system/wine-bottles
   wine_folders=()
   while IFS= read -r folder; do
     wine_folders+=( "$folder" "" )
   done < <(find /userdata/system/wine-bottles -type d -name "*.wine")
 
   if [ ${#wine_folders[@]} -eq 0 ]; then
-    dialog --backtitle "Foclabroc Toolbox" --msgbox "Aucun dossier .wine trouvé dans /userdata/system/wine-bottles." 10 40 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nAucun dossier .wine trouvé dans /userdata/system/wine-bottles.\nRetour au menu Wine Tools..." 10 40 2>&1 >/dev/tty
+    sleep 2
+    curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
     exit 1
   fi
 
-  selected_wine=$(dialog --backtitle "Foclabroc Toolbox" --clear --title "Sélection du conteneur Wine" \
-    --menu "Sélectionnez le dossier du conteneur wine correspondant :" 15 80 4 "${wine_folders[@]}" 3>&1 1>&2 2>&3)
+  selected_wine=$(dialog --backtitle "Foclabroc Toolbox" --clear --title "Sélection de la bouteille Wine" \
+    --menu "\nSélectionnez la bouteille wine correspondante :\n " 20 80 4 "${wine_folders[@]}" 3>&1 1>&2 2>&3)
   exit_status=$?
   clear
   if [ $exit_status -ne 0 ]; then
-    echo "Annulé."
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nAnnulé\nRetour au menu Wine Tools..." 6 40 2>&1 >/dev/tty
+    sleep 2
+    curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
     exit 1
   fi
 
-  # --- ÉTAPE 3 : Confirmer l'opération ---
-  dialog --backtitle "Foclabroc Toolbox" --yesno "Cela copiera les données depuis :\n$selected_wine\nvers :\n$selected_pc\npuis supprimera le conteneur Wine et renommer le dossier .pc en .wine.\nProcéder ?" 12 60 2>&1 >/dev/tty
+  #Confirmer l'opération
+  dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nCela copiera les données depuis :\n$selected_wine\nvers :\n$selected_pc\npuis supprimera la bouteille Wine et renommera le dossier .pc en .wine.\nContinuer ?" 15 60 2>&1 >/dev/tty
   if [ $? -ne 0 ]; then
-    clear
-    echo "Opération annulée."
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nAnnulé\nRetour au menu Wine Tools..." 6 40 2>&1 >/dev/tty
+    sleep 2
+    curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
     exit 1
   fi
 
-  # --- ÉTAPE 4 : Copier les données Wine dans le dossier .pc ---
+  #Copier les données Wine dans le dossier .pc
   cp -a "$selected_wine"/. "$selected_pc"/
   if [ $? -ne 0 ]; then
-    dialog --backtitle "Foclabroc Toolbox" --msgbox "Erreur lors de la copie des données depuis le conteneur wine." 10 40 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --infobox "Erreur lors de la copie des données depuis le conteneur wine.\nRetour au menu Wine Tools..." 10 40 2>&1 >/dev/tty
+    sleep 2
+    curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
     exit 1
   fi
 
-  # --- ÉTAPE 5 : Supprimer le dossier Wine original ---
+  #Supprimer le dossier Wine original
   rm -rf "$selected_wine"
   if [ $? -ne 0 ]; then
-    dialog --backtitle "Foclabroc Toolbox" --msgbox "Erreur lors de la suppression du dossier wine :\n$selected_wine" 10 40 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --infobox "Erreur lors de la suppression du dossier wine :\n$selected_wine\nRetour au menu Wine Tools..." 11 40 2>&1 >/dev/tty
+    sleep 2
+    curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
     exit 1
   fi
 
-  # --- ÉTAPE 6 : Renommer le dossier .pc en .wine dans /userdata/roms/windows ---
+  #Renommer le dossier .pc en .wine dans /userdata/roms/windows
   base_name=$(basename "$selected_pc")
   new_name="${base_name%.pc}.wine"
   parent_dir=$(dirname "$selected_pc")
@@ -86,17 +101,19 @@ while true; do
 
   mv "$selected_pc" "$new_path"
   if [ $? -ne 0 ]; then
-    dialog --backtitle "Foclabroc Toolbox" --msgbox "Erreur lors du renommage du dossier :\n$selected_pc\nen\n$new_path" 10 40 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --infobox "Erreur lors du renommage du dossier :\n$selected_pc\nen\n$new_path\nRetour au menu Wine Tools..." 11 40 2>&1 >/dev/tty
+    sleep 2
+    curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
     exit 1
   fi
 
   dialog --backtitle "Foclabroc Toolbox" --msgbox "Conversion terminée !\nNouveau dossier :\n$new_path" 10 40 2>&1 >/dev/tty
 
-  # --- ÉTAPE 7 : Compression facultative du dossier ---
-  dialog --backtitle "Foclabroc Toolbox" --yesno "Souhaitez-vous compresser le nouveau dossier .wine ?\n\nOptions de compression :\n- wtgz (TGZ) : Pour les petits jeux avec de nombreuses écritures.\n- wsquashfs (SquashFS) : Pour les jeux plus lourds avec peu d'écritures.\n\n(La compression convertira le dossier en une image en lecture seule avec l'extension .wtgz ou .wsquashfs.)" 15 70 2>&1 >/dev/tty
+  #Compression facultative du dossier
+  dialog --backtitle "Foclabroc Toolbox" --yesno "\nSouhaitez-vous compresser le nouveau dossier .wine ?\n\nOptions de compression :\n- wtgz (TGZ) : Pour les petits jeux avec de nombreuses écritures.\n- wsquashfs (SquashFS) : Pour les jeux plus lourds avec peu d'écritures.\n\n(La compression convertira le dossier en une image en lecture seule avec l'extension .wtgz ou .wsquashfs.)" 15 70 2>&1 >/dev/tty
   if [ $? -eq 0 ]; then
     compression_choice=$(dialog --backtitle "Foclabroc Toolbox" --clear --title "Sélection du type de compression" \
-      --menu "Choisissez la méthode de compression :" 12 60 2 \
+      --menu "\nChoisissez la méthode de compression :\n " 8 60 2 \
       "wtgz" "TGZ - reconditionne rapidement, idéal pour petits jeux avec écritures" \
       "wsquashfs" "SquashFS - idéal pour gros jeux avec peu d'écritures" 3>&1 1>&2 2>&3)
     exit_status=$?
@@ -124,32 +141,39 @@ while true; do
           fi
           ;;
         *)
-          dialog --backtitle "Foclabroc Toolbox" --msgbox "Option invalide sélectionnée." 10 40 2>&1 >/dev/tty
+          dialog --backtitle "Foclabroc Toolbox" --msgbox "\nOption invalide sélectionnée.\nRetour au menu Wine Tools..." 6 40 2>&1 >/dev/tty
+		  sleep 2
+          curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
+          exit 1
           ;;
       esac
       dialog --backtitle "Foclabroc Toolbox" --msgbox "Compression du dossier terminée !" 8 40 2>&1 >/dev/tty
     fi
   fi
 
-  # --- ÉTAPE 8 : Suppression optionnelle du dossier .wine dans /userdata/roms/windows ---
-  dialog --backtitle "Foclabroc Toolbox" --yesno "Souhaitez-vous supprimer le dossier .wine correspondant dans /userdata/roms/windows ?\n(Cela supprimera le dossier :\n$new_path)" 10 60 2>&1 >/dev/tty
+  #Suppression optionnelle du dossier .wine dans /userdata/roms/windows
+  dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "Souhaitez-vous supprimer le dossier .wine correspondant dans /userdata/roms/windows ?\n(Cela supprimera le dossier :\n$new_path)" 10 60 2>&1 >/dev/tty
   if [ $? -eq 0 ]; then
     rm -rf "$new_path"
     if [ $? -eq 0 ]; then
-      dialog --backtitle "Foclabroc Toolbox" --msgbox "Le dossier .wine a été supprimé avec succès." 8 40 2>&1 >/dev/tty
+      dialog --backtitle "Foclabroc Toolbox" --msgbox "\nLe dossier .wine a été supprimé avec succès." 8 40 2>&1 >/dev/tty
     else
-      dialog --backtitle "Foclabroc Toolbox" --msgbox "Erreur lors de la suppression du dossier .wine :\n$new_path" 10 40 2>&1 >/dev/tty
+      dialog --backtitle "Foclabroc Toolbox" --msgbox "\nErreur lors de la suppression du dossier .wine :\n$new_path\nRetour au menu Wine Tools..." 10 40 2>&1 >/dev/tty
+      sleep 2
+      curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
+      exit 1
     fi
   fi
 
-  # --- ÉTAPE 9 : Proposer de traiter un autre dossier ---
-  dialog --backtitle "Foclabroc Toolbox" --yesno "Souhaitez-vous traiter un autre dossier ?" 8 40 2>&1 >/dev/tty
+  #Proposer de traiter un autre dossier
+  dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nSouhaitez-vous traiter un autre dossier ?" 8 40 2>&1 >/dev/tty
   if [ $? -ne 0 ]; then
     clear
     exit 0
   fi
   clear
-  echo "Retour au menu des outils wine"
+  dialog --backtitle "Foclabroc Toolbox" --msgbox "\nRetour au menu Wine Tools..." 6 40 2>&1 >/dev/tty
   sleep 2
   curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
+  exit 1
 done
