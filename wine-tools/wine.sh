@@ -56,8 +56,8 @@ case $CHOICE in
         curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/tricks.sh | bash
         ;;
     8)
-        echo "You chose Easy autorun.cmd creator."
-        curl -L https://github.com/trashbus99/profork/raw/master/wine-custom/ar.sh | bash
+        #echo ".pc to .wine."
+        curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/pc-to-wine.sh | bash
         ;;
     9)
         echo "You chose to convert a .pc folder to a .wine folder."
