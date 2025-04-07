@@ -36,9 +36,10 @@ while true; do
   exit_status=$?
   clear
   if [ $exit_status -ne 0 ]; then
-    # dialog --backtitle "Foclabroc Toolbox" --infobox "\nAnnulé\nRetour au menu Wine Tools..." 6 40 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nAnnulé\nRetour au menu Wine Tools..." 6 40 2>&1 >/dev/tty
     sleep 2
-    return 0 2>/dev/null || exit 0
+    curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
+    exit 1
   fi
 
   #Sélectionner le dossier Wine correspondant dans /userdata/system/wine-bottles
@@ -60,17 +61,17 @@ while true; do
   clear
   if [ $exit_status -ne 0 ]; then
     # dialog --backtitle "Foclabroc Toolbox" --infobox "\nAnnulé\nRetour au menu Wine Tools..." 6 40 2>&1 >/dev/tty
-    sleep 2
-    return 0 2>/dev/null || exit 0
+    continue
   fi
 
   #Confirmer l'opération
   dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nCela copiera les données depuis :\n$selected_wine\nvers :\n$selected_pc\npuis supprimera la bouteille Wine et renommera le dossier .pc en .wine.\nContinuer ?" 15 60 2>&1 >/dev/tty
   if [ $? -ne 0 ]; then
-    dialog --backtitle "Foclabroc Toolbox" --infobox "\nAnnulé\nRetour au menu Wine Tools..." 6 40 2>&1 >/dev/tty
-    sleep 2
-    curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
-    exit 1
+    #dialog --backtitle "Foclabroc Toolbox" --infobox "\nAnnulé\nRetour au menu Wine Tools..." 6 40 2>&1 >/dev/tty
+    # sleep 2
+    # curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
+    # exit 1
+	continue
   fi
 
   #Copier les données Wine dans le dossier .pc
