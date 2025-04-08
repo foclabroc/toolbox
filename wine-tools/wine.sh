@@ -29,35 +29,35 @@ clear
 case $CHOICE in
     1)
         #echo "Liste Wine Vanilla and Proton."
-        curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/vanilla.sh | bash
+        curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/vanilla.sh | bash
         ;;
     2)
         #echo "Liste Wine-tkg staging."
-        curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/tkg.sh | bash
+        curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/tkg.sh | bash
         ;;
     3)
         #echo "Liste Wine-GE Custom."
-        curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine-ge.sh | bash
+        curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine-ge.sh | bash
         ;;
     4)
         #echo "Liste GE-Proton."
-        curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/ge-proton.sh | bash
+        curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/ge-proton.sh | bash
         ;;
     5)
         #echo "Ge-custom V40."
-        curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/v40wine.sh | bash
+        curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/v40wine.sh | bash
         ;;
     6)
         #echo "Suppression runner."
-        curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/delete-runner.sh | bash
+        curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/delete-runner.sh | bash
         ;;
     7)
         #echo "Winetricks."
-        curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/tricks.sh | bash
+        curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/tricks.sh | bash
         ;;
     8)
         #echo ".pc to .wine."
-        curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/pc-to-wine.sh | bash
+        curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/pc-to-wine.sh | bash
         ;;
     9)
         echo "You chose to convert a .pc folder to a .wine folder."
