@@ -32,7 +32,7 @@ while true; do
   fi
 
   selected_pc=$(dialog --backtitle "Foclabroc Toolbox" --clear --title "Sélection du jeu en .pc" \
-    --menu "\nSélectionnez le dossier .pc à convertir :\n " 30 80 4 "${pc_folders[@]}" 3>&1 1>&2 2>&3)
+    --menu "\nSélectionnez le dossier .pc à convertir :\n " 30 95 4 "${pc_folders[@]}" 3>&1 1>&2 2>&3)
   exit_status=$?
   clear
   if [ $exit_status -ne 0 ]; then
@@ -56,7 +56,7 @@ while true; do
   fi
 
   selected_wine=$(dialog --backtitle "Foclabroc Toolbox" --clear --title "Sélection de la bouteille Wine" \
-    --menu "\nSélectionnez la bouteille wine correspondante :\n " 30 80 4 "${wine_folders[@]}" 3>&1 1>&2 2>&3)
+    --menu "\nSélectionnez la bouteille wine correspondante :\n " 30 95 4 "${wine_folders[@]}" 3>&1 1>&2 2>&3)
   exit_status=$?
   clear
   if [ $exit_status -ne 0 ]; then

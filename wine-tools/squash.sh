@@ -16,7 +16,7 @@ fi
 
 #Sélectionner le dossier .wine dans /userdata/roms/windows
 selected_folder=$(dialog --backtitle "Foclabroc Toolbox" --clear --title "Sélection du jeu en .wine" \
-  --menu "\nSélectionnez le dossier .wine à compresser :\n " 30 80 4 "${wine_folders[@]}" 3>&1 1>&2 2>&3)
+  --menu "\nSélectionnez le dossier .wine à compresser :\n " 30 95 4 "${wine_folders[@]}" 3>&1 1>&2 2>&3)
 exit_status=$?
 clear
 if [ $exit_status -ne 0 ]; then
@@ -29,7 +29,7 @@ fi
 #Compression du dossier
 dialog --backtitle "Foclabroc Toolbox" --yesno "\nSouhaitez-vous compresser le dossier $selected_folder ?\n\nOptions de compression :\n- wtgz (TGZ) : Pour les petits jeux avec de nombreuses écritures.\n- wsquashfs (SquashFS) : Pour les jeux plus lourds avec peu d'écritures.\n\n(La compression convertira le dossier en une image en lecture seule avec l'extension .wtgz ou .wsquashfs.)" 15 70 2>&1 >/dev/tty
 if [ $? -ne 0 ]; then
-  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/pc-to-wine.sh | bash
+  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/squash.sh | bash
   exit 1
 fi
 
@@ -40,7 +40,7 @@ compression_choice=$(dialog --backtitle "Foclabroc Toolbox" --clear --title "Sé
 exit_status=$?
 clear
 if [ $exit_status -ne 0 ]; then
-  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/pc-to-wine.sh | bash
+  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/squash.sh | bash
   exit 1
 fi
 
@@ -57,7 +57,7 @@ case "$compression_choice" in
     else
       dialog --backtitle "Foclabroc Toolbox" --infobox "\nErreur de compression : .TGZ introuvable..." 6 60 2>&1 >/dev/tty
       sleep 2
-      curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/pc-to-wine.sh | bash
+      curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/squash.sh | bash
       exit 1
     fi
     ;;
@@ -72,7 +72,7 @@ case "$compression_choice" in
     else
       dialog --backtitle "Foclabroc Toolbox" --infobox "\nErreur de compression : .SquashFS introuvable..." 6 60 2>&1 >/dev/tty
       sleep 2
-      curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/pc-to-wine.sh | bash
+      curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/squash.sh | bash
       exit 1
     fi
     ;;
@@ -93,7 +93,7 @@ if [ $? -eq 0 ]; then
   else
     dialog --backtitle "Foclabroc Toolbox" --msgbox "\nErreur lors de la suppression du dossier .wine :\n$new_path\nRetour au menu Wine Tools..." 10 40 2>&1 >/dev/tty
     sleep 2
-    curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/pc-to-wine.sh | bash
+    curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/squash.sh | bash
     exit 1
   fi
 fi
@@ -108,5 +108,5 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 clear
-curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/pc-to-wine.sh | bash
+curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/squash.sh | bash
 exit 1
