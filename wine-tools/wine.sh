@@ -65,7 +65,7 @@ case $CHOICE in
         ;;
     10)
         #echo ".squashFS to .wine."
-        curl -L https://github.com/trashbus99/profork/raw/master/wine-custom/unsquash.sh | bash
+        curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/unsquash.sh | bash
         ;;
     *)
         echo "Invalid choice or no choice made. Exiting."
