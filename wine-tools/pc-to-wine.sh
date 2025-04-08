@@ -102,7 +102,6 @@ while true; do
   fi
 
   dialog --backtitle "Foclabroc Toolbox" --msgbox "\nConversion terminée !\nNouveau dossier :\n$new_path" 9 40 2>&1 >/dev/tty
-  sleep 2
 
 # Compression facultative du dossier
    dialog --backtitle "Foclabroc Toolbox" --yesno "\nSouhaitez-vous compresser le nouveau dossier .wine ?\n\nOptions de compression :\n- wtgz (TGZ) : Pour les petits jeux avec de nombreuses écritures.\n- wsquashfs (SquashFS) : Pour les jeux plus lourds avec peu d'écritures.\n\n(La compression convertira le dossier en une image en lecture seule avec l'extension .wtgz ou .wsquashfs.)" 15 70 2>&1 >/dev/tty
@@ -147,7 +146,7 @@ while true; do
            exit 1
            ;;
        esac
-       dialog --backtitle "Foclabroc Toolbox" --msgbox "Compression du dossier terminée !" 8 40 2>&1 >/dev/tty
+       dialog --backtitle "Foclabroc Toolbox" --msgbox "\nCompression du dossier terminée !" 6 40 2>&1 >/dev/tty
 
        # Vérifier si le fichier compressé existe avant de proposer la suppression du dossier .wine
        if [ -f "$final_output" ]; then
