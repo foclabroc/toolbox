@@ -71,7 +71,7 @@ case "$extension" in
     unsquashfs -d "$final_dir" "$selected_file" 2>&1 >/dev/tty
     if [ $? -ne 0 ]; then
       dialog --backtitle "Foclabroc Toolbox" --infobox "\nErreur de décompression du .SquashFS..." 6 60 2>&1 >/dev/tty
-	  sleep 2
+      sleep 2
       curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/unsquash.sh | bash
     fi
     dialog --backtitle "Foclabroc Toolbox" --msgbox "Decompression effectué avec succès !\nEmplacement: $final_dir" 10 60 2>&1 >/dev/tty
@@ -85,7 +85,7 @@ case "$extension" in
 esac
 
 #Suppression du fichier source (compréssé)
-dialog --yesno "Do you want to delete the compressed file?\n($selected_file)" 10 60
+dialog --yesno "Voulez vous supprimer le fichier compressé ?\n($selected_file)" 10 60 2>&1 >/dev/tty
 if [ $? -eq 0 ]; then
   rm -f "$selected_file"
   if [ $? -eq 0 ]; then
