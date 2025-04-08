@@ -32,7 +32,7 @@ while true; do
   fi
 
   selected_pc=$(dialog --backtitle "Foclabroc Toolbox" --clear --title "Sélection du jeu en .pc" \
-    --menu "\nSélectionnez le dossier .pc à convertir :\n " 15 80 4 "${pc_folders[@]}" 3>&1 1>&2 2>&3)
+    --menu "\nSélectionnez le dossier .pc à convertir :\n " 30 80 4 "${pc_folders[@]}" 3>&1 1>&2 2>&3)
   exit_status=$?
   clear
   if [ $exit_status -ne 0 ]; then
@@ -56,7 +56,7 @@ while true; do
   fi
 
   selected_wine=$(dialog --backtitle "Foclabroc Toolbox" --clear --title "Sélection de la bouteille Wine" \
-    --menu "\nSélectionnez la bouteille wine correspondante :\n " 20 80 4 "${wine_folders[@]}" 3>&1 1>&2 2>&3)
+    --menu "\nSélectionnez la bouteille wine correspondante :\n " 30 80 4 "${wine_folders[@]}" 3>&1 1>&2 2>&3)
   exit_status=$?
   clear
   if [ $exit_status -ne 0 ]; then
@@ -101,7 +101,7 @@ while true; do
     exit 1
   fi
 
-  dialog --backtitle "Foclabroc Toolbox" --msgbox "\nConversion terminée !\nNouveau dossier :\n$new_path" 9 40 2>&1 >/dev/tty
+  dialog --backtitle "Foclabroc Toolbox" --msgbox "\nConversion terminée !\n\nNouveau dossier :\n\n$new_path" 15 70 2>&1 >/dev/tty
 
 # Compression facultative du dossier
    dialog --backtitle "Foclabroc Toolbox" --yesno "\nSouhaitez-vous compresser le nouveau dossier .wine ?\n\nOptions de compression :\n- wtgz (TGZ) : Pour les petits jeux avec de nombreuses écritures.\n- wsquashfs (SquashFS) : Pour les jeux plus lourds avec peu d'écritures.\n\n(La compression convertira le dossier en une image en lecture seule avec l'extension .wtgz ou .wsquashfs.)" 15 70 2>&1 >/dev/tty
@@ -116,22 +116,17 @@ while true; do
        case "$compression_choice" in
          wtgz)
            dialog --backtitle "Foclabroc Toolbox" --infobox "Conversion du dossier au format TGZ (wtgz)... Veuillez patienter." 5 50 2>&1 >/dev/tty
-		   clear
-		   echo "convertion en cours"
            batocera-wine windows wine2winetgz "$new_path" 2>&1 >/dev/tty
-		   sleep 3
            # Supposé que le fichier de sortie est créé sous : new_path.tgz (ex. : gamename.wine.tgz)
-           old_output="${new_path}.tgz"
-           final_output="${new_path%.wine}.tgz"
+           old_output="${new_path}.wtgz"
+           final_output="${new_path%.wine}.wtgz"
            if [ -f "$old_output" ]; then
              mv "$old_output" "$final_output"
            fi
            ;;
          wsquashfs)
            dialog --backtitle "Foclabroc Toolbox" --infobox "Conversion du dossier au format SquashFS (wsquashfs)... Veuillez patienter." 5 50 2>&1 >/dev/tty
-		   clear
            batocera-wine windows wine2squashfs "$new_path" 2>&1 >/dev/tty
-		   sleep 3
            # Supposé que le fichier de sortie est créé sous : new_path.wsquashfs (ex. : gamename.wine.wsquashfs)
            old_output="${new_path}.wsquashfs"
            final_output="${new_path%.wine}.wsquashfs"
@@ -146,7 +141,7 @@ while true; do
            exit 1
            ;;
        esac
-       dialog --backtitle "Foclabroc Toolbox" --msgbox "\nCompression du dossier terminée !" 6 40 2>&1 >/dev/tty
+       dialog --backtitle "Foclabroc Toolbox" --msgbox "\nCompression du dossier $new_name en $final_output terminée !" 8 70 2>&1 >/dev/tty
 
        # Vérifier si le fichier compressé existe avant de proposer la suppression du dossier .wine
        if [ -f "$final_output" ]; then
@@ -154,7 +149,7 @@ while true; do
          if [ $? -eq 0 ]; then
            rm -rf "$new_path"
            if [ $? -eq 0 ]; then
-             dialog --backtitle "Foclabroc Toolbox" --msgbox "\nLe dossier .wine a été supprimé avec succès." 8 40 2>&1 >/dev/tty
+             dialog --backtitle "Foclabroc Toolbox" --msgbox "\nLe dossier $new_name a été supprimé avec succès." 8 40 2>&1 >/dev/tty
            else
              dialog --backtitle "Foclabroc Toolbox" --msgbox "\nErreur lors de la suppression du dossier .wine :\n$new_path\nRetour au menu Wine Tools..." 10 40 2>&1 >/dev/tty
              sleep 2
@@ -170,7 +165,7 @@ while true; do
    dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nSouhaitez-vous traiter un autre dossier ?" 8 40 2>&1 >/dev/tty
    if [ $? -ne 0 ]; then
      clear
-     dialog --backtitle "Foclabroc Toolbox" --infobox "\nRetour au menu Wine Tools..." 6 40 2>&1 >/dev/tty
+     dialog --backtitle "Foclabroc Toolbox" --infobox "\nRetour au menu Wine Tools..." 5 40 2>&1 >/dev/tty
      sleep 2
      curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
      exit 1
