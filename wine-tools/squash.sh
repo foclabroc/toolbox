@@ -47,7 +47,7 @@ fi
 #Compression et renommage
 case "$compression_choice" in
   1-wtgz)
-    dialog --infobox "\nConversion du dossier au format TGZ (wtgz)... Veuillez patienter." 6 50 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nConversion du dossier au format TGZ (wtgz)... Veuillez patienter." 6 50 2>&1 >/dev/tty
     batocera-wine windows wine2winetgz "$selected_folder" 2>&1 >/dev/tty
     old_output="${selected_folder}.wtgz"
     final_output="${selected_folder%.wine}.wtgz"
@@ -62,7 +62,7 @@ case "$compression_choice" in
     fi
     ;;
   2-wsquashfs)
-    dialog --infobox "\nConversion du dossier au format SquashFS (wsquashfs)... Veuillez patienter." 6 50 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nConversion du dossier au format SquashFS (wsquashfs)... Veuillez patienter." 6 50 2>&1 >/dev/tty
     batocera-wine windows wine2squashfs "$selected_folder" 2>&1 >/dev/tty
     old_output="${selected_folder}.wsquashfs"
     final_output="${selected_folder%.wine}.wsquashfs"

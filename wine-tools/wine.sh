@@ -64,8 +64,8 @@ case $CHOICE in
         curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/squash.sh | bash
         ;;
     10)
-        echo "You chose to compress a .wine folder to a .wsquashfs or .tgz file."
-        curl -L https://github.com/trashbus99/profork/raw/master/wine-custom/squash.sh | bash
+        #echo ".squashFS to .wine."
+        curl -L https://github.com/trashbus99/profork/raw/master/wine-custom/unsquash.sh | bash
         ;;
     *)
         echo "Invalid choice or no choice made. Exiting."
