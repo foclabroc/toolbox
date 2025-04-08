@@ -101,13 +101,13 @@ while true; do
     exit 1
   fi
 
-  dialog --backtitle "Foclabroc Toolbox" --msgbox "\nConversion terminée !\n\nNouveau dossier :\n\n$new_path" 15 70 2>&1 >/dev/tty
+  dialog --backtitle "Foclabroc Toolbox" --msgbox "\nConversion terminée !\n\nNouveau dossier :\n\n$new_path" 13 70 2>&1 >/dev/tty
 
 # Compression facultative du dossier
    dialog --backtitle "Foclabroc Toolbox" --yesno "\nSouhaitez-vous compresser le nouveau dossier .wine ?\n\nOptions de compression :\n- wtgz (TGZ) : Pour les petits jeux avec de nombreuses écritures.\n- wsquashfs (SquashFS) : Pour les jeux plus lourds avec peu d'écritures.\n\n(La compression convertira le dossier en une image en lecture seule avec l'extension .wtgz ou .wsquashfs.)" 15 70 2>&1 >/dev/tty
    if [ $? -eq 0 ]; then
      compression_choice=$(dialog --backtitle "Foclabroc Toolbox" --clear --title "Sélection du type de compression" \
-       --menu "\nChoisissez la méthode de compression :\n " 12 70 3 \
+       --menu "\nChoisissez la méthode de compression :\n " 12 85 3 \
        "wtgz" "TGZ - reconditionne rapidement, idéal pour petits jeux avec écritures" \
        "wsquashfs" "SquashFS - idéal pour gros jeux avec peu d'écritures" 3>&1 1>&2 2>&3)
      exit_status=$?
@@ -115,7 +115,7 @@ while true; do
      if [ $exit_status -eq 0 ]; then
        case "$compression_choice" in
          wtgz)
-           dialog --backtitle "Foclabroc Toolbox" --infobox "Conversion du dossier au format TGZ (wtgz)... Veuillez patienter." 5 50 2>&1 >/dev/tty
+           dialog --backtitle "Foclabroc Toolbox" --infobox "\nConversion du dossier au format TGZ (wtgz)... Veuillez patienter." 6 50 2>&1 >/dev/tty
            batocera-wine windows wine2winetgz "$new_path" 2>&1 >/dev/tty
            # Supposé que le fichier de sortie est créé sous : new_path.tgz (ex. : gamename.wine.tgz)
            old_output="${new_path}.wtgz"
@@ -125,7 +125,7 @@ while true; do
            fi
            ;;
          wsquashfs)
-           dialog --backtitle "Foclabroc Toolbox" --infobox "Conversion du dossier au format SquashFS (wsquashfs)... Veuillez patienter." 5 50 2>&1 >/dev/tty
+           dialog --backtitle "Foclabroc Toolbox" --infobox "\nConversion du dossier au format SquashFS (wsquashfs)... Veuillez patienter." 6 50 2>&1 >/dev/tty
            batocera-wine windows wine2squashfs "$new_path" 2>&1 >/dev/tty
            # Supposé que le fichier de sortie est créé sous : new_path.wsquashfs (ex. : gamename.wine.wsquashfs)
            old_output="${new_path}.wsquashfs"
@@ -145,11 +145,11 @@ while true; do
 
        # Vérifier si le fichier compressé existe avant de proposer la suppression du dossier .wine
        if [ -f "$final_output" ]; then
-         dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nSouhaitez-vous supprimer le dossier .wine correspondant dans /userdata/roms/windows ?\n(Cela supprimera le dossier :\n$new_path)" 10 60 2>&1 >/dev/tty
+         dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nSouhaitez-vous supprimer le dossier .wine correspondant dans /userdata/roms/windows ?\n\n(Cela supprimera le dossier :\n$new_path)" 11 60 2>&1 >/dev/tty
          if [ $? -eq 0 ]; then
            rm -rf "$new_path"
            if [ $? -eq 0 ]; then
-             dialog --backtitle "Foclabroc Toolbox" --msgbox "\nLe dossier $new_name a été supprimé avec succès." 8 40 2>&1 >/dev/tty
+             dialog --backtitle "Foclabroc Toolbox" --msgbox "\nLe dossier $new_name a été supprimé avec succès." 9 40 2>&1 >/dev/tty
            else
              dialog --backtitle "Foclabroc Toolbox" --msgbox "\nErreur lors de la suppression du dossier .wine :\n$new_path\nRetour au menu Wine Tools..." 10 40 2>&1 >/dev/tty
              sleep 2
