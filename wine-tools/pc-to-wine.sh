@@ -108,13 +108,13 @@ while true; do
    if [ $? -eq 0 ]; then
      compression_choice=$(dialog --backtitle "Foclabroc Toolbox" --clear --title "Sélection du type de compression" \
        --menu "\nChoisissez la méthode de compression :\n " 12 85 3 \
-       "wtgz" "TGZ - reconditionne rapidement, idéal pour petits jeux avec écritures" \
-       "wsquashfs" "SquashFS - idéal pour gros jeux avec peu d'écritures" 3>&1 1>&2 2>&3)
+       "1-wtgz" "TGZ - reconditionne rapidement, idéal pour petits jeux" \
+       "2-wsquashfs" "SquashFS - idéal pour gros jeux" 3>&1 1>&2 2>&3)
      exit_status=$?
      clear
      if [ $exit_status -eq 0 ]; then
        case "$compression_choice" in
-         wtgz)
+         1-wtgz)
            dialog --backtitle "Foclabroc Toolbox" --infobox "\nConversion du dossier au format TGZ (wtgz)... Veuillez patienter." 6 50 2>&1 >/dev/tty
            batocera-wine windows wine2winetgz "$new_path" 2>&1 >/dev/tty
            # Supposé que le fichier de sortie est créé sous : new_path.tgz (ex. : gamename.wine.tgz)
@@ -124,7 +124,7 @@ while true; do
              mv "$old_output" "$final_output"
            fi
            ;;
-         wsquashfs)
+         2-wsquashfs)
            dialog --backtitle "Foclabroc Toolbox" --infobox "\nConversion du dossier au format SquashFS (wsquashfs)... Veuillez patienter." 6 50 2>&1 >/dev/tty
            batocera-wine windows wine2squashfs "$new_path" 2>&1 >/dev/tty
            # Supposé que le fichier de sortie est créé sous : new_path.wsquashfs (ex. : gamename.wine.wsquashfs)
