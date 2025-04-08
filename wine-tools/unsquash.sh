@@ -74,7 +74,7 @@ case "$extension" in
       sleep 2
       curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/unsquash.sh | bash
     fi
-    dialog --backtitle "Foclabroc Toolbox" --msgbox "Decompression effectué avec succès !\nEmplacement: $final_dir" 10 60 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --msgbox "Decompression effectué avec succès !\n\nEmplacement: $final_dir" 8 60 2>&1 >/dev/tty
     ;;
   *)
     dialog --backtitle "Foclabroc Toolbox" --infobox "\nErreur extension de fichier non supporté..." 6 60 2>&1 >/dev/tty
@@ -85,7 +85,7 @@ case "$extension" in
 esac
 
 #Suppression du fichier source (compréssé)
-dialog --yesno "Voulez vous supprimer le fichier compressé ?\n($selected_file)" 10 60 2>&1 >/dev/tty
+dialog --yesno "Voulez vous supprimer le fichier compressé ?\n\n($selected_file)" 8 60 2>&1 >/dev/tty
 if [ $? -eq 0 ]; then
   rm -f "$selected_file"
   if [ $? -eq 0 ]; then
