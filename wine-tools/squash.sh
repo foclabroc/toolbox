@@ -1,23 +1,6 @@
 #!/bin/bash
-# Script to compress .wine folders in /userdata/roms/windows.
-# The script will:
-#   1. Scan /userdata/roms/windows for folders ending with .wine.
-#   2. Let the user select one via a dialog menu.
-#   3. Offer a compression option: TGZ (wtgz) or SquashFS (wsquashfs).
-#   4. Execute the corresponding command and then rename the output file
-#      to remove the .wine part (resulting in <gamename>.tgz or <gamename>.wsquashfs).
-#   5. Optionally, offer to delete the corresponding .wine folder in /userdata/roms/windows.
-#   6. Finally, return to the wine tools menu.
-#
-# WARNING: Compressed folders are read-only. Ensure you have backups if needed.
 
-# Check if dialog is installed
-if ! command -v dialog &> /dev/null; then
-  echo "The 'dialog' command is required but not installed. Aborting."
-  exit 1
-fi
-
-# --- STEP 1: Find .wine folders in /userdata/roms/windows ---
+#Recherche de dossiers .wine dans /userdata/roms/windows
 wine_folders=()
 for dir in /userdata/roms/windows/*.wine; do
   [ -d "$dir" ] || continue
@@ -25,84 +8,105 @@ for dir in /userdata/roms/windows/*.wine; do
 done
 
 if [ ${#wine_folders[@]} -eq 0 ]; then
-  dialog --msgbox "No .wine folders found in /userdata/roms/windows." 10 40
+  dialog --backtitle "Foclabroc Toolbox" --infobox "\nAucun dossier .wine trouvé dans /userdata/roms/windows.\nRetour au menu Wine Tools..." 12 40 2>&1 >/dev/tty
+  sleep 2
+  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
   exit 1
 fi
 
-# --- STEP 2: Let the user select a .wine folder ---
-selected_folder=$(dialog --clear --title "Select .wine Folder" \
-  --menu "Choose a .wine folder to compress:" 25 90 4 "${wine_folders[@]}" 3>&1 1>&2 2>&3)
+#Sélectionner le dossier .wine dans /userdata/roms/windows
+selected_folder=$(dialog --backtitle "Foclabroc Toolbox" --clear --title "Sélection du jeu en .wine" \
+  --menu "\nSélectionnez le dossier .wine à compresser :\n " 30 80 4 "${wine_folders[@]}" 3>&1 1>&2 2>&3)
 exit_status=$?
 clear
 if [ $exit_status -ne 0 ]; then
-  echo "Cancelled."
+  dialog --backtitle "Foclabroc Toolbox" --infobox "\nAnnulé\nRetour au menu Wine Tools..." 6 40 2>&1 >/dev/tty
+  sleep 2
+  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
   exit 1
 fi
 
-# --- STEP 3: Offer Compression Options ---
-dialog --yesno "Do you want to compress the selected .wine folder?\n\nCompression Options:\n- wtgz (TGZ): For small games with large writes.\n- wsquashfs (SquashFS): For larger games with small writes." 15 80
+#Compression du dossier
+dialog --backtitle "Foclabroc Toolbox" --yesno "\nSouhaitez-vous compresser le dossier $selected_folder ?\n\nOptions de compression :\n- wtgz (TGZ) : Pour les petits jeux avec de nombreuses écritures.\n- wsquashfs (SquashFS) : Pour les jeux plus lourds avec peu d'écritures.\n\n(La compression convertira le dossier en une image en lecture seule avec l'extension .wtgz ou .wsquashfs.)" 15 70 2>&1 >/dev/tty
 if [ $? -ne 0 ]; then
-  clear
-  echo "Compression cancelled."
-  exit 0
+  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/pc-to-wine.sh | bash
+  exit 1
 fi
 
-compression_choice=$(dialog --clear --title "Select Compression Type" \
-  --menu "Choose compression method:" 12 60 2 \
-  "wtgz" "TGZ - repackages quickly, best for small games with large writes" \
-  "wsquashfs" "SquashFS - best for larger games with small writes" 3>&1 1>&2 2>&3)
+compression_choice=$(dialog --backtitle "Foclabroc Toolbox" --clear --title "Sélection du type de compression" \
+  --menu "\nChoisissez la méthode de compression :\n " 12 85 3 \
+  "1-wtgz" "TGZ - reconditionne rapidement, idéal pour petits jeux" \
+  "2-wsquashfs" "SquashFS - idéal pour gros jeux" 3>&1 1>&2 2>&3)
 exit_status=$?
 clear
 if [ $exit_status -ne 0 ]; then
-  echo "Compression cancelled."
-  exit 0
+  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/pc-to-wine.sh | bash
+  exit 1
 fi
 
-# --- STEP 4: Run Compression Command and Rename Output ---
+#Compression et renommage
 case "$compression_choice" in
-  wtgz)
-    dialog --infobox "Converting folder to TGZ format (wtgz)... Please wait." 5 50
-    batocera-wine windows wine2winetgz "$selected_folder"
-    # Expected output: <selected_folder>.tgz, e.g. gamename.wine.tgz
-    old_output="${selected_folder}.tgz"
-    final_output="${selected_folder%.wine}.tgz"
+  1-wtgz)
+    dialog --infobox "\nConversion du dossier au format TGZ (wtgz)... Veuillez patienter." 6 50 2>&1 >/dev/tty
+    batocera-wine windows wine2winetgz "$selected_folder" 2>&1 >/dev/tty
+    old_output="${selected_folder}.wtgz"
+    final_output="${selected_folder%.wine}.wtgz"
     if [ -f "$old_output" ]; then
       mv "$old_output" "$final_output"
-      dialog --msgbox "Compression complete!\nOutput: $final_output" 8 50
+      dialog --backtitle "Foclabroc Toolbox" --msgbox "\nCompression du dossier $selected_folder en $final_output terminée !" 9 70 2>&1 >/dev/tty
     else
-      dialog --msgbox "Compression failed: TGZ output not found." 10 50
+      dialog --backtitle "Foclabroc Toolbox" --infobox "\nErreur de compression : .TGZ introuvable..." 6 60 2>&1 >/dev/tty
+      sleep 2
+      curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/pc-to-wine.sh | bash
+      exit 1
     fi
     ;;
-  wsquashfs)
-    dialog --infobox "Converting folder to SquashFS format (wsquashfs)... Please wait." 5 50
-    batocera-wine windows wine2squashfs "$selected_folder"
-    # Expected output: <selected_folder>.wsquashfs, e.g. gamename.wine.wsquashfs
+  2-wsquashfs)
+    dialog --infobox "\nConversion du dossier au format SquashFS (wsquashfs)... Veuillez patienter." 6 50 2>&1 >/dev/tty
+    batocera-wine windows wine2squashfs "$selected_folder" 2>&1 >/dev/tty
     old_output="${selected_folder}.wsquashfs"
     final_output="${selected_folder%.wine}.wsquashfs"
     if [ -f "$old_output" ]; then
       mv "$old_output" "$final_output"
-      dialog --msgbox "Compression complete!\nOutput: $final_output" 8 50
+      dialog --backtitle "Foclabroc Toolbox" --msgbox "\nCompression du dossier $selected_folder en $final_output terminée !" 9 70 2>&1 >/dev/tty
     else
-      dialog --msgbox "Compression failed: SquashFS output not found." 10 50
+      dialog --backtitle "Foclabroc Toolbox" --infobox "\nErreur de compression : .SquashFS introuvable..." 6 60 2>&1 >/dev/tty
+      sleep 2
+      curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/pc-to-wine.sh | bash
+      exit 1
     fi
     ;;
   *)
-    dialog --msgbox "Invalid option selected." 10 40
+    dialog --backtitle "Foclabroc Toolbox" --msgbox "\nOption invalide sélectionnée.\nRetour au menu Wine Tools..." 6 40 2>&1 >/dev/tty
+    sleep 2
+    curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
+    exit 1
     ;;
 esac
 
-# --- STEP 5: Optionally Delete the Corresponding .wine Folder ---
-dialog --yesno "Do you want to delete the selected .wine folder in /userdata/roms/windows?\n(This will remove the folder at:\n$selected_folder)" 10 60
+#Proposer la suppression du dossier .wine
+dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nSouhaitez-vous supprimer le dossier .wine correspondant dans /userdata/roms/windows ?\n\n(Cela supprimera le dossier :\n$selected_folder)" 11 60 2>&1 >/dev/tty
 if [ $? -eq 0 ]; then
   rm -rf "$selected_folder"
   if [ $? -eq 0 ]; then
-    dialog --msgbox ".wine folder deleted successfully." 8 40
+    dialog --backtitle "Foclabroc Toolbox" --msgbox "\nLe dossier $selected_folder a été supprimé avec succès." 9 40 2>&1 >/dev/tty
   else
-    dialog --msgbox "Error deleting the .wine folder:\n$selected_folder" 10 40
+    dialog --backtitle "Foclabroc Toolbox" --msgbox "\nErreur lors de la suppression du dossier .wine :\n$new_path\nRetour au menu Wine Tools..." 10 40 2>&1 >/dev/tty
+    sleep 2
+    curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/pc-to-wine.sh | bash
+    exit 1
   fi
 fi
 
-# --- STEP 6: Return to Wine Tools Menu ---
-echo "returning to wine tools menu"
-sleep 2
-curl -L https://github.com/trashbus99/profork/raw/master/wine-custom/wine.sh | bash
+#Proposer de traiter un autre dossier
+dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nSouhaitez-vous traiter un autre dossier ?" 8 40 2>&1 >/dev/tty
+if [ $? -ne 0 ]; then
+  clear
+  dialog --backtitle "Foclabroc Toolbox" --infobox "\nRetour au menu Wine Tools..." 5 40 2>&1 >/dev/tty
+  sleep 2
+  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
+  exit 1
+fi
+clear
+curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/pc-to-wine.sh | bash
+exit 1

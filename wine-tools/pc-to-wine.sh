@@ -117,7 +117,6 @@ while true; do
          1-wtgz)
            dialog --backtitle "Foclabroc Toolbox" --infobox "\nConversion du dossier au format TGZ (wtgz)... Veuillez patienter." 6 50 2>&1 >/dev/tty
            batocera-wine windows wine2winetgz "$new_path" 2>&1 >/dev/tty
-           # Supposé que le fichier de sortie est créé sous : new_path.tgz (ex. : gamename.wine.tgz)
            old_output="${new_path}.wtgz"
            final_output="${new_path%.wine}.wtgz"
            if [ -f "$old_output" ]; then
@@ -127,7 +126,6 @@ while true; do
          2-wsquashfs)
            dialog --backtitle "Foclabroc Toolbox" --infobox "\nConversion du dossier au format SquashFS (wsquashfs)... Veuillez patienter." 6 50 2>&1 >/dev/tty
            batocera-wine windows wine2squashfs "$new_path" 2>&1 >/dev/tty
-           # Supposé que le fichier de sortie est créé sous : new_path.wsquashfs (ex. : gamename.wine.wsquashfs)
            old_output="${new_path}.wsquashfs"
            final_output="${new_path%.wine}.wsquashfs"
            if [ -f "$old_output" ]; then
