@@ -9,7 +9,7 @@ done
 
 if [ ${#wine_folders[@]} -eq 0 ]; then
   dialog --backtitle "Foclabroc Toolbox" --infobox "\nAucun dossier .wine trouvé dans /userdata/roms/windows.\nRetour au menu Wine Tools..." 12 40 2>&1 >/dev/tty
-  sleep 2
+  sleep 3
   curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
   exit 1
 fi
