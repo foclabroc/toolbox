@@ -35,7 +35,7 @@ case "$extension" in
     dialog --backtitle "Foclabroc Toolbox" --infobox "\nDécompression du fichier TGZ (wtgz)... Veuillez patienter." 6 50 2>&1 >/dev/tty
     # Create temporary extraction directory
     tmp_dir=$(mktemp -d)
-    tar -xzf "$selected_file" -C "$tmp_dir"
+    tar -xzf "$selected_file" -C "$tmp_dir" 2>&1 >/dev/tty
     if [ $? -ne 0 ]; then
       dialog --backtitle "Foclabroc Toolbox" --infobox "\nErreur de décompression du .TGZ..." 6 60 2>&1 >/dev/tty
 	  sleep 2
@@ -68,7 +68,7 @@ case "$extension" in
     dialog --backtitle "Foclabroc Toolbox" --infobox "\nDécompression du fichier SquashFS (wsquashfs)... Veuillez patienter." 6 50 2>&1 >/dev/tty
     base_name=$(basename "$selected_file" .wsquashfs)
     final_dir="/userdata/roms/windows/${base_name}.wine"
-    unsquashfs -d "$final_dir" "$selected_file"
+    unsquashfs -d "$final_dir" "$selected_file" 2>&1 >/dev/tty
     if [ $? -ne 0 ]; then
       dialog --backtitle "Foclabroc Toolbox" --infobox "\nErreur de décompression du .SquashFS..." 6 60 2>&1 >/dev/tty
 	  sleep 2
