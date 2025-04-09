@@ -49,7 +49,7 @@ case "$compression_choice" in
   1-wtgz)
     dialog --backtitle "Foclabroc Toolbox" --infobox "\nConversion du dossier au format TGZ (wtgz)... Veuillez patienter." 6 50 2>&1 >/dev/tty
     batocera-wine windows wine2winetgz "$selected_folder" 2>&1 >/dev/tty
-    old_output="${selected_folder}.tgz"
+    old_output="${selected_folder}.wtgz"
     final_output="${selected_folder%.wine}.wtgz"
     if [ -f "$old_output" ]; then
       mv "$old_output" "$final_output"
