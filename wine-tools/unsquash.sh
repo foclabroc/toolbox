@@ -31,7 +31,7 @@ extension="${selected_file##*.}"
 
 #Decompression du fichier
 case "$extension" in
-  wtgz)
+  tgz)
     dialog --backtitle "Foclabroc Toolbox" --infobox "\nDécompression du fichier TGZ (wtgz)... Veuillez patienter." 6 50 2>&1 >/dev/tty
     # Create temporary extraction directory
     tmp_dir=$(mktemp -d)
