@@ -2,13 +2,13 @@
 
 #Recherche de fichiers compressé (.wtgz et .wsquashfs) dans /userdata/roms/windows
 compressed_files=()
-for file in /userdata/roms/windows/*.tgz /userdata/roms/windows/*.wsquashfs; do
+for file in /userdata/roms/windows/*.wtgz /userdata/roms/windows/*.wsquashfs; do
   [ -f "$file" ] || continue
   compressed_files+=( "$file" "" )
 done
 
 if [ ${#compressed_files[@]} -eq 0 ]; then
-  dialog --backtitle "Foclabroc Toolbox" --infobox "\nAucun fichier (.tgz or .wsquashfs) trouvé dans /userdata/roms/windows.\nRetour au menu Wine Tools..." 12 40 2>&1 >/dev/tty
+  dialog --backtitle "Foclabroc Toolbox" --infobox "\nAucun fichier (.wtgz or .wsquashfs) trouvé dans /userdata/roms/windows.\nRetour au menu Wine Tools..." 12 40 2>&1 >/dev/tty
   sleep 3
   curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
   exit 1
@@ -31,11 +31,11 @@ extension="${selected_file##*.}"
 
 #Decompression du fichier
 case "$extension" in
-  tgz)
+  wtgz)
     dialog --backtitle "Foclabroc Toolbox" --infobox "\nDécompression du fichier TGZ (wtgz)... Veuillez patienter." 6 50 2>&1 >/dev/tty
     # Create temporary extraction directory
     tmp_dir=$(mktemp -d)
-    tar -xzf "$selected_file" -C "$tmp_dir" 2>&1 >/dev/tty
+    tar -xzf "$selected_file" -C "$tmp_dir" >/dev/tty 2>&1
     if [ $? -ne 0 ]; then
       dialog --backtitle "Foclabroc Toolbox" --infobox "\nErreur de décompression du .TGZ..." 6 60 2>&1 >/dev/tty
 	  sleep 2
@@ -50,7 +50,7 @@ case "$extension" in
       rm -rf "$tmp_dir"
       exit 1
     fi
-    base_name=$(basename "$selected_file" .tgz)
+    base_name=$(basename "$selected_file" .wtgz)
     final_dir="/userdata/roms/windows/${base_name}"
     # Déplacement du dossier extrait vers la destination
     mv "$extracted_dir" "$final_dir"
