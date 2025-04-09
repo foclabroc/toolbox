@@ -117,7 +117,7 @@ while true; do
          1-wtgz)
            dialog --backtitle "Foclabroc Toolbox" --infobox "\nConversion du dossier au format TGZ (tgz)... Veuillez patienter." 6 50 2>&1 >/dev/tty
            batocera-wine windows wine2winetgz "$new_path" 2>&1 >/dev/tty
-           old_output="${new_path}.tgz"
+           old_output="${new_path}.wtgz"
            final_output1="${new_path%.wine}.wtgz"
            if [ -f "$old_output" ]; then
              mv "$old_output" "$final_output1"
