@@ -115,10 +115,10 @@ while true; do
      if [ $exit_status -eq 0 ]; then
        case "$compression_choice" in
          1-wtgz)
-           dialog --backtitle "Foclabroc Toolbox" --infobox "\nConversion du dossier au format TGZ (wtgz)... Veuillez patienter." 6 50 2>&1 >/dev/tty
+           dialog --backtitle "Foclabroc Toolbox" --infobox "\nConversion du dossier au format TGZ (tgz)... Veuillez patienter." 6 50 2>&1 >/dev/tty
            batocera-wine windows wine2winetgz "$new_path" 2>&1 >/dev/tty
-           old_output="${new_path}.wtgz"
-           final_output="${new_path%.wine}.wtgz"
+           old_output="${new_path}.tgz"
+           final_output="${new_path%.wine}.tgz"
            if [ -f "$old_output" ]; then
              mv "$old_output" "$final_output"
            fi
