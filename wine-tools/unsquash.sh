@@ -2,7 +2,7 @@
 
 #Recherche de fichiers compressé (.wtgz et .wsquashfs) dans /userdata/roms/windows
 compressed_files=()
-for file in /userdata/roms/windows/*.wtgz /userdata/roms/windows/*.wsquashfs; do
+for file in /userdata/roms/windows/*.tgz /userdata/roms/windows/*.wsquashfs; do
   [ -f "$file" ] || continue
   compressed_files+=( "$file" "" )
 done
@@ -50,8 +50,8 @@ case "$extension" in
       rm -rf "$tmp_dir"
       exit 1
     fi
-    base_name=$(basename "$selected_file" .wtgz)
-    final_dir="/userdata/roms/windows/${base_name}.wine"
+    base_name=$(basename "$selected_file" .tgz)
+    final_dir="/userdata/roms/windows/${base_name}"
     # Déplacement du dossier extrait vers la destination
     mv "$extracted_dir" "$final_dir"
     if [ $? -ne 0 ]; then
