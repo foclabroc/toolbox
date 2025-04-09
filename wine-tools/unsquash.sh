@@ -35,6 +35,8 @@ case "$extension" in
     dialog --backtitle "Foclabroc Toolbox" --infobox "\nDécompression du fichier TGZ (wtgz)... Veuillez patienter." 6 50 2>&1 >/dev/tty
     base_name=$(basename "$selected_file" .wtgz)
     final_dir="/userdata/roms/windows/${base_name}.wine"
+    rm -rf "$final_dir"
+    mkdir -p "$final_dir"
 	tar -xzf "$selected_file" -C "$final_dir" >/dev/tty 2>&1
     if [ $? -ne 0 ]; then
       dialog --backtitle "Foclabroc Toolbox" --infobox "\nErreur de décompression du .TGZ répertoire deja existant..." 6 60 2>&1 >/dev/tty
