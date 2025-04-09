@@ -140,6 +140,7 @@ while true; do
            ;;
        esac
        dialog --backtitle "Foclabroc Toolbox" --msgbox "\nCompression du dossier $new_name en $final_output terminée !" 9 70 2>&1 >/dev/tty
+	   sleep 1
 
        # Vérifier si le fichier compressé existe avant de proposer la suppression du dossier .wine
        if [ -f "$final_output" ]; then
