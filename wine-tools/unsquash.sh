@@ -50,7 +50,7 @@ case "$extension" in
       rm -rf "$tmp_dir"
       exit 1
     fi
-    base_name=$(basename "$selected_file" .tgz)
+    base_name=$(basename "$selected_file" .wtgz)
     final_dir="/userdata/roms/windows/${base_name}.wine"
     # Déplacement du dossier extrait vers la destination
     mv "$extracted_dir" "$final_dir"
