@@ -77,7 +77,7 @@ case "$extension" in
     dialog --backtitle "Foclabroc Toolbox" --msgbox "Decompression effectué avec succès !\n\nEmplacement: $final_dir" 8 60 2>&1 >/dev/tty
     ;;
   *)
-    dialog --backtitle "Foclabroc Toolbox" --infobox "\nErreur extension de fichier non supporté..." 6 60 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nErreur extension de fichier non supporté..." 5 60 2>&1 >/dev/tty
     sleep 2
     curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/unsquash.sh | bash
     exit 1
