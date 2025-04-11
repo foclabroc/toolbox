@@ -10,7 +10,7 @@ afficher_menu() {
 
     # Vérifier s’il y a des dossiers à afficher
     if [ ${#dossiers[@]} -eq 0 ]; then
-        dialog --backtitle "Foclabroc Toolbox" --msgbox "\nAucun dossier .wine, .wsquashfs ou .wtgz trouvé." 8 50
+        dialog --backtitle "Foclabroc Toolbox" --msgbox "\nAucun dossier .wine, .wsquashfs ou .wtgz trouvé." 8 50 2>&1 >/dev/tty
         exit 0
     fi
 
@@ -43,13 +43,13 @@ afficher_menu() {
 # Fonction de confirmation de suppression
 confirmer_suppression() {
     DOSSIER="$1"
-    dialog --backtitle "Foclabroc Toolbox" --yesno "\nEs-tu sûr de vouloir supprimer la bouteille ?\n\n$DOSSIER" 10 60
+    dialog --backtitle "Foclabroc Toolbox" --yesno "\nEs-tu sûr de vouloir supprimer la bouteille ?\n\n$DOSSIER" 10 60 2>&1 >/dev/tty
 
     if [ $? -eq 0 ]; then
         rm -rf "$DOSSIER"
-        dialog --backtitle "Foclabroc Toolbox" --msgbox "\nLa bouteille $DOSSIER a été supprimé avec succès." 9 75
+        dialog --backtitle "Foclabroc Toolbox" --msgbox "\nLa bouteille $DOSSIER a été supprimé avec succès." 9 75 2>&1 >/dev/tty
     else
-        dialog --backtitle "Foclabroc Toolbox" --msgbox "\nSuppression annulée." 7 40
+        dialog --backtitle "Foclabroc Toolbox" --msgbox "\nSuppression annulée." 7 40 2>&1 >/dev/tty
     fi
 
     # Retour au menu principal
