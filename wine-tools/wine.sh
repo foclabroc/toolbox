@@ -62,7 +62,7 @@ case $CHOICE in
         ;;
     9)
         #echo ".squashFS to .wine."
-        curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/unsquash.sh | bash
+        curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/unsquash.sh | bash
         ;;
     10)
         #echo "Suppression runner."
@@ -70,7 +70,7 @@ case $CHOICE in
         ;;
     11)
         #echo "Suppression bottle"
-        curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/delete-bottle.sh | bash
+        curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/delete-bottle.sh | bash
         ;;
     *)
         echo "Invalid choice or no choice made. Exiting."
