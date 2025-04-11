@@ -148,34 +148,17 @@ show_batocera_info() {
   # Fonction pour afficher le menu principal
   main_menu() {
     while true; do
-      CHOICE=$(dialog --title "Menu des outils" --backtitle "Foclabroc Toolbox" --menu "\nChoisissez une option :\n " 15 80 4 \
-        1 "[Screenshot] -> Prendre des captures d'écran de Batocera." \
-        2 "[Reload]     -> Actualiser la liste des jeux." \
-        3 "[Record]     -> Capturer des vidéos de l'écran de Batocera" \
-        4 "[Infos]      -> Afficher les informations système de Batocera." \
-        5 "[Retour]     -> Retour au menu principal de la toolbox" \
+      CHOICE=$(dialog --title "Menu des outils" --backtitle "Foclabroc Toolbox" --menu "\nChoisissez une option :\n " 9 80 2 \
+        1 "[Infos]      -> Afficher les informations système de Batocera." \
+        2 "[Retour]     -> Retour au menu principal de la toolbox" \
         2>&1 >/dev/tty)
 
       case $CHOICE in
         1)
-          # Option Screenshot
-          batocera-screenshot
-          show_message "Screenshot enregistré dans le dossier Screenshots avec succès."
-          ;;
-        2)
-          # Option Reload
-          curl http://127.0.0.1:1234/reloadgames
-          show_message "\nListe des jeux actualisée avec succès."
-          ;;
-        3)
-          # Option Record
-          start_recording_menu
-          ;;
-        4)
           # Option Info systeme
           show_batocera_info
           ;;
-        5)
+        2)
           # Retour
           break
           ;;
@@ -192,7 +175,7 @@ show_batocera_info() {
 
 # Confirmation d'installation
 confirm_install() {
-    dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "Voulez-vous vraiment installer $1 ?" 7 50
+    dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nVoulez-vous vraiment installer $1 ?" 7 60
     return $?
 }
 
@@ -207,7 +190,7 @@ main_menu() {
             3 "[Gparted]         -> Installer Gparted" \
             4 "[Pack Kodi]       -> Installer le pack streaming/iptv kodi (foclabroc)" \
             5 "[Pack Nes3D]      -> Installer le pack Nintendo Nes 3D (foclabroc)" \
-            6 "[Tools]           -> Outils pour Batocera. Screenshot, Records..." \
+            6 "[Tools]           -> Outils pour Batocera version light. (Plus d'options dispo via ssh)" \
             7 "[Wine Toolbox]    -> Téléchargement de Runner Wine et outils wsquash..." \
             8 "Wine Custom3 -> Télécharge une version optimisée de Wine" \
             9 "Other Freeware Games -> Jeux Linux & Windows (Wine)" \

@@ -192,7 +192,7 @@ show_batocera_info() {
 
 # Confirmation d'installation
 confirm_install() {
-    dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "Voulez-vous vraiment installer $1 ?" 7 50
+    dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nVoulez-vous vraiment installer $1 ?" 7 60
     return $?
 }
 

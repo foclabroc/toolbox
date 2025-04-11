@@ -2,7 +2,7 @@
 
 # Avertissement initial
 dialog --backtitle "Foclabroc Toolbox" --title "ATTENTION !" --yesno "\n\
-Attention ! Ce script va faire un listing de toutes les bouteilles Wine de vos jeux Windows disponibles dans /system/wine/windows.\n\n\
+Attention ! Ce script va faire un listing de toutes les bouteilles Wine de vos jeux Windows disponibles dans /system/wine-bottle/windows.\n\n\
 Vous pourrez ensuite supprimer, avec confirmation, celles dont vous n'avez plus besoin.\n\n\
 Soyez sûr de votre choix car les bouteilles contiennent les paramètres et sauvegardes de vos jeux Windows.\n\
 La suppression est irréversible.\n\n\
