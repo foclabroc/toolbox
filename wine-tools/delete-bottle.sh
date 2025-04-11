@@ -6,11 +6,11 @@ Attention ! Ce script va faire un listing de toutes les bouteilles Wine de vos j
 Vous pourrez ensuite supprimer, avec confirmation, celles dont vous n'avez plus besoin.\n\n\
 Soyez sûr de votre choix car les bouteilles contiennent les paramètres et sauvegardes de vos jeux Windows.\n\
 La suppression est irréversible.\n\n\
-Continuer ?" 18 70
+Continuer ?" 18 70 2>&1 >/dev/tty
 
 if [ $? -ne 0 ]; then
     clear
-    dialog --backtitle "Foclabroc Toolbox" --infobox "\nAnnulé.\nRetour au menu Wine Tools..." 6 40
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nAnnulé.\nRetour au menu Wine Tools..." 6 40 2>&1 >/dev/tty
     sleep 2
     curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
     exit 0

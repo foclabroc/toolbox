@@ -148,7 +148,7 @@ show_batocera_info() {
   # Fonction pour afficher le menu principal
   main_menu() {
     while true; do
-      CHOICE=$(dialog --title "Menu des outils" --backtitle "Foclabroc Toolbox" --menu "\nChoisissez une option :\n " 9 80 2 \
+      CHOICE=$(dialog --title "Menu des outils" --backtitle "Foclabroc Toolbox" --menu "\nChoisissez une option :\n " 15 80 4 \
         1 "[Infos]      -> Afficher les informations système de Batocera." \
         2 "[Retour]     -> Retour au menu principal de la toolbox" \
         2>&1 >/dev/tty)
