@@ -7,18 +7,19 @@ OPTIONS=(
   "3" "Telechargement Runner Wine-GE Custom builds"
   "4" "Telechargement Runner GE-Proton builds"
   "5" "Telechargement Runner GE-Custom de la V40 (pour garder vos anciennes bottles/sauvegarde)"
-  "6" "Sélectionnez et supprimer les runner custom inutiles"
-  "7" "Installation de Winetricks personnalisé"
-  "8" "Convertir dossier .pc en dossier .wine"
-  "9" "Compresser dossier .wine en fichier .wsquashfs ou .tgz"
-  "10" "Decompresser fichiers .wsquashfs ou .tgz en dossier .wine"
+  "6" "Installation de Winetricks personnalisé"
+  "7" "Convertir dossier .pc en dossier .wine"
+  "8" "Compresser dossier .wine en fichier .wsquashfs ou .tgz"
+  "9" "Decompresser fichiers .wsquashfs ou .wtgz en dossier .wine"
+  "10" "Suppression le runner custom inutiles dans /system/wine/custom"
+  "11" "Suppression de bouteille .wine .wsquashfs .wtgz dans /system/wine-bottle/windows"
 )
 
 # Use dialog to display the menu
 CHOICE=$(dialog --clear --backtitle "Foclabroc Toolbox" \
                 --title "Wine Toolbox" \
                 --menu "\nChoisissez une option:\n " \
-               22 106 10 \
+               22 106 11 \
                 "${OPTIONS[@]}" \
                 2>&1 >/dev/tty)
 
@@ -48,24 +49,28 @@ case $CHOICE in
         curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/v40wine.sh | bash
         ;;
     6)
-        #echo "Suppression runner."
-        curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/delete-runner.sh | bash
-        ;;
-    7)
         #echo "Winetricks."
         curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/tricks.sh | bash
         ;;
-    8)
+    7)
         #echo ".pc to .wine."
         curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/pc-to-wine.sh | bash
         ;;
-    9)
+    8)
         #echo ".wine to .squashFS."
         curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/squash.sh | bash
         ;;
-    10)
+    9)
         #echo ".squashFS to .wine."
         curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/unsquash.sh | bash
+        ;;
+    10)
+        #echo "Suppression runner."
+        curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/delete-runner.sh | bash
+        ;;
+    11)
+        #echo "Suppression bottle"
+        curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/delete-bottle.sh | bash
         ;;
     *)
         echo "Invalid choice or no choice made. Exiting."
