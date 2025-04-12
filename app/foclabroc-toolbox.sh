@@ -11,7 +11,7 @@ Une section \"Tools\" est également disponible, avec des fonctionnalités comme
 Cerise sur le gâteau : vous pouvez aussi installer la Toolbox dans la section \"Ports\" de Batocera Linux pour y accéder directement à la manette.\n\n
 Je continuerai sûrement à l’enrichir avec de nouvelles fonctionnalités au fil du temps.\n
 \n
-LA BISE." 25 70 2>&1 >/dev/tty
+LA BISE." 27 70 2>&1 >/dev/tty
 }
 
 # Vérification de la connexion Internet
