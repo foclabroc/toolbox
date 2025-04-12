@@ -11,13 +11,13 @@ Une section \"Tools\" est également disponible, avec des fonctionnalités comme
 Cerise sur le gâteau : vous pouvez aussi installer la Toolbox dans la section \"Ports\" de Batocera Linux pour y accéder directement à la manette.\n
 Je continuerai sûrement à l’enrichir avec de nouvelles fonctionnalités au fil du temps.\n
 \n
-LA BISE." 20 70
+LA BISE." 20 70 2>&1 >/dev/tty
 }
 
 # Vérification de la connexion Internet
 check_internet() {
     if ! ping -c 1 8.8.8.8 &>/dev/null; then
-        dialog --backtitle "Foclabroc Toolbox" --title "Erreur" --msgbox "\nPas de connexion Internet !" 6 40
+        dialog --backtitle "Foclabroc Toolbox" --title "Erreur" --msgbox "\nPas de connexion Internet !" 6 40 2>&1 >/dev/tty
         exit 1
     fi
 }
@@ -27,7 +27,7 @@ arch_check() {
     ARCH=$(uname -m)
     clear
     if [ "$ARCH" != "x86_64" ]; then
-        dialog --backtitle "FOCLABROC TOOLBOX SCRIPT FOR BATOCERA" --title "Architecture $ARCH Détectée" --msgbox "\nArchitecture $ARCH Détectée.\nCe script ne peut être exécuté que sur des PC x86_64 (AMD/Intel)." 9 50
+        dialog --backtitle "FOCLABROC TOOLBOX SCRIPT FOR BATOCERA" --title "Architecture $ARCH Détectée" --msgbox "\nArchitecture $ARCH Détectée.\nCe script ne peut être exécuté que sur des PC x86_64 (AMD/Intel)." 9 50 2>&1 >/dev/tty
         killall -9 xterm
         exit 1
     fi
@@ -35,7 +35,7 @@ arch_check() {
 # Fonction pour le sous-menu Tools
 tools_options() {
   show_message() {
-    dialog --backtitle "Foclabroc Toolbox" --msgbox "$1" 7 50
+    dialog --backtitle "Foclabroc Toolbox" --msgbox "$1" 7 50 2>&1 >/dev/tty
   }
 
   # Fonction pour exécuter l'enregistrement avec sous-menu
@@ -96,7 +96,7 @@ tools_options() {
     RECORD_PID=$(pgrep -f "batocera-record" | head -n 1)
     echo $RECORD_PID > /tmp/record_pid
 
-    dialog --infobox "\nCapture de $DURATION secondes en cours. Veuillez patienter..." 6 50
+    dialog --infobox "\nCapture de $DURATION secondes en cours. Veuillez patienter..." 6 50 2>&1 >/dev/tty
     sleep $DURATION
     stop_recording
   }
@@ -119,7 +119,7 @@ tools_options() {
 show_batocera_info() {
     echo "" > /tmp/batocera_info.txt
     batocera-info >> /tmp/batocera_info.txt
-    dialog --title "Information Système" --backtitle "Foclabroc Toolbox" --textbox /tmp/batocera_info.txt 21 45
+    dialog --title "Information Système" --backtitle "Foclabroc Toolbox" --textbox /tmp/batocera_info.txt 21 45 2>&1 >/dev/tty
     rm /tmp/batocera_info.txt
 }
 
@@ -170,7 +170,7 @@ show_batocera_info() {
 
 # Confirmation d'installation
 confirm_install() {
-    dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nVoulez-vous vraiment installer $1 ?" 7 60
+    dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" --yesno "\nVoulez-vous vraiment installer $1 ?" 7 60 2>&1 >/dev/tty
     return $?
 }
 
@@ -248,13 +248,13 @@ main_menu() {
                 ;;
             12)
                 # Afficher un message de remerciement
-                dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --msgbox "\nMerci d'avoir utilisé le script !" 7 40
+                dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --msgbox "\nMerci d'avoir utilisé le script !" 7 40 2>&1 >/dev/tty
                 killall -9 xterm
                 clear
                 exit 0
                 ;;
             *)
-                dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --msgbox "\nMerci d'avoir utilisé le script !" 7 40
+                dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --msgbox "\nMerci d'avoir utilisé le script !" 7 40 2>&1 >/dev/tty
                 killall -9 xterm
                 clear
                 exit 0
