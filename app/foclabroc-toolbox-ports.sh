@@ -2,44 +2,22 @@
 
 clear
 
-show_ascii() {
-echo -e "\e[1;36m"
-echo ""
-echo "     #####################################################################################################################"
-echo "     #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#"
-echo "     #@@@@@        @@        ,@@@/        &@@     @@@@@&       @@@          @@@         &@@@         @@@&        /@@@@@@@#"
-echo "     #@@@@@     ...@     @     @.    @/    &@     @@@@@        @@@     @     @@     %    @@     @     @#    (&    (@@@@@@#"
-echo "     #@@@@@     @@@@     @     @     @/    (@     @@@@@    (    @@     @     @@     &    @@     @     @*    #&    .@@@@@@#"
-echo "     #@@@@@       (@     @     @     @@@@@@@@     @@@@@    @    @@          @@@        ,@@@     @     @*    #@@@@@@@@@@@@#"
-echo "     #@@@@@     @@@@     @     @     @/    (@     @@@@     ,    %@     @     @@     @    @@     @     @*    #&    .@@@@@@#"
-echo "     #@@@@@     @@@@     @     @,    @/    &@     @@@@           @     @     @@     @    &@     @     @%    #&    /@@@@@@#"
-echo "     #@@@@@     @@@@@         @@@         *@@        @     @     @           @@     @    &@@         @@@          @@@@@@@#"
-echo "     #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#"
-echo "     #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#"
-echo "     #@@@@@@@@@@@@@@@@.          @,         @@@         @@@     @@@%         .@@@         @@     @    @@@@@@@@@@@@@@@@@@@#"
-echo "     #@@@@@@@@@@@@@@@@@@@     @@@@    .%    /@     @     @@     @@@%    ,%    @@     @     @@        (@@@@@@@@@@@@@@@@@@@#"
-echo "     #@@@@@@@@@@@@@@@@@@@     @@@&    .%    *@     @     @@     @@@%    .     @@     @     @@        @@@@@@@@@@@@@@@@@@@@#"
-echo "     #@@@@@@@@@@@@@@@@@@@     @@@&    .%    *@     @     @@     @@@%          @@     @     @@        @@@@@@@@@@@@@@@@@@@@#"
-echo "     #@@@@@@@@@@@@@@@@@@@     @@@&    .%    *@     @     @@     @@@%    ,&    .@     @     @@         @@@@@@@@@@@@@@@@@@@#"
-echo "     #@@@@@@@@@@@@@@@@@@@     @@@@    .#    %@     @     @@       /%    ,.    .@     @     @,    @    @@@@@@@@@@@@@@@@@@@#"
-echo "     #@@@@@@@@@@@@@@@@@@@     @@@@@        @@@@/        @@@       /%          @@@/       .@@     @     @@@@@@@@@@@@@@@@@@#"
-echo "     #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#"
-echo "     #####################################################################################################################"
-echo ""
-echo "                                     ###############################################"
-echo "                                     #                                             #"
-echo "                                     #    FOCLABROC TOOLBOX SCRIPT FOR BATOCERA    #"
-echo "                                     #              [PC X86_64 ONLY]               #"
-echo "                                     #                                             #"
-echo "                                     ###############################################"
-echo -e "\e[0m"
-sleep 3
+show_info() {
+dialog --backtitle "Foclabroc Toolbox" --title "Bienvenue dans ma Toolbox !" --msgbox \
+"Bienvenue dans ma Toolbox !\n
+Elle regroupe un ensemble de scripts conçus pour vous faciliter l'installation de mes différents packs (Switch, Kodi, NES 3D, etc.).\n
+Vous y trouverez aussi plusieurs outils pratiques, comme le téléchargement et la gestion de vos bouteilles et Runners Wine.\n
+Une section \"Tools\" est également disponible, avec des fonctionnalités comme la prise de screenshots et la capture vidéo sur Batocera (disponible uniquement en lançant la Toolbox via SSH).\n
+Cerise sur le gâteau : vous pouvez aussi installer la Toolbox dans la section \"Ports\" de Batocera Linux pour y accéder directement à la manette.\n
+Je continuerai sûrement à l’enrichir avec de nouvelles fonctionnalités au fil du temps.\n
+\n
+LA BISE." 20 70
 }
 
 # Vérification de la connexion Internet
 check_internet() {
     if ! ping -c 1 8.8.8.8 &>/dev/null; then
-        dialog --backtitle "Foclabroc Toolbox" --title "Erreur" --msgbox "Pas de connexion Internet !" 6 40
+        dialog --backtitle "Foclabroc Toolbox" --title "Erreur" --msgbox "\nPas de connexion Internet !" 6 40
         exit 1
     fi
 }
@@ -263,7 +241,7 @@ main_menu() {
 }
 
 # Lancer les vérifications et afficher le menu
-show_ascii
+show_info
 arch_check
 check_internet
 main_menu
