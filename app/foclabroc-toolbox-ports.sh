@@ -3,15 +3,15 @@
 clear
 
 show_info() {
-dialog --backtitle "Foclabroc Toolbox" --title "Bienvenue dans ma Toolbox !" --msgbox \
-"Bienvenue dans ma Toolbox !\n
-Elle regroupe un ensemble de scripts conçus pour vous faciliter l'installation de mes différents packs (Switch, Kodi, NES 3D, etc.).\n
+dialog --backtitle "Foclabroc Toolbox" --title "Foclabroc Toolbox" --msgbox \
+"\nBienvenue dans ma Toolbox !\n\n
+Elle regroupe un ensemble de scripts conçus pour vous faciliter l'installation de mes différents packs (Switch, Kodi, NES 3D, etc.).\n\n
 Vous y trouverez aussi plusieurs outils pratiques, comme le téléchargement et la gestion de vos bouteilles et Runners Wine.\n
-Une section \"Tools\" est également disponible, avec des fonctionnalités comme la prise de screenshots et la capture vidéo sur Batocera (disponible uniquement en lançant la Toolbox via SSH).\n
-Cerise sur le gâteau : vous pouvez aussi installer la Toolbox dans la section \"Ports\" de Batocera Linux pour y accéder directement à la manette.\n
+Une section \"Tools\" est également disponible, avec des fonctionnalités comme la prise de screenshots et la capture vidéo sur Batocera (disponible uniquement en lançant la Toolbox via SSH).\n\n
+Cerise sur le gâteau : vous pouvez aussi installer la Toolbox dans la section \"Ports\" de Batocera Linux pour y accéder directement à la manette.\n\n
 Je continuerai sûrement à l’enrichir avec de nouvelles fonctionnalités au fil du temps.\n
 \n
-LA BISE." 20 70 2>&1 >/dev/tty
+LA BISE." 25 70 2>&1 >/dev/tty
 }
 
 # Vérification de la connexion Internet
