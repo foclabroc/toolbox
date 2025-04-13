@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Déclaration des jeux : format "NomJeu|Description|Lien"
+# Liste des jeux au format : "NomJeu|Description|Lien"
 games_list=(
   "Abe|Un jeu de plateformes avec Abe l'extraterrestre|https://example.com/abe.sh"
   "Zelda 3D|Version 3D de Zelda pour nostalgique|https://example.com/zelda3d.sh"
@@ -9,7 +9,7 @@ games_list=(
 )
 
 while true; do
-    # Trier les jeux par nom
+    # Trier la liste par nom
     sorted_games=($(for game in "${games_list[@]}"; do echo "$game"; done | sort))
 
     # Préparer les options pour dialog
@@ -28,17 +28,16 @@ while true; do
 
     clear
 
-    # Si annulation
+    # Si l'utilisateur annule, on quitte
     [[ -z "$selection" ]] && break
 
-    # Retrouver le lien correspondant
+    # Chercher le lien correspondant au nom sélectionné
     for game_entry in "${sorted_games[@]}"; do
         IFS="|" read -r name desc link <<< "$game_entry"
         if [[ "$name" == "$selection" ]]; then
-            # Confirmation
             dialog --backtitle "Foclabroc Toolbox" \
                 --title "Confirmation" \
-                --yesno "\nVoulez-vous vraiment installer : $name ?" 8 50 2>&1 >/dev/tty
+                --yesno "\nVoulez-vous vraiment installer : $name ?" 8 50
             response=$?
 
             clear
