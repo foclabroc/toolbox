@@ -187,7 +187,7 @@ main_menu() {
             5 "[Pack Nes3D]      -> Installer le pack Nintendo Nes 3D (foclabroc)" \
             6 "[Tools]           -> Outils pour Batocera. Screenshot, Records..." \
             7 "[Wine Toolbox]    -> Téléchargement de Runner Wine et outils wsquash..." \
-            8 "Wine Custom3 -> Télécharge une version optimisée de Wine" \
+            8 "[Jeux Pc]         -> Téléchargement de Jeux Windows et linux..." \
             9 "Other Freeware Games -> Jeux Linux & Windows (Wine)" \
             10 "Install Portmaster -> Gestionnaire de ports pour Batocera" \
             11 "Install This Menu to Ports -> Ajoute ce menu aux ports Batocera" \
@@ -229,9 +229,9 @@ main_menu() {
                 clear
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
                 ;;
-            8)
-                confirm_install "Flatpak Linux Games" || continue
-                curl -Ls https://raw.githubusercontent.com/trashbus99/profork/master/app/fpg.sh | bash
+            8)  #Jeux windows et linux
+                clear
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/_win-game.sh | bash
                 ;;
             9)
                 confirm_install "Other Linux & Windows/Wine Freeware" || continue
