@@ -1,52 +1,56 @@
 #!/bin/bash
 
-# Liste des jeux au format : "NomJeu|Description|Lien"
-games_list=(
-  "Abe|Un jeu de plateformes avec Abe l'extraterrestre|https://example.com/abe.sh"
-  "Zelda 3D|Version 3D de Zelda pour nostalgique|https://example.com/zelda3d.sh"
-  "Battle Tanks|Des combats de tanks en arène|https://example.com/battletanks.sh"
-  "Chrono Adventure|Un RPG temporel classique|https://example.com/chrono.sh"
-)
+# Déclaration des jeux : clé = identifiant, valeur = "Nom affiché - Description"
+declare -A jeux
+jeux["abe"]="Abe Odyssey - Classique de la PS1"
+jeux["doom"]="Doom - FPS légendaire"
+jeux["mario"]="Mario Forever - Platformer fun"
+jeux["sonic"]="Sonic - Le hérisson supersonique"
+jeux["zelda"]="Zelda 3D - Aventure rétro"
+# ➕ Ajoute ici d'autres jeux en respectant le format : jeux["clé"]="Nom - Description"
 
 while true; do
-    # Trier la liste par nom
-    sorted_games=($(for game in "${games_list[@]}"; do echo "$game"; done | sort))
-
-    # Préparer les options pour dialog
-    options=()
-    for game_entry in "${sorted_games[@]}"; do
-        IFS="|" read -r name desc link <<< "$game_entry"
-        options+=("$name" "$desc")
+    # Construction dynamique du menu trié alphabétiquement par clé
+    menu_entries=()
+    for key in $(printf "%s\n" "${!jeux[@]}" | sort); do
+        menu_entries+=("$key" "${jeux[$key]}")
     done
 
-    # Afficher la liste des jeux
-    selection=$(dialog --clear --backtitle "Foclabroc Toolbox" \
-        --title "Jeux disponibles à installer" \
-        --menu "\nChoisissez un jeu à installer :" 20 70 10 \
-        "${options[@]}" \
+    # Affichage du menu principal
+    choix=$(dialog --clear --backtitle "Foclabroc Toolbox" \
+        --title "Jeux disponibles" \
+        --menu "\nSélectionnez un jeu à installer :" 20 70 10 \
+        "${menu_entries[@]}" \
         2>&1 >/dev/tty)
 
-    clear
+    # Annulation = sortie du menu
+    [ -z "$choix" ] && clear && exit 0
 
-    # Si l'utilisateur annule, on quitte
-    [[ -z "$selection" ]] && break
+    # Confirmation d'installation
+    dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" \
+        --yesno "\nVoulez-vous installer :\n\n${jeux[$choix]} ?" 10 50
 
-    # Chercher le lien correspondant au nom sélectionné
-    for game_entry in "${sorted_games[@]}"; do
-        IFS="|" read -r name desc link <<< "$game_entry"
-        if [[ "$name" == "$selection" ]]; then
-            dialog --backtitle "Foclabroc Toolbox" \
-                --title "Confirmation" \
-                --yesno "\nVoulez-vous vraiment installer : $name ?" 8 50
-            response=$?
-
-            clear
-            if [[ $response -eq 0 ]]; then
-                bash <(curl -Ls "$link")
-            fi
-            break
-        fi
-    done
+    if [ $? -eq 0 ]; then
+        clear
+        echo "Installation de ${jeux[$choix]}..."
+        # 🧩 Remplace par tes liens curl correspondants
+        case $choix in
+            abe)
+                curl -Ls https://tonsite.com/scripts/abe.sh | bash
+                ;;
+            doom)
+                curl -Ls https://tonsite.com/scripts/doom.sh | bash
+                ;;
+            mario)
+                curl -Ls https://tonsite.com/scripts/mario.sh | bash
+                ;;
+            sonic)
+                curl -Ls https://tonsite.com/scripts/sonic.sh | bash
+                ;;
+            zelda)
+                curl -Ls https://tonsite.com/scripts/zelda.sh | bash
+                ;;
+        esac
+        sleep 2
+    fi
 done
-
-clear
