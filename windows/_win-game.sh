@@ -2,11 +2,11 @@
 
 # Déclaration des jeux : clé = identifiant, valeur = "Nom affiché - Description"
 declare -A jeux
-jeux["abe"]="Abe Odyssey - Classique de la PS1"
-jeux["doom"]="Doom - FPS légendaire"
-jeux["mario"]="Mario Forever - Platformer fun"
-jeux["sonic"]="Sonic - Le hérisson supersonique"
-jeux["zelda"]="Zelda 3D - Aventure rétro"
+jeux["-abe"]="Abe Odyssey - Classique de la PS1"
+jeux["-doom"]="Doom - FPS légendaire"
+jeux["-mario"]="Mario Forever - Platformer fun"
+jeux["-sonic"]="Sonic - Le hérisson supersonique"
+jeux["-zelda"]="Zelda 3D - Aventure rétro"
 # ➕ Ajoute ici d'autres jeux en respectant le format : jeux["clé"]="Nom - Description"
 
 while true; do
@@ -35,19 +35,19 @@ while true; do
         echo "Installation de ${jeux[$choix]}..."
         # 🧩 Remplace par tes liens curl correspondants
         case $choix in
-            abe)
+            -abe)
                 curl -Ls https://tonsite.com/scripts/abe.sh | bash
                 ;;
-            doom)
+            -doom)
                 curl -Ls https://tonsite.com/scripts/doom.sh | bash
                 ;;
-            mario)
+            -mario)
                 curl -Ls https://tonsite.com/scripts/mario.sh | bash
                 ;;
-            sonic)
+            -sonic)
                 curl -Ls https://tonsite.com/scripts/sonic.sh | bash
                 ;;
-            zelda)
+            -zelda)
                 curl -Ls https://tonsite.com/scripts/zelda.sh | bash
                 ;;
         esac
