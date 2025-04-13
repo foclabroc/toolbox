@@ -28,7 +28,7 @@ while true; do
 
     # Confirmation d'installation
     dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" \
-        --yesno "\nVoulez-vous installer :\n\n${jeux[$choix]} ?" 10 50
+        --yesno "\nVoulez-vous installer :\n\n${jeux[$choix]} ?" 10 50 2>&1 >/dev/tty
 
     if [ $? -eq 0 ]; then
         clear
