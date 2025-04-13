@@ -2,10 +2,10 @@
 
 # Define the options
 OPTIONS=(
-  "1" "Telechargement Runner Wine (vanilla/regular) builds"
-  "2" "Telechargement Runner Wine-TKG-Staging builds"
-  "3" "Telechargement Runner Wine-GE Custom builds"
-  "4" "Telechargement Runner GE-Proton builds"
+  "1" "Telechargement Runner Wine (vanilla/regular) builds [Kron4ek/Wine-Builds]"
+  "2" "Telechargement Runner Wine-TKG-Staging builds [Kron4ek/Wine-Builds/tkg]"
+  "3" "Telechargement Runner Wine-GE Custom builds [GloriousEggroll/wine-ge-custom]"
+  "4" "Telechargement Runner GE-Proton builds [GloriousEggroll/proton-ge-custom]"
   "5" "Telechargement Runner GE-Custom de la V40 (pour garder vos anciennes bottles/sauvegarde)"
   "6" "Installation de Winetricks personnalisé"
   "7" "Convertir dossier .pc en dossier .wine"
