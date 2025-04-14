@@ -56,7 +56,7 @@ afficher_barre_progression() {
         echo "90"; sleep 0.5
         echo "100"; sleep 0.5
     ) |
-    dialog --backtitle "Foclabroc Toolbox" --title "Installation de $GAME_NAME" --gauge "\nTéléchargement et installation de $GAME_NAME en cours..." 8 60 0 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --title "Installation de $GAME_NAME" --gauge "\nTéléchargement et installation de $GAME_NAME en cours..." 9 60 0 2>&1 >/dev/tty
 }
 
 # Fonction edit gamelist
@@ -126,5 +126,5 @@ afficher_barre_progression
 ajouter_entree_gamelist
 
 # Message de fin
-dialog --backtitle "Foclabroc Toolbox" --title "Installation terminée" --msgbox "\n$GAME_NAME a été ajouté dans windows !\n\nPensez à mettre à jour les listes de jeux pour le voir apparaître dans le menu." 10 60 2>&1 >/dev/tty
+dialog --backtitle "Foclabroc Toolbox" --title "Installation terminée" --msgbox "\n$GAME_NAME a été ajouté dans windows !\n\nPensez à mettre à jour les listes de jeux pour le voir apparaître dans le menu." 11 60 2>&1 >/dev/tty
 clear
