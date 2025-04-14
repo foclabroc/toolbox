@@ -2,11 +2,11 @@
 
 # Déclaration des jeux : clé = identifiant, valeur = "Nom affiché - Description"
 declare -A jeux
-jeux["-Celeste-64"]="Le retour de Madeline mais en 3D."
-jeux["-Celeste-pico8"]="Aidez Madeline à survivre à ses démons intérieurs au mont Celeste."
-jeux["-Mario"]="Mario Forever - Platformer fun"
-jeux["-Sonic"]="Sonic - Le hérisson supersonique"
-jeux["-Zelda"]="Zelda 3D - Aventure rétro"
+jeux["- Celeste 64"]="Le retour de Madeline mais en 3D."
+jeux["- Celeste pico8"]="Aidez Madeline à survivre à ses démons intérieurs au mont Celeste."
+jeux["- Crash Bandicoot bit"]="Crash Bandicoot Fan-Made avec editeur de stage personnalisé"
+jeux["->Sonic"]="Sonic - Le hérisson supersonique"
+jeux["->Zelda"]="Zelda 3D - Aventure rétro"
 
 while true; do
     # Construction dynamique du menu trié alphabétiquement par clé
@@ -32,14 +32,14 @@ while true; do
     if [ $? -eq 0 ]; then
         clear
         case $choix in
-            -Celeste-64)
+            - Celeste 64)
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/c64.sh | bash
                 ;;
-            -Celeste-pico8)
+            - Celeste pico8)
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/celeste.sh | bash
                 ;;
-            -Mario)
-                curl -Ls https://tonsite.com/scripts/mario.sh | bash
+            - Crash Bandicoot bit)
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/cbit.sh | bash
                 ;;
             -Sonic)
                 curl -Ls https://tonsite.com/scripts/sonic.sh | bash
