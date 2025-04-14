@@ -2,7 +2,6 @@
 
 # Définition des variables
 URL_TELECHARGEMENT="https://github.com/foclabroc/toolbox/releases/download/Fichiers/Celeste64.wsquashfs"
-DOSSIER_DESTINATION="/userdata/roms/windows"
 CHEMIN_SCRIPT=""
 FICHIER_ZIP=""
 #gamelist
@@ -78,7 +77,7 @@ ajouter_entree_gamelist() {
 
         xmlstarlet ed -L \
             -s "/gameList" -t elem -n "game" -v "" \
-            -s "/gameList/game[last()]" -t elem -n "path" -v "./$GAME_NAME" \
+            -s "/gameList/game[last()]" -t elem -n "path" -v ".$GAME_NAME" \
             -s "/gameList/game[last()]" -t elem -n "name" -v "Celeste 64" \
             -s "/gameList/game[last()]" -t elem -n "desc" -v "Le retour de Madeline mais en 3D." \
             -s "/gameList/game[last()]" -t elem -n "developer" -v "Extremely OK Games" \
