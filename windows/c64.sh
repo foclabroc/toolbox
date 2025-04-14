@@ -16,18 +16,20 @@ GAME_FILE="Celeste64.wsquashfs"
 IMAGE_BASE_URL="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/_images"
 GAME_NAME="Celeste 64"
 GIT_NAME="celeste_64"
-IMAGE_DIR="$WIN_DIR/images"
-VIDEO_DIR="$WIN_DIR/videos"
-SCREENSHOT="$IMAGE_DIR/$GIT_NAME-s.png"
-WHEEL="$IMAGE_DIR/$GIT_NAME-w.png"
-THUMBNAIL="$IMAGE_DIR/$GIT_NAME-b.png"
-VIDEO="$VIDEO_DIR/$GIT_NAME-v.mp4"
 DESC="Le retour de Madeline mais en 3D."
 DEV="Extremely OK Games"
 PUBLISH="Extremely OK Games"
 GENRE="Plateforme"
 LANG="en"
 REGION="eu"
+########################################
+IMAGE_DIR="$WIN_DIR/images"
+VIDEO_DIR="$WIN_DIR/videos"
+SCREENSHOT="$IMAGE_DIR/$GIT_NAME-s.png"
+WHEEL="$IMAGE_DIR/$GIT_NAME-w.png"
+THUMBNAIL="$IMAGE_DIR/$GIT_NAME-b.png"
+VIDEO="$VIDEO_DIR/$GIT_NAME-v.mp4"
+
 ##############################################################################################################
 ##############################################################################################################
 #XMLSTARLET VARIABLES
@@ -46,13 +48,15 @@ afficher_barre_progression() {
         echo "20"; sleep 0.5
         curl -L --progress-bar "$URL_TELECHARGEMENT" -o "$WIN_DIR/$GAME_FILE" > /dev/null 2>&1
         echo "60"; sleep 0.5
-        #unzip -o "$FICHIER_ZIP" -d "$WIN_DIR" > /dev/null 2>&1
+        if [ -n "$URL_TELECHARGEMENT_KEY" ]; then
+            curl -L --progress-bar "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" > /dev/null 2>&1
+            echo "70"; sleep 0.5
+        fi
         echo "80"; sleep 0.5
-        #rm "$FICHIER_ZIP"
         echo "90"; sleep 0.5
         echo "100"; sleep 0.5
     ) |
-    dialog --backtitle "Foclabroc Toolbox" --title "Installation de $GAME_NAME" --gauge "\nTéléchargement et installation en cours..." 8 60 0 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --title "Installation de $GAME_NAME" --gauge "\nTéléchargement et installation de $GAME_NAME en cours..." 8 60 0 2>&1 >/dev/tty
 }
 
 # Fonction edit gamelist
