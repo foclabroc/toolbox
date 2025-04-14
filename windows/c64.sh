@@ -7,7 +7,7 @@ FICHIER_ZIP=""
 PORTS_DIR="/userdata/roms/ports"
 WIN_DIR="/userdata/roms/windows"
 #gamelist
-IMAGE_BASE_URL="https://github.com/foclabroc/toolbox/tree/main/_images"
+IMAGE_BASE_URL="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/_images"
 GAME_NAME="Celeste 64"
 GIT_NAME="celeste_64"
 IMAGE_DIR="$WIN_DIR/images"
