@@ -4,7 +4,7 @@
 ##############################################################################################################
 # VARIABLE DU JEU
 URL_TELECHARGEMENT="https://github.com/foclabroc/toolbox/releases/download/Fichiers/CrashBandicoot-BackInTime.wsquashfs"
-URL_TELECHARGEMENT_KEY=""
+URL_TELECHARGEMENT_KEY="https://github.com/foclabroc/toolbox/releases/download/Fichiers/CrashBandicoot-BackInTime.wsquashfs.keys"
 CHEMIN_SCRIPT=""
 FICHIER_ZIP=""
 PORTS_DIR="/userdata/roms/ports"
