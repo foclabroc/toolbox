@@ -98,7 +98,7 @@ ajouter_entree_gamelist() {
 
         echo "95"; sleep 0.3
 
-        curl -s http://127.0.0.1:1234/reloadgames > /dev/null 2>&1
+        curl -s http://127.0.0.1:1234/reloadgames
         echo "100"; sleep 0.3
     ) |
     dialog --backtitle "Foclabroc Toolbox" --title "Edition du gamelist" --gauge "\nAjout images et video au gamelist windows..." 8 60 0 2>&1 >/dev/tty
