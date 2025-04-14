@@ -12,7 +12,7 @@ afficher_barre_progression() {
         echo "10"; sleep 0.5
         mkdir -p "$DOSSIER_DESTINATION"
         echo "20"; sleep 0.5
-        curl -L --progress-bar "$URL_TELECHARGEMENT" -o "$FICHIER_ZIP"
+        curl -L --progress-bar "$URL_TELECHARGEMENT" -o "$FICHIER_ZIP" > /dev/null 2>&1
         echo "60"; sleep 0.5
         unzip -o "$FICHIER_ZIP" -d "$DOSSIER_DESTINATION" > /dev/null 2>&1
         echo "80"; sleep 0.5
