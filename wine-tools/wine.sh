@@ -11,8 +11,8 @@ OPTIONS=(
   "7" "Convertir dossier .pc en dossier .wine"
   "8" "Compresser dossier .wine en fichier .wsquashfs ou .tgz"
   "9" "Decompresser fichiers .wsquashfs ou .wtgz en dossier .wine"
-  "10" "Suppression le runner custom inutiles dans /system/wine/custom"
-  "11" "Suppression de bouteille .wine .wsquashfs .wtgz dans /system/wine-bottle/windows"
+  "10" "Suppression de runners custom inutiles dans /system/wine/custom"
+  "11" "Suppression de bouteilles .wine .wsquashfs .wtgz dans /system/wine-bottle/windows"
 )
 
 # Use dialog to display the menu

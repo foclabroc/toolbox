@@ -2,12 +2,11 @@
 
 # Déclaration des jeux : clé = identifiant, valeur = "Nom affiché - Description"
 declare -A jeux
-jeux["-abe"]="Abe Odyssey - Classique de la PS1"
+jeux["-celeste-64"]="Le retour de Madeline mais en 3D."
 jeux["-doom"]="Doom - FPS légendaire"
 jeux["-mario"]="Mario Forever - Platformer fun"
 jeux["-sonic"]="Sonic - Le hérisson supersonique"
 jeux["-zelda"]="Zelda 3D - Aventure rétro"
-# ➕ Ajoute ici d'autres jeux en respectant le format : jeux["clé"]="Nom - Description"
 
 while true; do
     # Construction dynamique du menu trié alphabétiquement par clé
@@ -19,7 +18,7 @@ while true; do
     # Affichage du menu principal
     choix=$(dialog --clear --backtitle "Foclabroc Toolbox" \
         --title "Jeux disponibles" \
-        --menu "\nSélectionnez un jeu à installer :" 20 70 10 \
+        --menu "\nSélectionnez un jeu à installer :\n " 20 70 10 \
         "${menu_entries[@]}" \
         2>&1 >/dev/tty)
 
@@ -33,10 +32,9 @@ while true; do
     if [ $? -eq 0 ]; then
         clear
         echo "Installation de ${jeux[$choix]}..."
-        # 🧩 Remplace par tes liens curl correspondants
         case $choix in
-            -abe)
-                curl -Ls https://tonsite.com/scripts/abe.sh | bash
+            -celeste-64)
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/c64.sh | bash
                 ;;
             -doom)
                 curl -Ls https://tonsite.com/scripts/doom.sh | bash
