@@ -2,6 +2,7 @@
 
 # Définition des variables
 URL_TELECHARGEMENT="https://github.com/foclabroc/toolbox/releases/download/Fichiers/Celeste64.wsquashfs"
+URL_TELECHARGEMENT_KEY=""
 CHEMIN_SCRIPT=""
 FICHIER_ZIP=""
 PORTS_DIR="/userdata/roms/ports"
