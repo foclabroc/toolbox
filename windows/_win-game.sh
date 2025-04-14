@@ -31,7 +31,6 @@ while true; do
 
     if [ $? -eq 0 ]; then
         clear
-        echo "Installation de ${jeux[$choix]}..."
         case $choix in
             -celeste-64)
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/c64.sh | bash

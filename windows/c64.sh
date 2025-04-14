@@ -97,7 +97,7 @@ ajouter_entree_gamelist() {
         curl -s http://127.0.0.1:1234/reloadgames > /dev/null 2>&1
         echo "100"; sleep 0.3
     ) |
-    dialog --title "Ajout de Youtube TV" --gauge "\nAjout images et video au gamelist windows..." 10 60 0 2>&1 >/dev/tty
+    dialog --title "Ajout de Youtube TV" --gauge "\nAjout images et video au gamelist windows..." 9 60 0 2>&1 >/dev/tty
 }
 
 # Exécution
