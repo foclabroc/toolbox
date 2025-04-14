@@ -31,7 +31,7 @@ afficher_barre_progression() {
         echo "10"; sleep 0.5
         mkdir -p "$WIN_DIR"
         echo "20"; sleep 0.5
-        curl -L --progress-bar "$URL_TELECHARGEMENT" -o "$WIN_DIR/GAME_FILE" > /dev/null 2>&1
+        curl -L --progress-bar "$URL_TELECHARGEMENT" -o "$WIN_DIR/$GAME_FILE" > /dev/null 2>&1
         echo "60"; sleep 0.5
         #unzip -o "$FICHIER_ZIP" -d "$WIN_DIR" > /dev/null 2>&1
         echo "80"; sleep 0.5
@@ -110,5 +110,4 @@ ajouter_entree_gamelist
 
 # Message de fin
 dialog --backtitle "Foclabroc Toolbox" --title "Installation terminée" --msgbox "\nCeleste64 a été ajouté dans windows !\n\nPensez à mettre à jour vos gamelists pour le voir apparaître dans le menu." 10 50 2>&1 >/dev/tty
-
 clear
