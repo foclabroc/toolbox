@@ -35,7 +35,7 @@ afficher_barre_progression() {
         echo "90"; sleep 0.5
         echo "100"; sleep 0.5
     ) |
-    dialog --title "Installation de Celeste64" --gauge "\nTéléchargement et installation en cours..." 10 60 0 2>&1 >/dev/tty
+    dialog --title "Installation de Celeste64" --gauge "\nTéléchargement et installation en cours..." 8 60 0 2>&1 >/dev/tty
 }
 
 # Fonction edit gamelist
@@ -97,7 +97,7 @@ ajouter_entree_gamelist() {
         curl -s http://127.0.0.1:1234/reloadgames > /dev/null 2>&1
         echo "100"; sleep 0.3
     ) |
-    dialog --title "Ajout de Youtube TV" --gauge "\nAjout images et video au gamelist windows..." 9 60 0 2>&1 >/dev/tty
+    dialog --title "Ajout de Youtube TV" --gauge "\nAjout images et video au gamelist windows..." 8 60 0 2>&1 >/dev/tty
 }
 
 # Exécution

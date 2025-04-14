@@ -2,11 +2,11 @@
 
 # Déclaration des jeux : clé = identifiant, valeur = "Nom affiché - Description"
 declare -A jeux
-jeux["-celeste-64"]="Le retour de Madeline mais en 3D."
-jeux["-doom"]="Doom - FPS légendaire"
-jeux["-mario"]="Mario Forever - Platformer fun"
-jeux["-sonic"]="Sonic - Le hérisson supersonique"
-jeux["-zelda"]="Zelda 3D - Aventure rétro"
+jeux["-Celeste-64"]="Le retour de Madeline mais en 3D."
+jeux["-Doom"]="Doom - FPS légendaire"
+jeux["-Mario"]="Mario Forever - Platformer fun"
+jeux["-Sonic"]="Sonic - Le hérisson supersonique"
+jeux["-Zelda"]="Zelda 3D - Aventure rétro"
 
 while true; do
     # Construction dynamique du menu trié alphabétiquement par clé
@@ -27,24 +27,24 @@ while true; do
 
     # Confirmation d'installation
     dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" \
-        --yesno "\nVoulez-vous installer :\n\n${jeux[$choix]} ?" 10 50 2>&1 >/dev/tty
+        --yesno "\nVoulez-vous installer :\n\n$choix ?" 10 50 2>&1 >/dev/tty
 
     if [ $? -eq 0 ]; then
         clear
         case $choix in
-            -celeste-64)
+            -Celeste-64)
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/c64.sh | bash
                 ;;
-            -doom)
+            -Doom)
                 curl -Ls https://tonsite.com/scripts/doom.sh | bash
                 ;;
-            -mario)
+            -Mario)
                 curl -Ls https://tonsite.com/scripts/mario.sh | bash
                 ;;
-            -sonic)
+            -Sonic)
                 curl -Ls https://tonsite.com/scripts/sonic.sh | bash
                 ;;
-            -zelda)
+            -Zelda)
                 curl -Ls https://tonsite.com/scripts/zelda.sh | bash
                 ;;
         esac
