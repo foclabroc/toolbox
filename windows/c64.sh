@@ -5,8 +5,14 @@ URL_TELECHARGEMENT="https://github.com/foclabroc/toolbox/releases/download/Fichi
 CHEMIN_SCRIPT=""
 FICHIER_ZIP=""
 #gamelist
+IMAGE_BASE_URL="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/_images"
 GAME_NAME="Celeste 64"
+GIT_NAME="celeste_64"
 GAME_FILE="Celeste64.wsquashfs"
+SCREENSHOT="$IMAGE_DIR/$GIT_NAME-s.png"
+WHEEL="$IMAGE_DIR/$GIT_NAME-w.png"
+THUMBNAIL="$IMAGE_DIR/$GIT_NAME-b.jpg"
+VIDEO="$VIDEO_DIR/$GIT_NAME-v.mp4"
 PORTS_DIR="/userdata/roms/ports"
 WIN_DIR="/userdata/roms/windows"
 GAMELIST_FILE="$WIN_DIR/gamelist.xml"
@@ -16,11 +22,6 @@ XMLSTARLET_DIR="/userdata/system/pro/extra"
 XMLSTARLET_BIN="$XMLSTARLET_DIR/xmlstarlet"
 XMLSTARLET_SYMLINK="/usr/bin/xmlstarlet"
 CUSTOM_SH="/userdata/system/custom.sh"
-IMAGE_BASE_URL="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/_images"
-SCREENSHOT="$IMAGE_DIR/$GAME_NAME-s.png"
-WHEEL="$IMAGE_DIR/$GAME_NAME-w.png"
-THUMBNAIL="$IMAGE_DIR/$GAME_NAME-b.jpg"
-VIDEO="$VIDEO_DIR/$GAME_NAME-v.mp4"
 
 # Fonction de chargement
 afficher_barre_progression() {
@@ -36,7 +37,7 @@ afficher_barre_progression() {
         echo "90"; sleep 0.5
         echo "100"; sleep 0.5
     ) |
-    dialog --title "Installation de $GAME_NAME" --gauge "\nTéléchargement et installation en cours..." 8 60 0 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --title "Installation de $GAME_NAME" --gauge "\nTéléchargement et installation en cours..." 8 60 0 2>&1 >/dev/tty
 }
 
 # Fonction edit gamelist
@@ -46,12 +47,12 @@ ajouter_entree_gamelist() {
         mkdir -p "$IMAGE_DIR"
         mkdir -p "$VIDEO_DIR"
         echo "10"; sleep 0.3
-        curl -s -L -o "$WHEEL" "$IMAGE_BASE_URL/$GAME_NAME-w.png"
+        curl -s -L -o "$WHEEL" "$IMAGE_BASE_URL/$GIT_NAME-w.png"
         echo "30"; sleep 0.3
-        curl -s -L -o "$SCREENSHOT" "$IMAGE_BASE_URL/$GAME_NAME-s.png"
+        curl -s -L -o "$SCREENSHOT" "$IMAGE_BASE_URL/$GIT_NAME-s.png"
         echo "50"; sleep 0.3
-        curl -s -L -o "$THUMBNAIL" "$IMAGE_BASE_URL/$GAME_NAME-b.jpg"
-        curl -s -L -o "$VIDEO" "$IMAGE_BASE_URL/$GAME_NAME-v.mp4"
+        curl -s -L -o "$THUMBNAIL" "$IMAGE_BASE_URL/$GIT_NAME-b.jpg"
+        curl -s -L -o "$VIDEO" "$IMAGE_BASE_URL/$GIT_NAME-v.mp4"
         echo "60"; sleep 0.3
 
         if [ ! -f "$GAMELIST_FILE" ]; then
@@ -87,10 +88,10 @@ ajouter_entree_gamelist() {
             -s "/gameList/game[last()]" -t elem -n "rating" -v "1.00" \
             -s "/gameList/game[last()]" -t elem -n "region" -v "eu" \
             -s "/gameList/game[last()]" -t elem -n "lang" -v "en" \
-            -s "/gameList/game[last()]" -t elem -n "image" -v "./images/$GAME_NAME-s.png" \
-            -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/$GAME_NAME-w.png" \
-            -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/$GAME_NAME-b.jpg" \
-            -s "/gameList/game[last()]" -t elem -n "video" -v "./videos/$GAME_NAME-v.mp4" \
+            -s "/gameList/game[last()]" -t elem -n "image" -v "./images/$GIT_NAME-s.png" \
+            -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/$GIT_NAME-w.png" \
+            -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/$GIT_NAME-b.jpg" \
+            -s "/gameList/game[last()]" -t elem -n "video" -v "./videos/$GIT_NAME-v.mp4" \
             "$GAMELIST_FILE"
 
         echo "95"; sleep 0.3
@@ -98,7 +99,7 @@ ajouter_entree_gamelist() {
         curl -s http://127.0.0.1:1234/reloadgames > /dev/null 2>&1
         echo "100"; sleep 0.3
     ) |
-    dialog --title "Ajout de Youtube TV" --gauge "\nAjout images et video au gamelist windows..." 8 60 0 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --title "Edition du gamelist" --gauge "\nAjout images et video au gamelist windows..." 8 60 0 2>&1 >/dev/tty
 }
 
 # Exécution
@@ -106,6 +107,6 @@ afficher_barre_progression
 ajouter_entree_gamelist
 
 # Message de fin
-dialog --title "Installation terminée" --msgbox "\nCeleste64 a été ajouté dans windows !\n\nPensez à mettre à jour vos gamelists pour le voir apparaître dans le menu." 10 50 2>&1 >/dev/tty
+dialog --backtitle "Foclabroc Toolbox" --title "Installation terminée" --msgbox "\nCeleste64 a été ajouté dans windows !\n\nPensez à mettre à jour vos gamelists pour le voir apparaître dans le menu." 10 50 2>&1 >/dev/tty
 
 clear
