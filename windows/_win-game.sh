@@ -9,7 +9,7 @@ jeux["->Celeste 64"]="Le retour de Madeline mais en 3D."
 jeux["->Celeste pico8"]="Aidez Madeline à survivre à ses démons intérieurs au mont Celeste."
 jeux["->Crash Bandicoot bit"]="Crash Bandicoot Fan-Made avec editeur de stage personnalisé"
 jeux["->Donkey Kong Advanced"]="Un remake du jeu d'arcade classique."
-jeux["->Zelda"]="Zelda 3D - Aventure rétro"
+jeux["->Sonic Triple Trouble"]="Sonic Triple Touble un fangame du jeu Game Gear Sonic Triple Trouble"
 
 while true; do
     # Construction dynamique du menu trié alphabétiquement par clé
@@ -48,8 +48,8 @@ while true; do
             "->Donkey Kong Advanced")
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/dka.sh | bash
                 ;;
-            "->Zelda")
-                curl -Ls https://tonsite.com/scripts/zelda.sh | bash
+            "->Sonic Triple Trouble")
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/stt.sh | bash
                 ;;
         esac
         sleep 2
