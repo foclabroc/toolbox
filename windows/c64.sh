@@ -1,29 +1,42 @@
 #!/bin/bash
 
-# Définition des variables
+##############################################################################################################
+##############################################################################################################
+# VARIABLE DU JEU
 URL_TELECHARGEMENT="https://github.com/foclabroc/toolbox/releases/download/Fichiers/Celeste64.wsquashfs"
 URL_TELECHARGEMENT_KEY=""
 CHEMIN_SCRIPT=""
 FICHIER_ZIP=""
 PORTS_DIR="/userdata/roms/ports"
 WIN_DIR="/userdata/roms/windows"
-#gamelist
+GAME_FILE="Celeste64.wsquashfs"
+##############################################################################################################
+##############################################################################################################
+# VARIABLES GAMELIST
 IMAGE_BASE_URL="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/_images"
 GAME_NAME="Celeste 64"
 GIT_NAME="celeste_64"
 IMAGE_DIR="$WIN_DIR/images"
 VIDEO_DIR="$WIN_DIR/videos"
-GAME_FILE="Celeste64.wsquashfs"
 SCREENSHOT="$IMAGE_DIR/$GIT_NAME-s.png"
 WHEEL="$IMAGE_DIR/$GIT_NAME-w.png"
-THUMBNAIL="$IMAGE_DIR/$GIT_NAME-b.jpg"
+THUMBNAIL="$IMAGE_DIR/$GIT_NAME-b.png"
 VIDEO="$VIDEO_DIR/$GIT_NAME-v.mp4"
-
+DESC="Le retour de Madeline mais en 3D."
+DEV="Extremely OK Games"
+PUBLISH="Extremely OK Games"
+GENRE="Plateforme"
+LANG="en"
+REGION="eu"
+##############################################################################################################
+##############################################################################################################
+#XMLSTARLET VARIABLES
 GAMELIST_FILE="$WIN_DIR/gamelist.xml"
 XMLSTARLET_DIR="/userdata/system/pro/extra"
 XMLSTARLET_BIN="$XMLSTARLET_DIR/xmlstarlet"
 XMLSTARLET_SYMLINK="/usr/bin/xmlstarlet"
 CUSTOM_SH="/userdata/system/custom.sh"
+##############################################################################################################
 
 # Fonction de chargement
 afficher_barre_progression() {
@@ -53,7 +66,7 @@ ajouter_entree_gamelist() {
         echo "30"; sleep 0.3
         curl -s -L -o "$SCREENSHOT" "$IMAGE_BASE_URL/$GIT_NAME-s.png"
         echo "50"; sleep 0.3
-        curl -s -L -o "$THUMBNAIL" "$IMAGE_BASE_URL/$GIT_NAME-b.jpg"
+        curl -s -L -o "$THUMBNAIL" "$IMAGE_BASE_URL/$GIT_NAME-b.png"
         curl -s -L -o "$VIDEO" "$IMAGE_BASE_URL/$GIT_NAME-v.mp4"
         echo "60"; sleep 0.3
 
@@ -83,17 +96,17 @@ ajouter_entree_gamelist() {
             -s "/gameList" -t elem -n "game" -v "" \
             -s "/gameList/game[last()]" -t elem -n "path" -v "./$GAME_FILE" \
             -s "/gameList/game[last()]" -t elem -n "name" -v "$GAME_NAME" \
-            -s "/gameList/game[last()]" -t elem -n "desc" -v "Le retour de Madeline mais en 3D." \
+            -s "/gameList/game[last()]" -t elem -n "desc" -v "$DESC" \
             -s "/gameList/game[last()]" -t elem -n "image" -v "./images/$GIT_NAME-s.png" \
             -s "/gameList/game[last()]" -t elem -n "video" -v "./videos/$GIT_NAME-v.mp4" \
             -s "/gameList/game[last()]" -t elem -n "marquee" -v "./images/$GIT_NAME-w.png" \
-            -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/$GIT_NAME-b.jpg" \
+            -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/$GIT_NAME-b.png" \
             -s "/gameList/game[last()]" -t elem -n "rating" -v "1.00" \
-            -s "/gameList/game[last()]" -t elem -n "developer" -v "Extremely OK Games" \
-            -s "/gameList/game[last()]" -t elem -n "publisher" -v "Extremely OK Games" \
-            -s "/gameList/game[last()]" -t elem -n "genre" -v "Plateforme" \
-            -s "/gameList/game[last()]" -t elem -n "lang" -v "en" \
-            -s "/gameList/game[last()]" -t elem -n "region" -v "eu" \
+            -s "/gameList/game[last()]" -t elem -n "developer" -v "$DEV" \
+            -s "/gameList/game[last()]" -t elem -n "publisher" -v "$PUBLISH" \
+            -s "/gameList/game[last()]" -t elem -n "genre" -v "$GENRE" \
+            -s "/gameList/game[last()]" -t elem -n "lang" -v "$LANG" \
+            -s "/gameList/game[last()]" -t elem -n "region" -v "$REGION" \
             "$GAMELIST_FILE"
 
         echo "95"; sleep 0.3
@@ -109,5 +122,5 @@ afficher_barre_progression
 ajouter_entree_gamelist
 
 # Message de fin
-dialog --backtitle "Foclabroc Toolbox" --title "Installation terminée" --msgbox "\n$GAME_NAME a été ajouté dans windows !\n\nPensez à mettre à jour vos gamelists pour le voir apparaître dans le menu." 10 50 2>&1 >/dev/tty
+dialog --backtitle "Foclabroc Toolbox" --title "Installation terminée" --msgbox "\n$GAME_NAME a été ajouté dans windows !\n\nPensez à mettre à jour les listes de jeux pour le voir apparaître dans le menu." 10 60 2>&1 >/dev/tty
 clear
