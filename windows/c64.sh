@@ -1,38 +1,111 @@
 #!/bin/bash
 
 # Définition des variables
-URL_TELECHARGEMENT="https://github.com/foclabroc/toolbox/releases/download/Fichiers/Celeste64-v1.1.1-Linux-x64.zip"
-DOSSIER_DESTINATION="/userdata/roms/ports/celeste64"
-CHEMIN_SCRIPT="/userdata/roms/ports/Celeste64.sh"
-FICHIER_ZIP="/tmp/Celeste64.zip"
+URL_TELECHARGEMENT="https://github.com/foclabroc/toolbox/releases/download/Fichiers/Celeste64.wsquashfs"
+DOSSIER_DESTINATION="/userdata/roms/windows"
+CHEMIN_SCRIPT=""
+FICHIER_ZIP=""
+#gamelist
+PORTS_DIR="/userdata/roms/ports"
+WIN_DIR="/userdata/roms/windows"
+GAMELIST_FILE="$WIN_DIR/gamelist.xml"
+IMAGE_DIR="$WIN_DIR/images"
+VIDEO_DIR="$WIN_DIR/videos"
+GAME_NAME="$WIN_DIR/Celeste64.wsquashfs"
+XMLSTARLET_DIR="/userdata/system/pro/extra"
+XMLSTARLET_BIN="$XMLSTARLET_DIR/xmlstarlet"
+XMLSTARLET_SYMLINK="/usr/bin/xmlstarlet"
+CUSTOM_SH="/userdata/system/custom.sh"
+IMAGE_BASE_URL="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/_images"
+SCREENSHOT="$IMAGE_DIR/celeste64-s.png"
+WHEEL="$IMAGE_DIR/celeste64-w.png"
+THUMBNAIL="$IMAGE_DIR/celeste64-b.jpg"
+VIDEO="$VIDEO_DIR/celeste64-v.mp4"
 
 # Fonction de chargement
 afficher_barre_progression() {
     (
         echo "10"; sleep 0.5
-        mkdir -p "$DOSSIER_DESTINATION"
+        mkdir -p "$WIN_DIR"
         echo "20"; sleep 0.5
-        curl -L --progress-bar "$URL_TELECHARGEMENT" -o "$FICHIER_ZIP" > /dev/null 2>&1
+        curl -L --progress-bar "$URL_TELECHARGEMENT" -o "$WIN_DIR/Celeste64.wsquashfs" > /dev/null 2>&1
         echo "60"; sleep 0.5
-        unzip -o "$FICHIER_ZIP" -d "$DOSSIER_DESTINATION" > /dev/null 2>&1
+        #unzip -o "$FICHIER_ZIP" -d "$WIN_DIR" > /dev/null 2>&1
         echo "80"; sleep 0.5
-        rm "$FICHIER_ZIP"
+        #rm "$FICHIER_ZIP"
         echo "90"; sleep 0.5
-        cat << EOF > "$CHEMIN_SCRIPT"
-#!/bin/bash
-cd "$DOSSIER_DESTINATION"
-DISPLAY=:0.0 ./Celeste64
-EOF
-        chmod +x "$CHEMIN_SCRIPT"
         echo "100"; sleep 0.5
     ) |
     dialog --title "Installation de Celeste64" --gauge "\nTéléchargement et installation en cours..." 10 60 0 2>&1 >/dev/tty
 }
 
+# Fonction edit gamelist
+ajouter_entree_gamelist() {
+    (
+        echo "5"; sleep 0.3
+        mkdir -p "$IMAGE_DIR"
+        mkdir -p "$VIDEO_DIR"
+        echo "10"; sleep 0.3
+        curl -s -L -o "$WHEEL" "$IMAGE_BASE_URL/celeste64-w.png"
+        echo "30"; sleep 0.3
+        curl -s -L -o "$SCREENSHOT" "$IMAGE_BASE_URL/celeste64-s.png"
+        echo "50"; sleep 0.3
+        curl -s -L -o "$THUMBNAIL" "$IMAGE_BASE_URL/celeste64-b.jpg"
+        curl -s -L -o "$VIDEO" "$IMAGE_BASE_URL/celeste64-v.mp4"
+        echo "60"; sleep 0.3
+
+        if [ ! -f "$GAMELIST_FILE" ]; then
+            echo '<?xml version="1.0" encoding="UTF-8"?><gameList></gameList>' > "$GAMELIST_FILE"
+        fi
+
+        echo "65"; sleep 0.3
+
+        if [ ! -f "$XMLSTARLET_BIN" ]; then
+            mkdir -p "$XMLSTARLET_DIR"
+            curl -s -L "https://github.com/foclabroc/toolbox/raw/refs/heads/main/app/xmlstarlet" -o "$XMLSTARLET_BIN"
+            chmod +x "$XMLSTARLET_BIN"
+            ln -sf "$XMLSTARLET_BIN" "$XMLSTARLET_SYMLINK"
+            if [ ! -f "$CUSTOM_SH" ]; then
+                echo "#!/bin/bash" > "$CUSTOM_SH"
+                chmod +x "$CUSTOM_SH"
+            fi
+            if ! grep -q "ln -sf $XMLSTARLET_BIN $XMLSTARLET_SYMLINK" "$CUSTOM_SH"; then
+                echo "ln -sf $XMLSTARLET_BIN $XMLSTARLET_SYMLINK" >> "$CUSTOM_SH"
+            fi
+        fi
+
+        echo "80"; sleep 0.3
+
+        xmlstarlet ed -L \
+            -s "/gameList" -t elem -n "game" -v "" \
+            -s "/gameList/game[last()]" -t elem -n "path" -v "./$GAME_NAME" \
+            -s "/gameList/game[last()]" -t elem -n "name" -v "Celeste 64" \
+            -s "/gameList/game[last()]" -t elem -n "desc" -v "Le retour de Madeline mais en 3D." \
+            -s "/gameList/game[last()]" -t elem -n "developer" -v "Extremely OK Games" \
+            -s "/gameList/game[last()]" -t elem -n "publisher" -v "Extremely OK Games" \
+            -s "/gameList/game[last()]" -t elem -n "genre" -v "Plateforme" \
+            -s "/gameList/game[last()]" -t elem -n "rating" -v "1.00" \
+            -s "/gameList/game[last()]" -t elem -n "region" -v "eu" \
+            -s "/gameList/game[last()]" -t elem -n "lang" -v "en" \
+            -s "/gameList/game[last()]" -t elem -n "image" -v "./images/celeste64-s.png" \
+            -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/celeste64-w.png" \
+            -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/celeste64-b.jpg" \
+            -s "/gameList/game[last()]" -t elem -n "video" -v "./videos/celeste64-v.mp4" \
+            "$GAMELIST_FILE"
+
+        echo "95"; sleep 0.3
+
+        curl -s http://127.0.0.1:1234/reloadgames > /dev/null 2>&1
+        echo "100"; sleep 0.3
+    ) |
+    dialog --title "Ajout de Youtube TV" --gauge "\nAjout images et video au gamelist windows..." 10 60 0 2>&1 >/dev/tty
+}
+
 # Exécution
 afficher_barre_progression
+ajouter_entree_gamelist
 
 # Message de fin
-dialog --title "Installation terminée" --msgbox "\nCeleste64 a été ajouté dans les Ports !\n\nPensez à mettre à jour vos gamelists pour le voir apparaître dans le menu." 10 50 2>&1 >/dev/tty
+dialog --title "Installation terminée" --msgbox "\nCeleste64 a été ajouté dans windows !\n\nPensez à mettre à jour vos gamelists pour le voir apparaître dans le menu." 10 50 2>&1 >/dev/tty
 
 clear
