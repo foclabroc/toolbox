@@ -5,7 +5,7 @@ declare -A jeux
 jeux["->Celeste 64"]="Le retour de Madeline mais en 3D."
 jeux["->Celeste pico8"]="Aidez Madeline à survivre à ses démons intérieurs au mont Celeste."
 jeux["->Crash Bandicoot bit"]="Crash Bandicoot Fan-Made avec editeur de stage personnalisé"
-jeux["->Sonic"]="Sonic - Le hérisson supersonique"
+jeux["->Donkey Kong Advanced"]="Un remake du jeu d'arcade classique."
 jeux["->Zelda"]="Zelda 3D - Aventure rétro"
 
 while true; do
@@ -42,8 +42,8 @@ while true; do
             "->Crash Bandicoot bit")
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/cbit.sh | bash
                 ;;
-            "->Sonic")
-                curl -Ls https://tonsite.com/scripts/sonic.sh | bash
+            "->Donkey Kong Advanced")
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/dka.sh | bash
                 ;;
             "->Zelda")
                 curl -Ls https://tonsite.com/scripts/zelda.sh | bash
