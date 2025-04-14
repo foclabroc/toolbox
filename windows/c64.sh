@@ -5,21 +5,22 @@ URL_TELECHARGEMENT="https://github.com/foclabroc/toolbox/releases/download/Fichi
 CHEMIN_SCRIPT=""
 FICHIER_ZIP=""
 #gamelist
+GAME_NAME="Celeste 64"
+GAME_FILE="Celeste64.wsquashfs"
 PORTS_DIR="/userdata/roms/ports"
 WIN_DIR="/userdata/roms/windows"
 GAMELIST_FILE="$WIN_DIR/gamelist.xml"
 IMAGE_DIR="$WIN_DIR/images"
 VIDEO_DIR="$WIN_DIR/videos"
-GAME_NAME="$WIN_DIR/Celeste64.wsquashfs"
 XMLSTARLET_DIR="/userdata/system/pro/extra"
 XMLSTARLET_BIN="$XMLSTARLET_DIR/xmlstarlet"
 XMLSTARLET_SYMLINK="/usr/bin/xmlstarlet"
 CUSTOM_SH="/userdata/system/custom.sh"
 IMAGE_BASE_URL="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/_images"
-SCREENSHOT="$IMAGE_DIR/celeste64-s.png"
-WHEEL="$IMAGE_DIR/celeste64-w.png"
-THUMBNAIL="$IMAGE_DIR/celeste64-b.jpg"
-VIDEO="$VIDEO_DIR/celeste64-v.mp4"
+SCREENSHOT="$IMAGE_DIR/$GAME_NAME-s.png"
+WHEEL="$IMAGE_DIR/$GAME_NAME-w.png"
+THUMBNAIL="$IMAGE_DIR/$GAME_NAME-b.jpg"
+VIDEO="$VIDEO_DIR/$GAME_NAME-v.mp4"
 
 # Fonction de chargement
 afficher_barre_progression() {
@@ -27,7 +28,7 @@ afficher_barre_progression() {
         echo "10"; sleep 0.5
         mkdir -p "$WIN_DIR"
         echo "20"; sleep 0.5
-        curl -L --progress-bar "$URL_TELECHARGEMENT" -o "$WIN_DIR/Celeste64.wsquashfs" > /dev/null 2>&1
+        curl -L --progress-bar "$URL_TELECHARGEMENT" -o "$WIN_DIR/GAME_FILE" > /dev/null 2>&1
         echo "60"; sleep 0.5
         #unzip -o "$FICHIER_ZIP" -d "$WIN_DIR" > /dev/null 2>&1
         echo "80"; sleep 0.5
@@ -35,7 +36,7 @@ afficher_barre_progression() {
         echo "90"; sleep 0.5
         echo "100"; sleep 0.5
     ) |
-    dialog --title "Installation de Celeste64" --gauge "\nTéléchargement et installation en cours..." 8 60 0 2>&1 >/dev/tty
+    dialog --title "Installation de $GAME_NAME" --gauge "\nTéléchargement et installation en cours..." 8 60 0 2>&1 >/dev/tty
 }
 
 # Fonction edit gamelist
@@ -45,12 +46,12 @@ ajouter_entree_gamelist() {
         mkdir -p "$IMAGE_DIR"
         mkdir -p "$VIDEO_DIR"
         echo "10"; sleep 0.3
-        curl -s -L -o "$WHEEL" "$IMAGE_BASE_URL/celeste64-w.png"
+        curl -s -L -o "$WHEEL" "$IMAGE_BASE_URL/$GAME_NAME-w.png"
         echo "30"; sleep 0.3
-        curl -s -L -o "$SCREENSHOT" "$IMAGE_BASE_URL/celeste64-s.png"
+        curl -s -L -o "$SCREENSHOT" "$IMAGE_BASE_URL/$GAME_NAME-s.png"
         echo "50"; sleep 0.3
-        curl -s -L -o "$THUMBNAIL" "$IMAGE_BASE_URL/celeste64-b.jpg"
-        curl -s -L -o "$VIDEO" "$IMAGE_BASE_URL/celeste64-v.mp4"
+        curl -s -L -o "$THUMBNAIL" "$IMAGE_BASE_URL/$GAME_NAME-b.jpg"
+        curl -s -L -o "$VIDEO" "$IMAGE_BASE_URL/$GAME_NAME-v.mp4"
         echo "60"; sleep 0.3
 
         if [ ! -f "$GAMELIST_FILE" ]; then
@@ -77,8 +78,8 @@ ajouter_entree_gamelist() {
 
         xmlstarlet ed -L \
             -s "/gameList" -t elem -n "game" -v "" \
-            -s "/gameList/game[last()]" -t elem -n "path" -v ".$GAME_NAME" \
-            -s "/gameList/game[last()]" -t elem -n "name" -v "Celeste 64" \
+            -s "/gameList/game[last()]" -t elem -n "path" -v "./$GAME_FILE" \
+            -s "/gameList/game[last()]" -t elem -n "name" -v "$GAME_NAME" \
             -s "/gameList/game[last()]" -t elem -n "desc" -v "Le retour de Madeline mais en 3D." \
             -s "/gameList/game[last()]" -t elem -n "developer" -v "Extremely OK Games" \
             -s "/gameList/game[last()]" -t elem -n "publisher" -v "Extremely OK Games" \
@@ -86,10 +87,10 @@ ajouter_entree_gamelist() {
             -s "/gameList/game[last()]" -t elem -n "rating" -v "1.00" \
             -s "/gameList/game[last()]" -t elem -n "region" -v "eu" \
             -s "/gameList/game[last()]" -t elem -n "lang" -v "en" \
-            -s "/gameList/game[last()]" -t elem -n "image" -v "./images/celeste64-s.png" \
-            -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/celeste64-w.png" \
-            -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/celeste64-b.jpg" \
-            -s "/gameList/game[last()]" -t elem -n "video" -v "./videos/celeste64-v.mp4" \
+            -s "/gameList/game[last()]" -t elem -n "image" -v "./images/$GAME_NAME-s.png" \
+            -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/$GAME_NAME-w.png" \
+            -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/$GAME_NAME-b.jpg" \
+            -s "/gameList/game[last()]" -t elem -n "video" -v "./videos/$GAME_NAME-v.mp4" \
             "$GAMELIST_FILE"
 
         echo "95"; sleep 0.3
