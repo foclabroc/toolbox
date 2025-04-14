@@ -1,5 +1,8 @@
 #!/bin/bash
 
+export LANG=fr_FR.UTF-8
+export LC_ALL=fr_FR.UTF-8
+
 # Déclaration des jeux : clé = identifiant, valeur = "Nom affiché - Description"
 declare -A jeux
 jeux["->Celeste 64"]="Le retour de Madeline mais en 3D."
