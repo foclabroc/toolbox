@@ -86,8 +86,8 @@ ajouter_entree_gamelist() {
             -s "/gameList/game[last()]" -t elem -n "desc" -v "Le retour de Madeline mais en 3D." \
             -s "/gameList/game[last()]" -t elem -n "image" -v "./images/$GIT_NAME-s.png" \
             -s "/gameList/game[last()]" -t elem -n "video" -v "./videos/$GIT_NAME-v.mp4" \
+            -s "/gameList/game[last()]" -t elem -n "marquee" -v "./images/$GIT_NAME-w.png" \
             -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/$GIT_NAME-b.jpg" \
-            -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/$GIT_NAME-w.png" \
             -s "/gameList/game[last()]" -t elem -n "rating" -v "1.00" \
             -s "/gameList/game[last()]" -t elem -n "developer" -v "Extremely OK Games" \
             -s "/gameList/game[last()]" -t elem -n "publisher" -v "Extremely OK Games" \
