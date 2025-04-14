@@ -109,5 +109,5 @@ afficher_barre_progression
 ajouter_entree_gamelist
 
 # Message de fin
-dialog --backtitle "Foclabroc Toolbox" --title "Installation terminée" --msgbox "\nCeleste64 a été ajouté dans windows !\n\nPensez à mettre à jour vos gamelists pour le voir apparaître dans le menu." 10 50 2>&1 >/dev/tty
+dialog --backtitle "Foclabroc Toolbox" --title "Installation terminée" --msgbox "\n$GAME_NAME a été ajouté dans windows !\n\nPensez à mettre à jour vos gamelists pour le voir apparaître dans le menu." 10 50 2>&1 >/dev/tty
 clear
