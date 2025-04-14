@@ -3,7 +3,7 @@
 # Déclaration des jeux : clé = identifiant, valeur = "Nom affiché - Description"
 declare -A jeux
 jeux["-Celeste-64"]="Le retour de Madeline mais en 3D."
-jeux["-Doom"]="Doom - FPS légendaire"
+jeux["-Celeste"]="Aidez Madeline à survivre à ses démons intérieurs au mont Celeste, dans ce jeu de plateformes ultra relevé"
 jeux["-Mario"]="Mario Forever - Platformer fun"
 jeux["-Sonic"]="Sonic - Le hérisson supersonique"
 jeux["-Zelda"]="Zelda 3D - Aventure rétro"
@@ -18,7 +18,7 @@ while true; do
     # Affichage du menu principal
     choix=$(dialog --clear --backtitle "Foclabroc Toolbox" \
         --title "Jeux disponibles" \
-        --menu "\nSélectionnez un jeu à installer :\n " 20 70 10 \
+        --menu "\nSélectionnez un jeu à installer :\n " 20 105 10 \
         "${menu_entries[@]}" \
         2>&1 >/dev/tty)
 
@@ -35,8 +35,8 @@ while true; do
             -Celeste-64)
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/c64.sh | bash
                 ;;
-            -Doom)
-                curl -Ls https://tonsite.com/scripts/doom.sh | bash
+            -Celeste)
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/celeste.sh | bash
                 ;;
             -Mario)
                 curl -Ls https://tonsite.com/scripts/mario.sh | bash
