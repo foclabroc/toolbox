@@ -15,7 +15,7 @@ if [ ! -d "/userdata/system/pro" ]; then
 fi
 
 
-echo "Installing Foclabroc-toolbox to port folder..."
+echo "Installation de Foclabroc-toolbox dans Ports..."
 sleep 3
 # Add Foclabroc-tool.sh to "ports"
 curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/foclabroc-tools.sh -o /userdata/roms/ports/foclabroc-tools.sh
@@ -33,7 +33,7 @@ curl http://127.0.0.1:1234/reloadgames
 # Add an entry to gamelist.xml#################################xmledit#########################################################
 ports_dir="/userdata/roms/ports"
 mkdir -p "$ports_dir"
-echo "Adding YouTube TV entry to gamelist.xml..."
+echo "Ajout toolbox dans le gamelist.xml..."
 gamelist_file="$ports_dir/gamelist.xml"
 screenshot_url="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/foctool-screenshot.jpg"
 screenshot_path="$ports_dir/images/foctool-screenshot.jpg"
@@ -103,7 +103,7 @@ xmlstarlet ed -L \
     -s "/gameList/game[last()]" -t elem -n "region" -v "eu" \
     -s "/gameList/game[last()]" -t elem -n "lang" -v "fr" \
     -s "/gameList/game[last()]" -t elem -n "image" -v "./images/foctool-screenshot.jpg" \
-    -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/foctool-wheel.png" \
+    -s "/gameList/game[last()]" -t elem -n "marquee" -v "./images/foctool-wheel.png" \
     -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/foctool-box.png" \
     "$gamelist_file"
 # Add an entry to gamelist.xml#################################xmledit#########################################################
@@ -113,5 +113,5 @@ killall -9 emulationstation
 sleep 1
 
 
-echo -e "\e[1;32mFoclabroc-Toolbox Successfully Installed in Ports folder.\e[1;37m"
-sleep 3
+echo -e "\e[1;32mFoclabroc-Toolbox Installé avec succés dans Ports.\e[1;37m"
+sleep 2
