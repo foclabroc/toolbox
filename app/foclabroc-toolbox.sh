@@ -180,17 +180,17 @@ main_menu() {
     while true; do
         main_menu=$(dialog --clear --backtitle "Foclabroc Toolbox" \
             --title "Menu Principal" \
-            --menu "\nSélectionnez une option :\n " 22 86 10 \
-            1 "[Nintendo Switch] -> Installer l'émulation Switch sur Batocera" \
-            2 "[Youtube TV]      -> Installer Youtube TV" \
-            3 "[Gparted]         -> Installer Gparted" \
-            4 "[Pack Kodi]       -> Installer le pack streaming/iptv kodi" \
-            5 "[Pack Nes3D]      -> Installer le pack Nintendo Nes 3D" \
-            6 "[Jeux Pc]         -> Téléchargement de Jeux Windows..." \
-            7 "[Wine Toolbox]    -> Téléchargement de Runner Wine et outils wsquash..." \
-            8 "[Tools]           -> Outils pour Batocera. Screenshot, Records..." \
-            9 "Install This Menu to Ports -> Ajoute ce menu aux ports Batocera" \
-            10 "Exit -> Quitter le script" \
+            --menu "\nSélectionnez une option :\n " 22 90 10 \
+            1 "[Nintendo Switch]    -> Installer l'émulation Switch sur Batocera" \
+            2 "[Youtube TV]         -> Installer Youtube TV" \
+            3 "[Gparted]            -> Installer Gparted" \
+            4 "[Pack Kodi]          -> Installer le pack streaming/iptv kodi" \
+            5 "[Pack Nes3D]         -> Installer le pack Nintendo Nes 3D" \
+            6 "[Jeux Pc]            -> Téléchargement de Jeux Windows..." \
+            7 "[Wine Toolbox]       -> Téléchargement de Runner Wine et outils wsquash..." \
+            8 "[Tools]              -> Outils pour Batocera. Screenshot, Records..." \
+            9 "[Install dans Ports] -> Ajoute ce menu aux ports Batocera" \
+            10 "Exit                -> Quitter le script" \
             2>&1 >/dev/tty)
         clear
 
