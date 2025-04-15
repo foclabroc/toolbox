@@ -8,10 +8,11 @@ dialog --backtitle "Foclabroc Toolbox" --title "Foclabroc Toolbox" --msgbox \
 Elle regroupe un ensemble de scripts conçus pour vous faciliter l'installation de mes différents packs (Switch, Kodi, NES 3D, etc.).\n\n
 Vous y trouverez aussi plusieurs outils pratiques, comme le téléchargement et la gestion de vos bouteilles et Runners Wine.\n
 Une section \"Tools\" est également disponible, avec des fonctionnalités comme la prise de screenshots et la capture vidéo sur Batocera (disponible uniquement en lançant la Toolbox via SSH).\n\n
+Mais aussi une section \"Télechargement de jeux windows\" dans laquelle vous trouverez différents jeux Windows, majoritairement FanGame, avec ajout des médias à votre gamelist automatique.\n\n
 Cerise sur le gâteau : vous pouvez aussi installer la Toolbox dans la section \"Ports\" de Batocera Linux pour y accéder directement à la manette.\n\n
 Je continuerai sûrement à l’enrichir avec de nouvelles fonctionnalités au fil du temps.\n
 \n
-LA BISE." 27 70 2>&1 >/dev/tty
+LA BISE." 30 70 2>&1 >/dev/tty
 }
 
 # Vérification de la connexion Internet
@@ -179,19 +180,17 @@ main_menu() {
     while true; do
         main_menu=$(dialog --clear --backtitle "Foclabroc Toolbox" \
             --title "Menu Principal" \
-            --menu "\nSélectionnez une option :\n " 22 86 12 \
-            1 "[Nintendo Switch] -> Installer l'émulation Switch sur Batocera (foclabroc)" \
+            --menu "\nSélectionnez une option :\n " 22 86 10 \
+            1 "[Nintendo Switch] -> Installer l'émulation Switch sur Batocera" \
             2 "[Youtube TV]      -> Installer Youtube TV" \
             3 "[Gparted]         -> Installer Gparted" \
-            4 "[Pack Kodi]       -> Installer le pack streaming/iptv kodi (foclabroc)" \
-            5 "[Pack Nes3D]      -> Installer le pack Nintendo Nes 3D (foclabroc)" \
-            6 "[Tools]           -> Outils pour Batocera. Screenshot, Records..." \
+            4 "[Pack Kodi]       -> Installer le pack streaming/iptv kodi" \
+            5 "[Pack Nes3D]      -> Installer le pack Nintendo Nes 3D" \
+            6 "[Jeux Pc]         -> Téléchargement de Jeux Windows..." \
             7 "[Wine Toolbox]    -> Téléchargement de Runner Wine et outils wsquash..." \
-            8 "[Jeux Pc]         -> Téléchargement de Jeux Windows et linux..." \
-            9 "Other Freeware Games -> Jeux Linux & Windows (Wine)" \
-            10 "Install Portmaster -> Gestionnaire de ports pour Batocera" \
-            11 "Install This Menu to Ports -> Ajoute ce menu aux ports Batocera" \
-            12 "Exit -> Quitter le script" \
+            8 "[Tools]           -> Outils pour Batocera. Screenshot, Records..." \
+            9 "Install This Menu to Ports -> Ajoute ce menu aux ports Batocera" \
+            10 "Exit -> Quitter le script" \
             2>&1 >/dev/tty)
         clear
 
@@ -221,32 +220,24 @@ main_menu() {
                 clear
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/3d/pack_3d.sh | bash
                 ;;
-            6)
+            6)  #Jeux windows et linux
                 clear
-                tools_options
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/_win-game.sh | bash
                 ;;
             7)  #wine tools
                 clear
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
                 ;;
-            8)  #Jeux windows et linux
+            8)
                 clear
-                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/_win-game.sh | bash
+                tools_options
                 ;;
             9)
-                confirm_install "Other Linux & Windows/Wine Freeware" || continue
-                curl -Ls https://github.com/trashbus99/profork/raw/master/app/wquashfs.sh | bash
-                ;;
-            10)
-                confirm_install "Portmaster Installer" || continue
-                curl -Ls https://github.com/trashbus99/profork/raw/master/portmaster/install.sh | bash
-                ;;
-            11)
                 confirm_install "Ports Installer" || continue 
                 clear
                 wget -q --tries=30 --no-check-certificate -O /tmp/runner https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/install-to-port.sh && chmod +x /tmp/runner && bash /tmp/runner
                 ;;
-            12)
+            10)
                 # Afficher un message de remerciement
                 dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --msgbox "\nMerci d'avoir utilisé le script !" 7 40 2>&1 >/dev/tty
                 killall -9 xterm
