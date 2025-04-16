@@ -47,42 +47,55 @@ CUSTOM_SH="/userdata/system/custom.sh"
 afficher_barre_progression() {
     (
         echo "0"; echo "Initialisation..."
-        sleep 0.2
+        sleep 0.5
         echo "5"; echo "Création du dossier d'installation..."
         mkdir -p "$WIN_DIR"
-        sleep 0.2
+        sleep 0.5
 
         echo "15"; echo "Téléchargement de $GAME_FILE..."
 
+        # Détection de la taille réelle du fichier
+        REAL_SIZE=$(wget --spider --server-response "$URL_TELECHARGEMENT" 2>&1 | \
+          awk '/Content-Length/ {print $2}' | tail -1)
+
+        # Si la taille n'est pas disponible, on met une estimation de 10 Mo
+        if [ -z "$REAL_SIZE" ]; then
+            REAL_SIZE=$((10 * 1024 * 1024)) # Estimation 10 Mo
+        fi
+
+        CURRENT_SIZE=0
+
         wget "$URL_TELECHARGEMENT" -O "$WIN_DIR/$GAME_FILE" --progress=dot:mega 2>&1 | \
         stdbuf -oL grep --line-buffered '\.' | \
-        awk 'BEGIN {
-            total = 0;
-            seuil = 1024 * 1024; # On suppose ~1 Mo pour estimer, à ajuster si on peut détecter la taille
-        }
+        awk -v total=$REAL_SIZE '
         {
-            total += 102400; # Chaque point représente ~100K avec dot:mega
-            # Convertit total en pourcentage estimé (15 à 70)
-            p = int(15 + (total / seuil) * 55);
-            if (p > 70) p = 70;
-            print p; print "Téléchargement de " ENVIRON["GAME_NAME"] "...";
+            downloaded += 102400;  # chaque point ≈ 100K
+            percent = int(15 + (downloaded / total) * 55);
+            if (percent > 70) percent = 70;
+            print percent; print "Téléchargement de " ENVIRON["GAME_NAME"] "...";
             fflush();
         }'
 
         if [ -n "$URL_TELECHARGEMENT_KEY" ]; then
             echo "70"; echo "Téléchargement des clés..."
 
+            # Détection de la taille des clés
+            REAL_KEYS_SIZE=$(wget --spider --server-response "$URL_TELECHARGEMENT_KEY" 2>&1 | \
+              awk '/Content-Length/ {print $2}' | tail -1)
+
+            # Si la taille n'est pas disponible, estimation de 1 Mo pour les clés
+            if [ -z "$REAL_KEYS_SIZE" ]; then
+                REAL_KEYS_SIZE=$((1 * 1024 * 1024)) # Estimation 1 Mo
+            fi
+
             wget "$URL_TELECHARGEMENT_KEY" -O "$WIN_DIR/${GAME_FILE}.keys" --progress=dot:mega 2>&1 | \
             stdbuf -oL grep --line-buffered '\.' | \
-            awk 'BEGIN {
-                total = 0;
-                seuil = 1024 * 512; # estimation 512K
-            }
+            awk -v total=$REAL_KEYS_SIZE '
             {
-                total += 102400;
-                p = int(70 + (total / seuil) * 30);
-                if (p > 100) p = 100;
-                print p; print "Téléchargement des clés...";
+                downloaded += 102400;
+                percent = int(70 + (downloaded / total) * 30);
+                if (percent > 100) percent = 100;
+                print percent; print "Téléchargement des clés...";
                 fflush();
             }'
         fi
