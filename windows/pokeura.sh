@@ -46,8 +46,9 @@ CUSTOM_SH="/userdata/system/custom.sh"
 # Fonction de chargement
 afficher_barre_progression() {
     TMP_FILE=$(mktemp)
+
     FILE_PATH="$WIN_DIR/$GAME_FILE"
-    
+
     (
         echo "10"; sleep 0.5
         echo "15"; sleep 0.5
@@ -57,32 +58,17 @@ afficher_barre_progression() {
         # Récupération de la taille totale du fichier
         FILE_SIZE=$(curl -sIL "$URL_TELECHARGEMENT" | grep -i Content-Length | tail -1 | awk '{print $2}' | tr -d '\r')
 
-        if [ -z "$FILE_SIZE" ] || ! [[ "$FILE_SIZE" =~ ^[0-9]+$ ]]; then
-            echo "Erreur : Taille du fichier non récupérable."
-            exit 1
-        fi
-
         # Téléchargement réel avec suivi des redirections
         curl -sL "$URL_TELECHARGEMENT" -o "$FILE_PATH" &
         PID_CURL=$!
-
-        # Variable pour suivre la progression
-        LAST_PROGRESS=20
 
         # Affichage de la progression
         while kill -0 $PID_CURL 2>/dev/null; do
             if [ -f "$FILE_PATH" ]; then
                 CURRENT_SIZE=$(stat -c%s "$FILE_PATH" 2>/dev/null)
                 if [ -n "$FILE_SIZE" ] && [ "$FILE_SIZE" -gt 0 ]; then
-                    # Calcul de la progression sur une plage de 20 à 100
-                    PROGRESS=$(( CURRENT_SIZE * 80 / FILE_SIZE )) # progression de 0 à 80
-                    PROGRESS=$(( 20 + PROGRESS )) # ajuste la progression de 20 à 100
-
-                    # On n'affiche que si la progression a augmenté
-                    if [ "$PROGRESS" -gt "$LAST_PROGRESS" ]; then
-                        echo "$PROGRESS"
-                        LAST_PROGRESS=$PROGRESS
-                    fi
+                    PROGRESS=$(( CURRENT_SIZE * 40 / FILE_SIZE )) # progression de 20 à 60
+                    echo $(( 20 + PROGRESS ))
                 fi
             fi
             sleep 0.2
