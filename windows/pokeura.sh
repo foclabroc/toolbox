@@ -45,22 +45,30 @@ CUSTOM_SH="/userdata/system/custom.sh"
 
 # Fonction de chargement
 afficher_barre_progression() {
-    TMP_LOG=$(mktemp)
+    TMP_FILE=$(mktemp)
+    TMP_SIZE=$(mktemp)
+
+    FILE_PATH="$WIN_DIR/$GAME_FILE"
 
     (
         echo "10"; sleep 0.5
         mkdir -p "$WIN_DIR"
         echo "20"; sleep 0.5
 
-        # Lancement du téléchargement avec progression réelle
-        curl -L --progress-bar "$URL_TELECHARGEMENT" -o "$WIN_DIR/$GAME_FILE" 2> "$TMP_LOG" &
+        # Récupération de la taille totale du fichier à télécharger
+        FILE_SIZE=$(curl -sI "$URL_TELECHARGEMENT" | grep -i Content-Length | awk '{print $2}' | tr -d '\r')
+
+        # Téléchargement en tâche de fond, en écrivant en temps réel dans un fichier
+        curl -s "$URL_TELECHARGEMENT" -o "$FILE_PATH" &
         PID_CURL=$!
 
-        # Lecture de la progression pendant le téléchargement
         while kill -0 $PID_CURL 2>/dev/null; do
-            PROGRESS=$(grep -o '[0-9]\{1,3\}%' "$TMP_LOG" | tail -1 | tr -d '%')
-            if [ -n "$PROGRESS" ]; then
-                echo "$(( 20 + PROGRESS * 40 / 100 ))"  # de 20 à 60 %
+            if [ -f "$FILE_PATH" ]; then
+                CURRENT_SIZE=$(stat -c%s "$FILE_PATH" 2>/dev/null)
+                if [ -n "$FILE_SIZE" ] && [ "$FILE_SIZE" -gt 0 ]; then
+                    PROGRESS=$(( CURRENT_SIZE * 40 / FILE_SIZE )) # on garde de 20 à 60
+                    echo $(( 20 + PROGRESS ))
+                fi
             fi
             sleep 0.2
         done
@@ -82,7 +90,7 @@ afficher_barre_progression() {
            --gauge "\nTéléchargement et installation de $GAME_NAME en cours..." 9 60 0 \
            2>&1 >/dev/tty
 
-    rm -f "$TMP_LOG"
+    rm -f "$TMP_FILE" "$TMP_SIZE"
 }
 
 # Fonction edit gamelist
