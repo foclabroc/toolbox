@@ -190,7 +190,7 @@ main_menu() {
             7 "[Wine Toolbox]       -> Téléchargement de Runner Wine et outils wsquash..." \
             8 "[Tools]              -> Outils pour Batocera. Screenshot, Records..." \
             9 "[Install dans Ports] -> Ajoute ce menu aux ports Batocera" \
-            10 "[Exit]              -> Quitter le script" \
+            10 "[Exit]               -> Quitter le script" \
             2>&1 >/dev/tty)
         clear
 
