@@ -51,35 +51,40 @@ afficher_barre_progression() {
         echo "5"; echo "Création du dossier d'installation..."
         mkdir -p "$WIN_DIR"
         sleep 0.2
+
         echo "15"; echo "Téléchargement de $GAME_FILE..."
 
-        curl -L -# "$URL_TELECHARGEMENT" -o "$WIN_DIR/$GAME_FILE" 2>&1 | \
-        stdbuf -oL tr -d '\r' | \
-        awk '
-            /#/ {
-                gsub(/#+/, "", $0);  # remove the hashes if any
-            }
-            {
-                if (match($0, /([0-9]{1,3})%/, m)) {
-                    p = int(15 + m[1] * 0.55);  # 15 → 70
-                    print p; print "Téléchargement de " ENVIRON["GAME_NAME"] "...";
-                    fflush();
-                }
-            }'
+        wget "$URL_TELECHARGEMENT" -O "$WIN_DIR/$GAME_FILE" --progress=dot:mega 2>&1 | \
+        stdbuf -oL grep --line-buffered '\.' | \
+        awk 'BEGIN {
+            total = 0;
+            seuil = 1024 * 1024; # On suppose ~1 Mo pour estimer, à ajuster si on peut détecter la taille
+        }
+        {
+            total += 102400; # Chaque point représente ~100K avec dot:mega
+            # Convertit total en pourcentage estimé (15 à 70)
+            p = int(15 + (total / seuil) * 55);
+            if (p > 70) p = 70;
+            print p; print "Téléchargement de " ENVIRON["GAME_NAME"] "...";
+            fflush();
+        }'
 
         if [ -n "$URL_TELECHARGEMENT_KEY" ]; then
             echo "70"; echo "Téléchargement des clés..."
 
-            curl -L -# "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" 2>&1 | \
-            stdbuf -oL tr -d '\r' | \
-            awk '
-                {
-                    if (match($0, /([0-9]{1,3})%/, m)) {
-                        p = int(70 + m[1] * 0.3);  # 70 → 100
-                        print p; print "Téléchargement des clés...";
-                        fflush();
-                    }
-                }'
+            wget "$URL_TELECHARGEMENT_KEY" -O "$WIN_DIR/${GAME_FILE}.keys" --progress=dot:mega 2>&1 | \
+            stdbuf -oL grep --line-buffered '\.' | \
+            awk 'BEGIN {
+                total = 0;
+                seuil = 1024 * 512; # estimation 512K
+            }
+            {
+                total += 102400;
+                p = int(70 + (total / seuil) * 30);
+                if (p > 100) p = 100;
+                print p; print "Téléchargement des clés...";
+                fflush();
+            }'
         fi
 
         echo "100"; echo "Installation terminée !"
