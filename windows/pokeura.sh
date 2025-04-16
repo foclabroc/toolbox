@@ -81,6 +81,10 @@ afficher_barre_progression() {
 
         wait $PID_CURL
 
+        for i in {61..70..1}; do
+            echo "$i"; sleep 0.1
+        done
+
         if [ -n "$URL_TELECHARGEMENT_KEY" ]; then
             curl -L --progress-bar "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" > /dev/null 2>&1
             echo "70"; sleep 0.3
