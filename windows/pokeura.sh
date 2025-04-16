@@ -46,20 +46,37 @@ CUSTOM_SH="/userdata/system/custom.sh"
 # Fonction de chargement
 afficher_barre_progression() {
     (
-        echo "10"; sleep 0.5
+        echo "0"; sleep 0.2
+        echo "5 - Création du dossier d'installation..."
         mkdir -p "$WIN_DIR"
-        echo "20"; sleep 0.5
-        curl -L --progress-bar "$URL_TELECHARGEMENT" -o "$WIN_DIR/$GAME_FILE" > /dev/null 2>&1
-        echo "60"; sleep 0.5
+        echo "10"; sleep 0.2
+        echo "15 - Téléchargement de $GAME_FILE..."
+
+        curl -L "$URL_TELECHARGEMENT" -o "$WIN_DIR/$GAME_FILE" 2>&1 | \
+        grep --line-buffered "%" | \
+        sed -u -e "s/\r//g" | \
+        awk '{ 
+            match($0, /([0-9]+)%/, m); 
+            if (m[1] != "") { print m[1] } 
+        }'
+
         if [ -n "$URL_TELECHARGEMENT_KEY" ]; then
-            curl -L --progress-bar "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" > /dev/null 2>&1
-            echo "70"; sleep 0.5
+            echo "85 - Téléchargement des clés..."
+
+            curl -L "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" 2>&1 | \
+            grep --line-buffered "%" | \
+            sed -u -e "s/\r//g" | \
+            awk '{ 
+                match($0, /([0-9]+)%/, m); 
+                if (m[1] != "") { print int(85 + (m[1] * 0.15)) } 
+            }'
         fi
-        echo "80"; sleep 0.5
-        echo "90"; sleep 0.5
-        echo "100"; sleep 0.5
+
+        echo "100 - Terminé"
     ) |
-    dialog --backtitle "Foclabroc Toolbox" --title "Installation de $GAME_NAME" --gauge "\nTéléchargement et installation de $GAME_NAME en cours..." 9 60 0 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" \
+           --title "Installation de $GAME_NAME" \
+           --gauge "\nTéléchargement et installation de $GAME_NAME en cours..." 10 60 0
 }
 
 # Fonction edit gamelist
