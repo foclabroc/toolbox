@@ -46,7 +46,13 @@ CUSTOM_SH="/userdata/system/custom.sh"
 # Fonction de chargement
 afficher_barre_progression() {
     TMP_FILE=$(mktemp)
+
     FILE_PATH="$WIN_DIR/$GAME_FILE"
+    # Vérification et suppression du fichier s'il existe déjà
+    if [ -f "$FILE_PATH" ]; then
+        rm -f "$FILE_PATH"
+        echo "Fichier existant supprimé : $FILE_PATH"
+    fi
 
     (
         echo "10"; sleep 0.5
@@ -61,30 +67,18 @@ afficher_barre_progression() {
         PID_CURL=$!
 
         # Affichage de la progression
-        LAST_PROGRESS=20  # Démarre à 20 pour éviter retour arrière
-
         while kill -0 $PID_CURL 2>/dev/null; do
             if [ -f "$FILE_PATH" ]; then
                 CURRENT_SIZE=$(stat -c%s "$FILE_PATH" 2>/dev/null)
                 if [ -n "$FILE_SIZE" ] && [ "$FILE_SIZE" -gt 0 ]; then
-                    PROGRESS=$(( CURRENT_SIZE * 40 / FILE_SIZE ))  # de 0 à 40
-                    PERCENT=$(( 20 + PROGRESS ))                   # de 20 à 60
-                    if [ "$PERCENT" -gt "$LAST_PROGRESS" ]; then
-                        echo "$PERCENT"
-                        LAST_PROGRESS=$PERCENT
-                    fi
+                    PROGRESS=$(( CURRENT_SIZE * 40 / FILE_SIZE )) # progression de 20 à 60
+                    echo $(( 20 + PROGRESS ))
                 fi
             fi
             sleep 0.2
         done
 
         wait $PID_CURL
-
-        # S'assurer qu'on atteint 60 si le téléchargement est terminé trop vite
-        if [ "$LAST_PROGRESS" -lt 60 ]; then
-            echo "60"
-            sleep 0.2
-        fi
 
         if [ -n "$URL_TELECHARGEMENT_KEY" ]; then
             curl -L --progress-bar "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" > /dev/null 2>&1
