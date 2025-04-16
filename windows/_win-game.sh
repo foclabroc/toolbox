@@ -13,6 +13,9 @@ jeux["->TMNT Rescue Palooza"]="TMNT: Rescue-Palooza est un jeu de beat-em-up gra
 jeux["->Spelunky"]="Spelunky jeu de plates-formes en deux dimensions. Le joueur incarne un spéléologue.(24.2MB)"
 jeux["->Sonic Triple Trouble"]="Sonic Triple Touble un fangame du jeu Game Gear Sonic Triple Trouble.(115MB)"
 jeux["->Pokemon Uranium"]="Fangame basé sur les series pokemon.(332MB)"
+jeux["->MiniDoom 2"]="Le jeu hommage qui transforme DOOM en un jeu de plateforme d'action.(114MB)"
+
+
 
 while true; do
     # Construction dynamique du menu trié alphabétiquement par clé
@@ -62,6 +65,9 @@ while true; do
                 ;;
             "->Pokemon Uranium")
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/pokeura.sh | bash
+                ;;
+            "->MiniDoom 2")
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/minidoom2.sh | bash
                 ;;
         esac
         sleep 2
