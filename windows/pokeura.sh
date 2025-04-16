@@ -51,6 +51,7 @@ afficher_barre_progression() {
 
     (
         echo "10"; sleep 0.5
+        echo "15"; sleep 0.5
         mkdir -p "$WIN_DIR"
         echo "20"; sleep 0.5
 
@@ -74,8 +75,6 @@ afficher_barre_progression() {
         done
 
         wait $PID_CURL
-        sleep 1
-        echo "60"; sleep 0.5
 
         if [ -n "$URL_TELECHARGEMENT_KEY" ]; then
             curl -L --progress-bar "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" > /dev/null 2>&1
@@ -83,7 +82,9 @@ afficher_barre_progression() {
         fi
 
         echo "80"; sleep 0.5
+        echo "85"; sleep 0.5
         echo "90"; sleep 0.5
+        echo "95"; sleep 0.5
         echo "100"; sleep 0.5
     ) |
     dialog --backtitle "Foclabroc Toolbox" \
