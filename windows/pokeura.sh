@@ -46,71 +46,20 @@ CUSTOM_SH="/userdata/system/custom.sh"
 # Fonction de chargement
 afficher_barre_progression() {
     (
-        echo "0" ; echo "Initialisation..." 2>&1 >/dev/tty
-        sleep 0.5
-        echo "5" ; echo "Création du dossier d'installation..." 2>&1 >/dev/tty
+        echo "10"; sleep 0.5
         mkdir -p "$WIN_DIR"
-        sleep 0.5
-
-        # Calcul de la taille du fichier à télécharger
-        REAL_SIZE=$(wget --spider --server-response "$URL_TELECHARGEMENT" 2>&1 | \
-            awk '/Content-Length/ {print $2}' | tail -1)
-
-        if [ -z "$REAL_SIZE" ]; then
-            REAL_SIZE=$((10 * 1024 * 1024))  # Estimation de 10 Mo
-        fi
-
-        CURRENT_SIZE=0
-
-        # Affichage de la première étape de téléchargement
-        echo "15"; echo "Téléchargement de $GAME_NAME... 0%" 2>&1 >/dev/tty
-
-        # Téléchargement du fichier principal
-        wget "$URL_TELECHARGEMENT" -O "$WIN_DIR/$GAME_FILE" --progress=dot:mega 2>&1 >/dev/tty | \
-        stdbuf -oL grep --line-buffered '\.' | \
-        while read line; do
-            CURRENT_SIZE=$((CURRENT_SIZE + 102400))  # Chaque point ≈ 100 Ko
-
-            PERCENTAGE=$(( (CURRENT_SIZE * 55) / REAL_SIZE + 15 )) # Progression du fichier
-            if [ "$PERCENTAGE" -gt 70 ]; then
-                PERCENTAGE=70
-            fi
-
-            # Mise à jour de la jauge et du texte
-            echo "$PERCENTAGE"; echo "Téléchargement de $GAME_NAME... ($PERCENTAGE%)" 2>&1 >/dev/tty
-        done
-
+        echo "20"; sleep 0.5
+        curl -L --progress-bar "$URL_TELECHARGEMENT" -o "$WIN_DIR/$GAME_FILE" > /dev/null 2>&1
+        echo "60"; sleep 0.5
         if [ -n "$URL_TELECHARGEMENT_KEY" ]; then
-            echo "70"; echo "Téléchargement des clés..." 2>&1 >/dev/tty
-
-            # Taille des clés
-            REAL_KEYS_SIZE=$(wget --spider --server-response "$URL_TELECHARGEMENT_KEY" 2>&1 | \
-                awk '/Content-Length/ {print $2}' | tail -1)
-
-            if [ -z "$REAL_KEYS_SIZE" ]; then
-                REAL_KEYS_SIZE=$((1 * 1024 * 1024))  # Estimation de 1 Mo pour les clés
-            fi
-
-            CURRENT_KEYS_SIZE=0
-            wget "$URL_TELECHARGEMENT_KEY" -O "$WIN_DIR/${GAME_FILE}.keys" --progress=dot:mega 2>&1 >/dev/tty | \
-            stdbuf -oL grep --line-buffered '\.' | \
-            while read line; do
-                CURRENT_KEYS_SIZE=$((CURRENT_KEYS_SIZE + 102400))  # Chaque point ≈ 100 Ko
-
-                PERCENTAGE_KEYS=$(( (CURRENT_KEYS_SIZE * 30) / REAL_KEYS_SIZE + 70 )) # Progression des clés
-                if [ "$PERCENTAGE_KEYS" -gt 100 ]; then
-                    PERCENTAGE_KEYS=100
-                fi
-
-                # Mise à jour de la jauge et du texte pour les clés
-                echo "$PERCENTAGE_KEYS"; echo "Téléchargement des clés... ($PERCENTAGE_KEYS%)" 2>&1 >/dev/tty
-            done
+            curl -L --progress-bar "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" > /dev/null 2>&1
+            echo "70"; sleep 0.5
         fi
-
-        echo "100"; echo "Installation terminée !" 2>&1 >/dev/tty
-    ) | dialog --backtitle "Foclabroc Toolbox" \
-               --title "Installation de $GAME_NAME" \
-               --gauge "" 13 60 0 2>&1 >/dev/tty
+        echo "80"; sleep 0.5
+        echo "90"; sleep 0.5
+        echo "100"; sleep 0.5
+    ) |
+    dialog --backtitle "Foclabroc Toolbox" --title "Installation de $GAME_NAME" --gauge "\nTéléchargement et installation de $GAME_NAME en cours..." 9 60 0 2>&1 >/dev/tty
 }
 
 # Fonction edit gamelist
