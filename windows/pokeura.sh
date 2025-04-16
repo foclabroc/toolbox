@@ -55,8 +55,9 @@ afficher_barre_progression() {
     fi
 
     (
-        echo "10"; sleep 0.5
-        echo "15"; sleep 0.5
+        for i in {5..19..1}; do
+            echo "$i"; sleep 0.1
+        done
         mkdir -p "$WIN_DIR"
 
         # Récupération de la taille totale du fichier
@@ -82,14 +83,12 @@ afficher_barre_progression() {
 
         if [ -n "$URL_TELECHARGEMENT_KEY" ]; then
             curl -L --progress-bar "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" > /dev/null 2>&1
-            echo "70"; sleep 0.5
+            echo "70"; sleep 0.3
         fi
 
-        echo "80"; sleep 0.5
-        echo "85"; sleep 0.5
-        echo "90"; sleep 0.5
-        echo "95"; sleep 0.5
-        echo "100"; sleep 0.5
+        for i in {71..100..1}; do
+            echo "$i"; sleep 0.1
+        done
     ) |
     dialog --backtitle "Foclabroc Toolbox" \
            --title "Installation de $GAME_NAME" \
