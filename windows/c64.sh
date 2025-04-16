@@ -45,43 +45,88 @@ CUSTOM_SH="/userdata/system/custom.sh"
 
 # Fonction de chargement
 afficher_barre_progression() {
+    TMP_FILE=$(mktemp)
+
+    FILE_PATH="$WIN_DIR/$GAME_FILE"
+    # Vérification et suppression du fichier s'il existe déjà
+    if [ -f "$FILE_PATH" ]; then
+        rm -f "$FILE_PATH"
+        echo "Fichier existant supprimé : $FILE_PATH"
+    fi
+
     (
-        echo "10"; sleep 0.5
+        for i in {5..19..1}; do
+            echo "$i"; sleep 0.1
+        done
         mkdir -p "$WIN_DIR"
-        echo "20"; sleep 0.5
-        curl -L --progress-bar "$URL_TELECHARGEMENT" -o "$WIN_DIR/$GAME_FILE" > /dev/null 2>&1
-        echo "60"; sleep 0.5
+
+        # Récupération de la taille totale du fichier
+        FILE_SIZE=$(curl -sIL "$URL_TELECHARGEMENT" | grep -i Content-Length | tail -1 | awk '{print $2}' | tr -d '\r')
+
+        # Téléchargement réel avec suivi des redirections
+        curl -sL "$URL_TELECHARGEMENT" -o "$FILE_PATH" &
+        PID_CURL=$!
+
+        # Affichage de la progression
+        while kill -0 $PID_CURL 2>/dev/null; do
+            if [ -f "$FILE_PATH" ]; then
+                CURRENT_SIZE=$(stat -c%s "$FILE_PATH" 2>/dev/null)
+                if [ -n "$FILE_SIZE" ] && [ "$FILE_SIZE" -gt 0 ]; then
+                    PROGRESS=$(( CURRENT_SIZE * 40 / FILE_SIZE )) # progression de 20 à 60
+                    echo $(( 20 + PROGRESS ))
+                fi
+            fi
+            sleep 0.2
+        done
+
+        wait $PID_CURL
+
+        for i in {61..70..1}; do
+            echo "$i"; sleep 0.1
+        done
+
         if [ -n "$URL_TELECHARGEMENT_KEY" ]; then
             curl -L --progress-bar "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" > /dev/null 2>&1
-            echo "70"; sleep 0.5
+            echo "70"; sleep 0.3
         fi
-        echo "80"; sleep 0.5
-        echo "90"; sleep 0.5
-        echo "100"; sleep 0.5
+
+        for i in {71..100..1}; do
+            echo "$i"; sleep 0.1
+        done
     ) |
-    dialog --backtitle "Foclabroc Toolbox" --title "Installation de $GAME_NAME" --gauge "\nTéléchargement et installation de $GAME_NAME en cours..." 8 60 0 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" \
+           --title "Installation de $GAME_NAME" \
+           --gauge "\nTéléchargement et installation de $GAME_NAME en cours..." 9 60 0 \
+           2>&1 >/dev/tty
+
+    rm -f "$TMP_FILE"
 }
+
 
 # Fonction edit gamelist
 ajouter_entree_gamelist() {
     (
-        echo "5"; sleep 0.3
+        for i in {1..50..2}; do
+            echo "$i"; sleep 0.1
+        done
         mkdir -p "$IMAGE_DIR"
         mkdir -p "$VIDEO_DIR"
-        echo "10"; sleep 0.3
         curl -s -L -o "$WHEEL" "$IMAGE_BASE_URL/$GIT_NAME-w.png"
-        echo "30"; sleep 0.3
+        echo "51"; sleep 0.1
         curl -s -L -o "$SCREENSHOT" "$IMAGE_BASE_URL/$GIT_NAME-s.png"
-        echo "50"; sleep 0.3
+        echo "52"; sleep 0.1
         curl -s -L -o "$THUMBNAIL" "$IMAGE_BASE_URL/$GIT_NAME-b.png"
+        echo "53"; sleep 0.1
         curl -s -L -o "$VIDEO" "$IMAGE_BASE_URL/$GIT_NAME-v.mp4"
-        echo "60"; sleep 0.3
+        for i in {54..64..2}; do
+            echo "$i"; sleep 0.1
+        done
 
         if [ ! -f "$GAMELIST_FILE" ]; then
             echo '<?xml version="1.0" encoding="UTF-8"?><gameList></gameList>' > "$GAMELIST_FILE"
         fi
 
-        echo "65"; sleep 0.3
+        echo "65"; sleep 0.1
 
         if [ ! -f "$XMLSTARLET_BIN" ]; then
             mkdir -p "$XMLSTARLET_DIR"
@@ -97,7 +142,9 @@ ajouter_entree_gamelist() {
             fi
         fi
 
-        echo "80"; sleep 0.3
+        for i in {66..94..2}; do
+            echo "$i"; sleep 0.1
+        done
 
         xmlstarlet ed -L \
             -s "/gameList" -t elem -n "game" -v "" \
@@ -116,10 +163,11 @@ ajouter_entree_gamelist() {
             -s "/gameList/game[last()]" -t elem -n "region" -v "$REGION" \
             "$GAMELIST_FILE"
 
-        echo "95"; sleep 0.3
-
+        for i in {95..99..2}; do
+            echo "$i"; sleep 0.1
+        done
         curl -s http://127.0.0.1:1234/reloadgames
-        echo "100"; sleep 0.3
+        echo "100"; sleep 0.2
     ) |
     dialog --backtitle "Foclabroc Toolbox" --title "Edition du gamelist" --gauge "\nAjout images et video au gamelist windows..." 8 60 0 2>&1 >/dev/tty
 }
