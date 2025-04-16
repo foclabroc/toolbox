@@ -172,7 +172,7 @@ main_menu() {
             6 "[Jeux Pc]         -> Téléchargement de Jeux Windows et linux..." \
             7 "[Wine Toolbox]    -> Téléchargement de Runner Wine et outils wsquash..." \
             8 "[Tools]           -> Outils pour Batocera version light. (Plus d'options dispo via ssh)" \
-            9 "Exit              -> Quitter le script" \
+            9 "[Exit]            -> Quitter le script" \
             2>&1 >/dev/tty)
         clear
 
