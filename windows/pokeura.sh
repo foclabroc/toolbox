@@ -54,13 +54,15 @@ afficher_barre_progression() {
         echo "15"; echo "Téléchargement de $GAME_FILE..."
 
         curl -L "$URL_TELECHARGEMENT" -o "$WIN_DIR/$GAME_FILE" 2>&1 | \
-        grep --line-buffered "%" | \
+        stdbuf -oL grep --line-buffered "%" | \
         sed -u -e "s/\r//g" | \
         awk '{
-            match($0, /([0-9]+)%/, m);
-            if (m[1] != "") {
-                p = int(15 + (m[1] * 0.55 / 100));
+            if (match($0, /([0-9]+)%/, m)) {
+                pourcent = m[1];
+                # On mappe 0-100 => 15-70
+                p = int(15 + (pourcent * 0.55));
                 print p; print "Téléchargement de " ENVIRON["GAME_NAME"] "...";
+                fflush();
             }
         }'
 
@@ -68,19 +70,20 @@ afficher_barre_progression() {
             echo "70"; echo "Téléchargement des clés..."
 
             curl -L "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" 2>&1 | \
-            grep --line-buffered "%" | \
+            stdbuf -oL grep --line-buffered "%" | \
             sed -u -e "s/\r//g" | \
             awk '{
-                match($0, /([0-9]+)%/, m);
-                if (m[1] != "") {
-                    p = int(70 + (m[1] * 0.30 / 100));
+                if (match($0, /([0-9]+)%/, m)) {
+                    pourcent = m[1];
+                    # On mappe 0-100 => 70-100
+                    p = int(70 + (pourcent * 0.30));
                     print p; print "Téléchargement des clés...";
+                    fflush();
                 }
             }'
         fi
 
         echo "100"; echo "Installation terminée !"
-
     ) | dialog --backtitle "Foclabroc Toolbox" \
                --title "Installation de $GAME_NAME" \
                --gauge "" 10 60 0 2>&1 >/dev/tty
