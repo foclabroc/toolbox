@@ -53,7 +53,6 @@ afficher_barre_progression() {
         echo "10"; sleep 0.5
         echo "15"; sleep 0.5
         mkdir -p "$WIN_DIR"
-        echo "20"; sleep 0.5
 
         # Récupération de la taille totale du fichier
         FILE_SIZE=$(curl -sIL "$URL_TELECHARGEMENT" | grep -i Content-Length | tail -1 | awk '{print $2}' | tr -d '\r')
