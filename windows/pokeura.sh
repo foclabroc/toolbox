@@ -45,30 +45,45 @@ CUSTOM_SH="/userdata/system/custom.sh"
 
 # Fonction de chargement
 afficher_barre_progression() {
-    (
-        echo "5"; sleep 0.3
-        mkdir -p "$WIN_DIR"
-        echo "15"; sleep 0.3
+    TMP_LOG=$(mktemp)
 
-        echo "20"; echo "# Téléchargement du jeu..."
-        curl -L --progress-bar "$URL_TELECHARGEMENT" -o "$WIN_DIR/$GAME_FILE" > /dev/null 2>&1
-        echo "60"; sleep 0.3
+    (
+        echo "10"; sleep 0.5
+        mkdir -p "$WIN_DIR"
+        echo "20"; sleep 0.5
+
+        # Lancement du téléchargement avec progression réelle
+        curl -L --progress-bar "$URL_TELECHARGEMENT" -o "$WIN_DIR/$GAME_FILE" 2> "$TMP_LOG" &
+        PID_CURL=$!
+
+        # Lecture de la progression pendant le téléchargement
+        while kill -0 $PID_CURL 2>/dev/null; do
+            PROGRESS=$(grep -o '[0-9]\{1,3\}%' "$TMP_LOG" | tail -1 | tr -d '%')
+            if [ -n "$PROGRESS" ]; then
+                echo "$(( 20 + PROGRESS * 40 / 100 ))"  # de 20 à 60 %
+            fi
+            sleep 0.2
+        done
+
+        wait $PID_CURL
+        echo "60"; sleep 0.5
 
         if [ -n "$URL_TELECHARGEMENT_KEY" ]; then
-            echo "65"; echo "# Téléchargement de la clé..."
             curl -L --progress-bar "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" > /dev/null 2>&1
-            echo "75"; sleep 0.3
+            echo "70"; sleep 0.5
         fi
 
-        echo "85"; echo "# Finalisation..."
-        sleep 0.3
-        echo "100"; echo "# Installation terminée !"
-        sleep 0.5
-    ) | dialog --backtitle "Foclabroc Toolbox" \
-               --title "Installation de $GAME_NAME" \
-               --gauge "\nTéléchargement et installation de $GAME_NAME en cours..." 10 60 0 2>&1 >/dev/tty
-}
+        echo "80"; sleep 0.5
+        echo "90"; sleep 0.5
+        echo "100"; sleep 0.5
+    ) |
+    dialog --backtitle "Foclabroc Toolbox" \
+           --title "Installation de $GAME_NAME" \
+           --gauge "\nTéléchargement et installation de $GAME_NAME en cours..." 9 60 0 \
+           2>&1 >/dev/tty
 
+    rm -f "$TMP_LOG"
+}
 
 # Fonction edit gamelist
 ajouter_entree_gamelist() {
