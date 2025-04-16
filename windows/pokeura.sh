@@ -102,23 +102,22 @@ afficher_barre_progression() {
 # Fonction edit gamelist
 ajouter_entree_gamelist() {
     (
-        echo "5"; sleep 0.3
+        for i in {1..60..2}; do
+            echo "$i"; sleep 0.1
+        done
         mkdir -p "$IMAGE_DIR"
         mkdir -p "$VIDEO_DIR"
-        echo "10"; sleep 0.3
         curl -s -L -o "$WHEEL" "$IMAGE_BASE_URL/$GIT_NAME-w.png"
-        echo "30"; sleep 0.3
         curl -s -L -o "$SCREENSHOT" "$IMAGE_BASE_URL/$GIT_NAME-s.png"
-        echo "50"; sleep 0.3
         curl -s -L -o "$THUMBNAIL" "$IMAGE_BASE_URL/$GIT_NAME-b.png"
         curl -s -L -o "$VIDEO" "$IMAGE_BASE_URL/$GIT_NAME-v.mp4"
-        echo "60"; sleep 0.3
+        echo "61"; sleep 0.1
 
         if [ ! -f "$GAMELIST_FILE" ]; then
             echo '<?xml version="1.0" encoding="UTF-8"?><gameList></gameList>' > "$GAMELIST_FILE"
         fi
 
-        echo "65"; sleep 0.3
+        echo "65"; sleep 0.1
 
         if [ ! -f "$XMLSTARLET_BIN" ]; then
             mkdir -p "$XMLSTARLET_DIR"
@@ -134,7 +133,9 @@ ajouter_entree_gamelist() {
             fi
         fi
 
-        echo "80"; sleep 0.3
+        for i in {66..94..2}; do
+            echo "$i"; sleep 0.1
+        done
 
         xmlstarlet ed -L \
             -s "/gameList" -t elem -n "game" -v "" \
@@ -153,10 +154,11 @@ ajouter_entree_gamelist() {
             -s "/gameList/game[last()]" -t elem -n "region" -v "$REGION" \
             "$GAMELIST_FILE"
 
-        echo "95"; sleep 0.3
-
+        for i in {95..99..2}; do
+            echo "$i"; sleep 0.1
+        done
         curl -s http://127.0.0.1:1234/reloadgames
-        echo "100"; sleep 0.3
+        echo "100"; sleep 0.2
     ) |
     dialog --backtitle "Foclabroc Toolbox" --title "Edition du gamelist" --gauge "\nAjout images et video au gamelist windows..." 8 60 0 2>&1 >/dev/tty
 }
