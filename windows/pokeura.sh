@@ -102,16 +102,21 @@ afficher_barre_progression() {
 # Fonction edit gamelist
 ajouter_entree_gamelist() {
     (
-        for i in {1..60..2}; do
+        for i in {1..50..2}; do
             echo "$i"; sleep 0.1
         done
         mkdir -p "$IMAGE_DIR"
         mkdir -p "$VIDEO_DIR"
         curl -s -L -o "$WHEEL" "$IMAGE_BASE_URL/$GIT_NAME-w.png"
+        echo "51"; sleep 0.1
         curl -s -L -o "$SCREENSHOT" "$IMAGE_BASE_URL/$GIT_NAME-s.png"
+        echo "52"; sleep 0.1
         curl -s -L -o "$THUMBNAIL" "$IMAGE_BASE_URL/$GIT_NAME-b.png"
+        echo "53"; sleep 0.1
         curl -s -L -o "$VIDEO" "$IMAGE_BASE_URL/$GIT_NAME-v.mp4"
-        echo "61"; sleep 0.1
+        for i in {54..64..2}; do
+            echo "$i"; sleep 0.1
+        done
 
         if [ ! -f "$GAMELIST_FILE" ]; then
             echo '<?xml version="1.0" encoding="UTF-8"?><gameList></gameList>' > "$GAMELIST_FILE"
