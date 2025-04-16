@@ -25,7 +25,7 @@ while true; do
     # Affichage du menu principal
     choix=$(dialog --clear --backtitle "Foclabroc Toolbox" \
         --title "Jeux disponibles" \
-        --menu "\nSélectionnez un jeu à installer :\n " 20 120 10 \
+        --menu "\nSélectionnez un jeu à installer :\n " 20 124 10 \
         "${menu_entries[@]}" \
         2>&1 >/dev/tty)
 
