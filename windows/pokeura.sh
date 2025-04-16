@@ -46,38 +46,48 @@ CUSTOM_SH="/userdata/system/custom.sh"
 # Fonction de chargement
 afficher_barre_progression() {
     (
-        echo "0"; sleep 0.2
+        echo "0 - Initialisation..."
+        sleep 0.2
         echo "5 - Création du dossier d'installation..."
         mkdir -p "$WIN_DIR"
-        echo "10"; sleep 0.2
+        sleep 0.2
         echo "15 - Téléchargement de $GAME_FILE..."
 
         curl -L "$URL_TELECHARGEMENT" -o "$WIN_DIR/$GAME_FILE" 2>&1 | \
         grep --line-buffered "%" | \
         sed -u -e "s/\r//g" | \
-        awk '{ 
-            match($0, /([0-9]+)%/, m); 
-            if (m[1] != "") { print m[1] } 
+        awk '{
+            match($0, /([0-9]+)%/, m);
+            if (m[1] != "") {
+                # Interpolation de 15% à 70%
+                p = int(15 + (m[1] * 0.55 / 100));
+                print p " - Téléchargement de " ENVIRON["GAME_NAME"] "...";
+            }
         }'
 
         if [ -n "$URL_TELECHARGEMENT_KEY" ]; then
-            echo "85 - Téléchargement des clés..."
+            echo "70 - Téléchargement des clés..."
 
             curl -L "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" 2>&1 | \
             grep --line-buffered "%" | \
             sed -u -e "s/\r//g" | \
-            awk '{ 
-                match($0, /([0-9]+)%/, m); 
-                if (m[1] != "") { print int(85 + (m[1] * 0.15)) } 
+            awk '{
+                match($0, /([0-9]+)%/, m);
+                if (m[1] != "") {
+                    # Interpolation de 70% à 100%
+                    p = int(70 + (m[1] * 0.30 / 100));
+                    print p " - Téléchargement des clés...";
+                }
             }'
+        else
+            echo "100 - Terminé."
         fi
 
-        echo "100 - Terminé"
-    ) |
-    dialog --backtitle "Foclabroc Toolbox" \
-           --title "Installation de $GAME_NAME" \
-           --gauge "\nTéléchargement et installation de $GAME_NAME en cours..." 10 60 0
+    ) | dialog --backtitle "Foclabroc Toolbox" \
+               --title "Installation de $GAME_NAME" \
+               --gauge "\nTéléchargement et installation de $GAME_NAME en cours..." 10 60 0
 }
+
 
 # Fonction edit gamelist
 ajouter_entree_gamelist() {
