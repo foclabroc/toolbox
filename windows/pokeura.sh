@@ -46,12 +46,12 @@ CUSTOM_SH="/userdata/system/custom.sh"
 # Fonction de chargement
 afficher_barre_progression() {
     (
-        echo "0 - Initialisation..."
+        echo "0"; echo "Initialisation..."
         sleep 0.2
-        echo "5 - Création du dossier d'installation..."
+        echo "5"; echo "Création du dossier d'installation..."
         mkdir -p "$WIN_DIR"
         sleep 0.2
-        echo "15 - Téléchargement de $GAME_FILE..."
+        echo "15"; echo "Téléchargement de $GAME_FILE..."
 
         curl -L "$URL_TELECHARGEMENT" -o "$WIN_DIR/$GAME_FILE" 2>&1 | \
         grep --line-buffered "%" | \
@@ -59,14 +59,13 @@ afficher_barre_progression() {
         awk '{
             match($0, /([0-9]+)%/, m);
             if (m[1] != "") {
-                # Interpolation de 15% à 70%
                 p = int(15 + (m[1] * 0.55 / 100));
-                print p " - Téléchargement de " ENVIRON["GAME_NAME"] "...";
+                print p; print "Téléchargement de " ENVIRON["GAME_NAME"] "...";
             }
         }'
 
         if [ -n "$URL_TELECHARGEMENT_KEY" ]; then
-            echo "70 - Téléchargement des clés..."
+            echo "70"; echo "Téléchargement des clés..."
 
             curl -L "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" 2>&1 | \
             grep --line-buffered "%" | \
@@ -74,20 +73,18 @@ afficher_barre_progression() {
             awk '{
                 match($0, /([0-9]+)%/, m);
                 if (m[1] != "") {
-                    # Interpolation de 70% à 100%
                     p = int(70 + (m[1] * 0.30 / 100));
-                    print p " - Téléchargement des clés...";
+                    print p; print "Téléchargement des clés...";
                 }
             }'
-        else
-            echo "100 - Terminé."
         fi
+
+        echo "100"; echo "Installation terminée !"
 
     ) | dialog --backtitle "Foclabroc Toolbox" \
                --title "Installation de $GAME_NAME" \
-               --gauge "\nTéléchargement et installation de $GAME_NAME en cours..." 10 60 0
+               --gauge "" 10 60 0 2>&1 >/dev/tty
 }
-
 
 # Fonction edit gamelist
 ajouter_entree_gamelist() {
