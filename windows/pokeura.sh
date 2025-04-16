@@ -46,29 +46,31 @@ CUSTOM_SH="/userdata/system/custom.sh"
 # Fonction de chargement
 afficher_barre_progression() {
     TMP_FILE=$(mktemp)
-
     FILE_PATH="$WIN_DIR/$GAME_FILE"
 
     (
         echo "10"; sleep 0.5
-        echo "15"; sleep 0.5
         mkdir -p "$WIN_DIR"
         echo "20"; sleep 0.5
 
-        # Récupération de la taille totale du fichier
+        # Récupérer la taille totale du fichier à télécharger
         FILE_SIZE=$(curl -sIL "$URL_TELECHARGEMENT" | grep -i Content-Length | tail -1 | awk '{print $2}' | tr -d '\r')
 
-        # Téléchargement réel avec suivi des redirections
+        # Téléchargement en tâche de fond
         curl -sL "$URL_TELECHARGEMENT" -o "$FILE_PATH" &
         PID_CURL=$!
 
-        # Affichage de la progression
         while kill -0 $PID_CURL 2>/dev/null; do
             if [ -f "$FILE_PATH" ]; then
                 CURRENT_SIZE=$(stat -c%s "$FILE_PATH" 2>/dev/null)
                 if [ -n "$FILE_SIZE" ] && [ "$FILE_SIZE" -gt 0 ]; then
-                    PROGRESS=$(( CURRENT_SIZE * 40 / FILE_SIZE )) # progression de 20 à 60
-                    echo $(( 20 + PROGRESS ))
+                    # Calcul de la progression de 20 à 60
+                    PROGRESS=$(( CURRENT_SIZE * 40 / FILE_SIZE ))  # de 20 à 60
+                    PROGRESS=$(( 20 + PROGRESS ))  # Démarrer à 20%
+                    if [ "$PROGRESS" -gt 60 ]; then
+                        PROGRESS=60  # Ne pas dépasser 60%
+                    fi
+                    echo "$PROGRESS"
                 fi
             fi
             sleep 0.2
