@@ -14,7 +14,7 @@ jeux["->Spelunky"]="Spelunky jeu de plates-formes en deux dimensions. Le joueur 
 jeux["->Sonic Triple Trouble"]="Sonic Triple Touble un fangame du jeu Game Gear Sonic Triple Trouble.(115MB)"
 jeux["->Pokemon Uranium"]="Fangame basé sur les series pokemon.(332MB)"
 jeux["->MiniDoom 2"]="Le jeu hommage qui transforme DOOM en un jeu de plateforme d'action.(114MB)"
-
+jeux["->AM2R"]="Another Metroid 2 Remake, remake non officiel du jeu Game Boy de 1991 Metroid II.(85.6MB)"
 
 
 while true; do
@@ -68,6 +68,9 @@ while true; do
                 ;;
             "->MiniDoom 2")
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/minidoom2.sh | bash
+                ;;
+            "->AM2R")
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/am2r.sh | bash
                 ;;
         esac
         sleep 2
