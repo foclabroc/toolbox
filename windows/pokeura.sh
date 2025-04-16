@@ -74,6 +74,7 @@ afficher_barre_progression() {
         done
 
         wait $PID_CURL
+        sleep 1
         echo "60"; sleep 0.5
 
         if [ -n "$URL_TELECHARGEMENT_KEY" ]; then
