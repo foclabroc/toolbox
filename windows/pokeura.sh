@@ -46,61 +46,62 @@ CUSTOM_SH="/userdata/system/custom.sh"
 # Fonction de chargement
 afficher_barre_progression() {
     (
-        echo "0"; echo "Initialisation..."
+        echo "0" ; echo "Initialisation..."
         sleep 0.5
-        echo "5"; echo "Création du dossier d'installation..."
+        echo "5" ; echo "Création du dossier d'installation..."
         mkdir -p "$WIN_DIR"
         sleep 0.5
 
-        echo "15"; echo "Téléchargement de $GAME_FILE..."
-
-        # Détection de la taille réelle du fichier
+        # Calcul de la taille du fichier à télécharger
         REAL_SIZE=$(wget --spider --server-response "$URL_TELECHARGEMENT" 2>&1 | \
-          awk '/Content-Length/ {print $2}' | tail -1)
+            awk '/Content-Length/ {print $2}' | tail -1)
 
-        # Si la taille n'est pas disponible, on met une estimation de 10 Mo
         if [ -z "$REAL_SIZE" ]; then
-            REAL_SIZE=$((10 * 1024 * 1024)) # Estimation 10 Mo
+            REAL_SIZE=$((10 * 1024 * 1024))  # Estimation de 10 Mo
         fi
 
         CURRENT_SIZE=0
 
+        echo "15"; echo "Téléchargement de $GAME_NAME... 0%"
+
+        # Téléchargement du fichier principal
         wget "$URL_TELECHARGEMENT" -O "$WIN_DIR/$GAME_FILE" --progress=dot:mega 2>&1 | \
         stdbuf -oL grep --line-buffered '\.' | \
         while read line; do
-            # Comptabilisation de la taille téléchargée
-            CURRENT_SIZE=$((CURRENT_SIZE + 102400))  # 100K à chaque point
-            PERCENTAGE=$(( (CURRENT_SIZE * 55) / REAL_SIZE + 15 ))
+            CURRENT_SIZE=$((CURRENT_SIZE + 102400))  # Chaque point ≈ 100 Ko
+
+            PERCENTAGE=$(( (CURRENT_SIZE * 55) / REAL_SIZE + 15 )) # Progression du fichier
             if [ "$PERCENTAGE" -gt 70 ]; then
                 PERCENTAGE=70
             fi
 
-            # Affichage de la progression avec le texte
+            # Affichage de la progression de la jauge et du texte
             echo "$PERCENTAGE"; echo "Téléchargement de $GAME_NAME... ($PERCENTAGE%)"
         done
 
         if [ -n "$URL_TELECHARGEMENT_KEY" ]; then
             echo "70"; echo "Téléchargement des clés..."
 
-            # Détection de la taille des clés
+            # Taille des clés
             REAL_KEYS_SIZE=$(wget --spider --server-response "$URL_TELECHARGEMENT_KEY" 2>&1 | \
-              awk '/Content-Length/ {print $2}' | tail -1)
+                awk '/Content-Length/ {print $2}' | tail -1)
 
-            # Si la taille n'est pas disponible, estimation de 1 Mo pour les clés
             if [ -z "$REAL_KEYS_SIZE" ]; then
-                REAL_KEYS_SIZE=$((1 * 1024 * 1024)) # Estimation 1 Mo
+                REAL_KEYS_SIZE=$((1 * 1024 * 1024))  # Estimation de 1 Mo pour les clés
             fi
 
+            CURRENT_KEYS_SIZE=0
             wget "$URL_TELECHARGEMENT_KEY" -O "$WIN_DIR/${GAME_FILE}.keys" --progress=dot:mega 2>&1 | \
             stdbuf -oL grep --line-buffered '\.' | \
             while read line; do
-                CURRENT_KEYS_SIZE=$((CURRENT_KEYS_SIZE + 102400))  # 100K à chaque point
-                PERCENTAGE_KEYS=$(( (CURRENT_KEYS_SIZE * 30) / REAL_KEYS_SIZE + 70 ))
+                CURRENT_KEYS_SIZE=$((CURRENT_KEYS_SIZE + 102400))  # Chaque point ≈ 100 Ko
+
+                PERCENTAGE_KEYS=$(( (CURRENT_KEYS_SIZE * 30) / REAL_KEYS_SIZE + 70 )) # Progression des clés
                 if [ "$PERCENTAGE_KEYS" -gt 100 ]; then
                     PERCENTAGE_KEYS=100
                 fi
 
-                # Affichage de la progression des clés avec le texte
+                # Affichage de la progression des clés et du texte
                 echo "$PERCENTAGE_KEYS"; echo "Téléchargement des clés... ($PERCENTAGE_KEYS%)"
             done
         fi
@@ -108,7 +109,7 @@ afficher_barre_progression() {
         echo "100"; echo "Installation terminée !"
     ) | dialog --backtitle "Foclabroc Toolbox" \
                --title "Installation de $GAME_NAME" \
-               --gauge "" 12 60 0
+               --gauge "" 10 60 0
 }
 
 # Fonction edit gamelist
