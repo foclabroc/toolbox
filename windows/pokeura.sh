@@ -67,14 +67,17 @@ afficher_barre_progression() {
 
         wget "$URL_TELECHARGEMENT" -O "$WIN_DIR/$GAME_FILE" --progress=dot:mega 2>&1 | \
         stdbuf -oL grep --line-buffered '\.' | \
-        awk -v total=$REAL_SIZE '
-        {
-            downloaded += 102400;  # chaque point ≈ 100K
-            percent = int(15 + (downloaded / total) * 55);
-            if (percent > 70) percent = 70;
-            print percent; print "Téléchargement de " ENVIRON["GAME_NAME"] "...";
-            fflush();
-        }'
+        while read line; do
+            # Comptabilisation de la taille téléchargée
+            CURRENT_SIZE=$((CURRENT_SIZE + 102400))  # 100K à chaque point
+            PERCENTAGE=$(( (CURRENT_SIZE * 55) / REAL_SIZE + 15 ))
+            if [ "$PERCENTAGE" -gt 70 ]; then
+                PERCENTAGE=70
+            fi
+
+            # Affichage de la progression avec le texte
+            echo "$PERCENTAGE"; echo "Téléchargement de $GAME_NAME... ($PERCENTAGE%)"
+        done
 
         if [ -n "$URL_TELECHARGEMENT_KEY" ]; then
             echo "70"; echo "Téléchargement des clés..."
@@ -90,20 +93,22 @@ afficher_barre_progression() {
 
             wget "$URL_TELECHARGEMENT_KEY" -O "$WIN_DIR/${GAME_FILE}.keys" --progress=dot:mega 2>&1 | \
             stdbuf -oL grep --line-buffered '\.' | \
-            awk -v total=$REAL_KEYS_SIZE '
-            {
-                downloaded += 102400;
-                percent = int(70 + (downloaded / total) * 30);
-                if (percent > 100) percent = 100;
-                print percent; print "Téléchargement des clés...";
-                fflush();
-            }'
+            while read line; do
+                CURRENT_KEYS_SIZE=$((CURRENT_KEYS_SIZE + 102400))  # 100K à chaque point
+                PERCENTAGE_KEYS=$(( (CURRENT_KEYS_SIZE * 30) / REAL_KEYS_SIZE + 70 ))
+                if [ "$PERCENTAGE_KEYS" -gt 100 ]; then
+                    PERCENTAGE_KEYS=100
+                fi
+
+                # Affichage de la progression des clés avec le texte
+                echo "$PERCENTAGE_KEYS"; echo "Téléchargement des clés... ($PERCENTAGE_KEYS%)"
+            done
         fi
 
         echo "100"; echo "Installation terminée !"
     ) | dialog --backtitle "Foclabroc Toolbox" \
                --title "Installation de $GAME_NAME" \
-               --gauge "" 10 60 0
+               --gauge "" 12 60 0
 }
 
 # Fonction edit gamelist
