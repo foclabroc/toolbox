@@ -72,7 +72,7 @@ while true; do
     fi
 
 # Extraire la version et l'URL
-	version=$(echo "$release_data" | jq -r ".[$choice].name" 2>/dev/null)
+	version=$(echo "$release_data" | jq -r ".[$choice].tag_name" 2>/dev/null)
 	version="Vanilla-${version}"
 	url=$(echo "$release_data" | jq -r ".[$choice].assets[] | select(.name | endswith(\"amd64.tar.xz\")).browser_download_url" | head -n1 2>/dev/null)
 
