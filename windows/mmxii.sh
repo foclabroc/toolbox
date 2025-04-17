@@ -13,6 +13,8 @@ FICHIER_ZIP=""
 PORTS_DIR="/userdata/roms/ports"
 WIN_DIR="/userdata/roms/windows"
 GAME_FILE="mmx-ii.zip"
+GAME_FILE_FINAL="mmx ii.pc"
+INFO_MESSAGE="!!!POUR JOUER EN PLEIN ECRAN ca ce passe dans les options du jeu!!!"
 ##############################################################################################################
 ##############################################################################################################
 # VARIABLES GAMELIST
@@ -154,7 +156,7 @@ ajouter_entree_gamelist() {
 
         xmlstarlet ed -L \
             -s "/gameList" -t elem -n "game" -v "" \
-            -s "/gameList/game[last()]" -t elem -n "path" -v "./$GAME_FILE" \
+            -s "/gameList/game[last()]" -t elem -n "path" -v "./$GAME_FILE_FINAL" \
             -s "/gameList/game[last()]" -t elem -n "name" -v "$GAME_NAME" \
             -s "/gameList/game[last()]" -t elem -n "desc" -v "$DESC" \
             -s "/gameList/game[last()]" -t elem -n "image" -v "./images/$GIT_NAME-s.png" \
@@ -183,5 +185,5 @@ afficher_barre_progression
 ajouter_entree_gamelist
 
 # Message de fin
-dialog --backtitle "Foclabroc Toolbox" --title "Installation terminée" --msgbox "\n$GAME_NAME a été ajouté dans windows !\n\n!!!POUR JOUER EN PLEIN ECRAN ca ce passe dans les options du jeu!!!" 11 60 2>&1 >/dev/tty
+dialog --backtitle "Foclabroc Toolbox" --title "Installation terminée" --msgbox "\n$GAME_NAME a été ajouté dans windows !\n\nPensez à mettre à jour les listes de jeux pour le voir apparaître dans le menu. $INFO_MESSAGE" 12 60 2>&1 >/dev/tty
 clear
