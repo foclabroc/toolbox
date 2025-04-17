@@ -2,7 +2,7 @@
 
 #info
 (
-  dialog --backtitle "Foclabroc Toolbox" --title "Wine-GE-Custom" --msgbox "\nInfo : les version superieur à 8.15 semblent ne pas fonctionner sous batocera" 8 60
+  dialog --backtitle "Foclabroc Toolbox" --title "Wine-GE-Custom" --msgbox "\nInfo : les version superieur à 8.15 semblent ne pas fonctionner sous batocera." 8 60
   sleep 1
 ) 2>&1 >/dev/tty
 
