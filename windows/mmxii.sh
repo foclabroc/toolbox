@@ -14,7 +14,7 @@ PORTS_DIR="/userdata/roms/ports"
 WIN_DIR="/userdata/roms/windows"
 GAME_FILE="mmx-ii.zip"
 GAME_FILE_FINAL="mmx ii.pc"
-INFO_MESSAGE="!!!POUR JOUER EN PLEIN ECRAN ca ce passe dans les options du jeu!!!"
+INFO_MESSAGE="\n!!!POUR JOUER EN PLEIN ECRAN ca ce passe dans les options du jeu!!!"
 ##############################################################################################################
 ##############################################################################################################
 # VARIABLES GAMELIST
