@@ -31,7 +31,7 @@ while true; do
     options=()
     i=1
 
-    # Construire la liste des options (index et name) avec ajout de "-staging-tkg"
+    # Construire la liste des options (index et name)
     while IFS= read -r line; do
         tag=$(echo "$line" | jq -r '.name')
         options+=("$i" "$tag")
@@ -78,8 +78,8 @@ while true; do
     fi
 
 # Extraire la version et l'URL
-	version=$(echo "$release_data" | jq -r ".[$choice-1].name" 2>/dev/null)
-	version="Ge-custom-${version}"
+	version=$(echo "$release_data" | jq -r ".[$choice-1].tag_name" 2>/dev/null)
+	version="${version}"
     url=$(echo "$release_data" | jq -r ".[$choice-1].assets[] | select(.name | endswith(\"x86_64.tar.xz\")).browser_download_url" | head -n1 2>/dev/null)
 
 # Vérifier si la version est bien récupérée

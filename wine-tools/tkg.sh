@@ -78,8 +78,8 @@ while true; do
     fi
 
 # Extraire la version et l'URL
-	version=$(echo "$release_data" | jq -r ".[$choice-1].name" 2>/dev/null)
-	version="Stag-tkg-${version}"
+	version=$(echo "$release_data" | jq -r ".[$choice-1].tag_name" 2>/dev/null)
+	version="Tkg-${version}"
     url=$(echo "$release_data" | jq -r ".[$choice-1].assets[] | select(.name | contains(\"staging-tkg\") and endswith(\"amd64.tar.xz\")).browser_download_url" | head -n1 2>/dev/null)
 
 # Vérifier si la version est bien récupérée
