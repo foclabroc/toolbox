@@ -59,40 +59,53 @@ afficher_barre_progression() {
 
     (
         for i in {5..19..1}; do
-            echo "$i"; sleep 0.1
+            echo "$i"
+            sleep 0.1
         done
+
         mkdir -p "$WIN_DIR"
+
+        START_TIME=$(date +%s)
+        CURRENT_SIZE=0
+        BLOCK_SIZE=32768 # 32 Ko
 
         # Récupération de la taille totale du fichier
         FILE_SIZE=$(curl -sIL "$URL_TELECHARGEMENT" | grep -i Content-Length | tail -1 | awk '{print $2}' | tr -d '\r')
 
-		# Téléchargement réel avec suivi des redirections
-		START_TIME=$(date +%s)
-		curl -sL "$URL_TELECHARGEMENT" -o "$FILE_PATH" &
-		PID_CURL=$!
+        # Téléchargement manuel avec lecture directe
+        exec 3<> <(curl -sL "$URL_TELECHARGEMENT")
+        > "$FILE_PATH"
 
-		# Affichage dynamique du pourcentage et de la vitesse
-		while kill -0 $PID_CURL 2>/dev/null; do
-			if [ -f "$FILE_PATH" ]; then
-				CURRENT_SIZE=$(stat -c%s "$FILE_PATH" 2>/dev/null)
-				NOW=$(date +%s)
-				ELAPSED=$((NOW - START_TIME))
-				[ "$ELAPSED" -eq 0 ] && ELAPSED=1
+        while true; do
+            read -N $BLOCK_SIZE -u 3 CHUNK
+            [ -z "$CHUNK" ] && break
 
-				if [ -n "$FILE_SIZE" ] && [ "$FILE_SIZE" -gt 0 ]; then
-					PROGRESS=$(( CURRENT_SIZE * 40 / FILE_SIZE ))
-					SPEED_KB=$(( CURRENT_SIZE / 1024 / ELAPSED ))
+            printf "%s" "$CHUNK" >> "$FILE_PATH"
+            CURRENT_SIZE=$(stat -c%s "$FILE_PATH" 2>/dev/null)
 
-					echo $(( 20 + PROGRESS ))
-					echo "XXX"
-					echo "Téléchargement de $GAME_FILE... $((CURRENT_SIZE * 100 / FILE_SIZE))% à ${SPEED_KB} Ko/s"
-					echo "XXX"
-				fi
-			fi
-			sleep 0.5
-		done
+            NOW=$(date +%s)
+            ELAPSED=$((NOW - START_TIME))
+            [ "$ELAPSED" -eq 0 ] && ELAPSED=1
 
-        wait $PID_CURL
+            if [ -n "$FILE_SIZE" ] && [ "$FILE_SIZE" -gt 0 ]; then
+                PERCENT=$(( CURRENT_SIZE * 100 / FILE_SIZE ))
+                PROGRESS=$(( CURRENT_SIZE * 40 / FILE_SIZE ))
+                SPEED_KB=$(( CURRENT_SIZE / 1024 / ELAPSED ))
+
+                if [ "$SPEED_KB" -gt 1024 ]; then
+                    SPEED_MB=$(( SPEED_KB / 1024 ))
+                    SPEED_DISPLAY="${SPEED_MB} Mo/s"
+                else
+                    SPEED_DISPLAY="${SPEED_KB} Ko/s"
+                fi
+
+                echo $((20 + PROGRESS))
+                echo "XXX"
+                echo "Téléchargement de $GAME_FILE... $PERCENT% à $SPEED_DISPLAY"
+                echo "XXX"
+            fi
+            sleep 0.1
+        done
 
         # Décompression automatique si .zip
         if [[ "$FILE_PATH" == *.zip ]]; then
@@ -101,21 +114,24 @@ afficher_barre_progression() {
         fi
 
         for i in {61..70..1}; do
-            echo "$i"; sleep 0.1
+            echo "$i"
+            sleep 0.1
         done
 
         if [ -n "$URL_TELECHARGEMENT_KEY" ]; then
             curl -L --progress-bar "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" > /dev/null 2>&1
-            echo "70"; sleep 0.3
+            echo "70"
+            sleep 0.3
         fi
 
         for i in {71..100..1}; do
-            echo "$i"; sleep 0.1
+            echo "$i"
+            sleep 0.1
         done
     ) |
     dialog --backtitle "Foclabroc Toolbox" \
            --title "Installation de $GAME_NAME" \
-           --gauge "\nTéléchargement et installation de $GAME_NAME en cours..." 9 60 0 \
+           --gauge "\nTéléchargement et installation de $GAME_NAME en cours..." 10 70 0 \
            2>&1 >/dev/tty
 
     rm -f "$TMP_FILE"
