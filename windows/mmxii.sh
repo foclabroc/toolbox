@@ -7,7 +7,7 @@ export LC_ALL=fr_FR.UTF-8
 ##############################################################################################################
 # VARIABLE DU JEU
 URL_TELECHARGEMENT="https://github.com/foclabroc/toolbox/releases/download/Fichiers/mmx-ii.zip"
-URL_TELECHARGEMENT_KEY=""
+URL_TELECHARGEMENT_KEY="https://github.com/foclabroc/toolbox/releases/download/Fichiers/minidoom-2.wsquashfs.keys"
 CHEMIN_SCRIPT=""
 FICHIER_ZIP=""
 PORTS_DIR="/userdata/roms/ports"
@@ -88,11 +88,6 @@ afficher_barre_progression() {
                 echo -e "\nVitesse : ${SPEED_KB} ko/s | ${CURRENT_MB} / ${TOTAL_MB} Mo"
                 echo "XXX"
                 echo "$PROGRESS"
-            else
-                echo "XXX"
-                echo -e "\n\nTéléchargement en cours...\nTaille inconnue."
-                echo "XXX"
-                echo "30"
             fi
             sleep 0.5
         done
@@ -104,7 +99,9 @@ afficher_barre_progression() {
             echo "XXX"
             echo -e "\n\nDécompression de $GAME_FILE..."
             echo "XXX"
-            echo "75"; sleep 0.5
+            for i in {71..90}; do
+                echo "$i"; sleep 0.05
+            done
             unzip -o "$FILE_PATH" -d "$WIN_DIR" >/dev/null 2>&1
             rm -f "$FILE_PATH"
         fi
@@ -115,13 +112,10 @@ afficher_barre_progression() {
             echo -e "\n\nTéléchargement du pad2key..."
             echo "XXX"
             curl -L --progress-bar "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" > /dev/null 2>&1
-            echo "90"; sleep 0.5
+            for i in {91..100}; do
+                echo "$i"; sleep 0.05
+            done
         fi
-
-        # === Étape 5 : Finalisation ===
-        for i in {91..100}; do
-            echo "$i"; sleep 0.05
-        done
 
     ) |
     dialog --backtitle "Foclabroc Toolbox" \
