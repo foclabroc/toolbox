@@ -51,69 +51,63 @@ afficher_barre_progression() {
     TMP_FILE=$(mktemp)
 
     FILE_PATH="$WIN_DIR/$GAME_FILE"
-    # Vérification et suppression du fichier s'il existe déjà
+
+    # Suppression de l'ancien fichier si besoin
     if [ -f "$FILE_PATH" ]; then
         rm -f "$FILE_PATH"
         echo "Fichier existant supprimé : $FILE_PATH"
     fi
 
     (
-        for i in {5..19..1}; do
+        for i in {5..19}; do
             echo "$i"
             sleep 0.1
         done
 
         mkdir -p "$WIN_DIR"
 
-        START_TIME=$(date +%s)
-        CURRENT_SIZE=0
-        BLOCK_SIZE=32768 # 32 Ko
-
-        # Récupération de la taille totale du fichier
+        # Taille totale à télécharger
         FILE_SIZE=$(curl -sIL "$URL_TELECHARGEMENT" | grep -i Content-Length | tail -1 | awk '{print $2}' | tr -d '\r')
+        [ -z "$FILE_SIZE" ] && FILE_SIZE=0
 
-        # Téléchargement manuel avec lecture directe
-        exec 3<> <(curl -sL "$URL_TELECHARGEMENT")
-        > "$FILE_PATH"
+        START_TIME=$(date +%s)
 
-        while true; do
-            read -N $BLOCK_SIZE -u 3 CHUNK
-            [ -z "$CHUNK" ] && break
+        # Lancement du téléchargement en tâche de fond
+        curl -sL "$URL_TELECHARGEMENT" -o "$FILE_PATH" &
+        PID_CURL=$!
 
-            printf "%s" "$CHUNK" >> "$FILE_PATH"
-            CURRENT_SIZE=$(stat -c%s "$FILE_PATH" 2>/dev/null)
+        # Suivi de progression
+        while kill -0 $PID_CURL 2>/dev/null; do
+            if [ -f "$FILE_PATH" ]; then
+                CURRENT_SIZE=$(stat -c%s "$FILE_PATH" 2>/dev/null)
+                NOW=$(date +%s)
+                ELAPSED=$((NOW - START_TIME))
+                [ "$ELAPSED" -eq 0 ] && ELAPSED=1
 
-            NOW=$(date +%s)
-            ELAPSED=$((NOW - START_TIME))
-            [ "$ELAPSED" -eq 0 ] && ELAPSED=1
+                SPEED_KB=$((CURRENT_SIZE / 1024 / ELAPSED))
+                [ "$SPEED_KB" -gt 1024 ] && SPEED_STR="$((SPEED_KB / 1024)) Mo/s" || SPEED_STR="${SPEED_KB} Ko/s"
 
-            if [ -n "$FILE_SIZE" ] && [ "$FILE_SIZE" -gt 0 ]; then
-                PERCENT=$(( CURRENT_SIZE * 100 / FILE_SIZE ))
-                PROGRESS=$(( CURRENT_SIZE * 40 / FILE_SIZE ))
-                SPEED_KB=$(( CURRENT_SIZE / 1024 / ELAPSED ))
-
-                if [ "$SPEED_KB" -gt 1024 ]; then
-                    SPEED_MB=$(( SPEED_KB / 1024 ))
-                    SPEED_DISPLAY="${SPEED_MB} Mo/s"
-                else
-                    SPEED_DISPLAY="${SPEED_KB} Ko/s"
+                if [ "$FILE_SIZE" -gt 0 ]; then
+                    PERCENT=$((CURRENT_SIZE * 100 / FILE_SIZE))
+                    PROGRESS=$((CURRENT_SIZE * 40 / FILE_SIZE))
+                    echo $((20 + PROGRESS))
+                    echo "XXX"
+                    echo "Téléchargement de $GAME_FILE... $PERCENT% à $SPEED_STR"
+                    echo "XXX"
                 fi
-
-                echo $((20 + PROGRESS))
-                echo "XXX"
-                echo "Téléchargement de $GAME_FILE... $PERCENT% à $SPEED_DISPLAY"
-                echo "XXX"
             fi
-            sleep 0.1
+            sleep 0.5
         done
 
-        # Décompression automatique si .zip
+        wait $PID_CURL
+
+        # Décompression auto si zip
         if [[ "$FILE_PATH" == *.zip ]]; then
             unzip -o "$FILE_PATH" -d "$WIN_DIR" >/dev/null 2>&1
             rm -f "$FILE_PATH"
         fi
 
-        for i in {61..70..1}; do
+        for i in {61..70}; do
             echo "$i"
             sleep 0.1
         done
@@ -124,7 +118,7 @@ afficher_barre_progression() {
             sleep 0.3
         fi
 
-        for i in {71..100..1}; do
+        for i in {71..100}; do
             echo "$i"
             sleep 0.1
         done
@@ -136,6 +130,7 @@ afficher_barre_progression() {
 
     rm -f "$TMP_FILE"
 }
+
 
 
 # Fonction edit gamelist
