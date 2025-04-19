@@ -50,83 +50,73 @@ afficher_barre_progression() {
     TMP_FILE=$(mktemp)
 
     FILE_PATH="$WIN_DIR/$GAME_FILE"
-    # Vérification et suppression du fichier s'il existe déjà
+    FILE_PATH_PC="$WIN_DIR/$GAME_FILE_FINAL"
     if [ -f "$FILE_PATH" ]; then
         rm -f "$FILE_PATH"
-        echo "Fichier existant supprimé : $FILE_PATH"
+        rm -rf "$FILE_PATH_PC"
     fi
 
     (
-        for i in {5..19..1}; do
-            echo "$i"; sleep 0.1
+        echo "XXX"
+        echo -e "\n\nSuppression ancien $GAME_NAME si existant..."
+        echo "XXX"
+        for i in {0..10}; do
+            echo "$i"; sleep 0.10
         done
         mkdir -p "$WIN_DIR"
 
-        # Récupération de la taille totale du fichier
         FILE_SIZE=$(curl -sIL "$URL_TELECHARGEMENT" | grep -i Content-Length | tail -1 | awk '{print $2}' | tr -d '\r')
+        [ -z "$FILE_SIZE" ] && FILE_SIZE=0
 
-        # Téléchargement réel avec suivi des redirections
         curl -sL "$URL_TELECHARGEMENT" -o "$FILE_PATH" &
         PID_CURL=$!
+        START_TIME=$(date +%s)
 
-        # Affichage de la progression
-		START_TIME=$(date +%s)
+        while kill -0 $PID_CURL 2>/dev/null; do
+            if [ -f "$FILE_PATH" ] && [ "$FILE_SIZE" -gt 0 ]; then
+                CURRENT_SIZE=$(stat -c%s "$FILE_PATH" 2>/dev/null)
+                NOW=$(date +%s)
+                ELAPSED=$((NOW - START_TIME))
+                [ "$ELAPSED" -eq 0 ] && ELAPSED=1
+                SPEED_KB=$((CURRENT_SIZE / ELAPSED / 1024))
+                CURRENT_MB=$((CURRENT_SIZE / 1024 / 1024))
+                TOTAL_MB=$((FILE_SIZE / 1024 / 1024))
+                PROGRESS_DL=$((CURRENT_SIZE * 90 / FILE_SIZE))  # 90 pts = 10 à 100
+                PROGRESS=$((10 + PROGRESS_DL))
+                [ "$PROGRESS" -gt 100 ] && PROGRESS=100
 
-		while kill -0 $PID_CURL 2>/dev/null; do
-			if [ -f "$FILE_PATH" ]; then
-				CURRENT_SIZE=$(stat -c%s "$FILE_PATH" 2>/dev/null)
-				NOW=$(date +%s)
-				ELAPSED=$((NOW - START_TIME))
-				[ "$ELAPSED" -eq 0 ] && ELAPSED=1  # éviter division par 0
-				SPEED=$((CURRENT_SIZE / ELAPSED)) # octets/seconde
-				SPEED_KB=$((SPEED / 1024))
-				SPEED_MB=$((SPEED_KB / 1024))
-
-				# Conversion Mo
-				CURRENT_MB=$((CURRENT_SIZE / 1024 / 1024))
-				TOTAL_MB=$((FILE_SIZE / 1024 / 1024))
-
-				if [ -n "$FILE_SIZE" ] && [ "$FILE_SIZE" -gt 0 ]; then
-					PROGRESS=$((CURRENT_SIZE * 40 / FILE_SIZE)) # 40 pts d'écart
-					PROGRESS=$((20 + PROGRESS))
-					[ "$PROGRESS" -gt 60 ] && PROGRESS=60
-
-					echo "XXX"
-					echo -e "\n\nTéléchargement de $GAME_FILE..."
-					echo -e "\nVitesse : ${SPEED_KB} ko/s | ${CURRENT_MB} / ${TOTAL_MB} Mo"
-					echo "XXX"
-					echo "$PROGRESS"
-				fi
-			fi
-			sleep 0.5
-		done
+                echo "XXX"
+                echo -e "\n\nTéléchargement de $GAME_NAME..."
+                echo -e "\nVitesse : ${SPEED_KB} ko/s | ${CURRENT_MB} / ${TOTAL_MB} Mo"
+                echo "XXX"
+                echo "$PROGRESS"
+            fi
+            sleep 0.5
+        done
 
         wait $PID_CURL
 
-        # Décompression automatique si .zip
         if [[ "$FILE_PATH" == *.zip ]]; then
-		    echo "XXX"
-			echo -e "\n\nDécompression de $GAME_FILE..."
-			echo "XXX"
+            echo "XXX"
+            echo -e "\n\nDécompression de $GAME_NAME..."
+            echo "XXX"
+            for i in {0..100..2}; do
+                echo "$i"; sleep 0.05
+            done
             unzip -o "$FILE_PATH" -d "$WIN_DIR" >/dev/null 2>&1
             rm -f "$FILE_PATH"
         fi
 
-        for i in {61..70..1}; do
-            echo "$i"; sleep 0.1
-        done
-
         if [ -n "$URL_TELECHARGEMENT_KEY" ]; then
-		    echo "XXX"
-			echo -e "\n\nTélechargement du pad2key..."
-			echo "XXX"
+            echo "XXX"
+            echo -e "\n\nTéléchargement du pad2key..."
+            echo "XXX"
             curl -L --progress-bar "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" > /dev/null 2>&1
-            echo "70"; sleep 1
+            for i in {0..100..2}; do
+                echo "$i"; sleep 0.01
+            done
         fi
 
-        for i in {71..100..1}; do
-            echo "$i"; sleep 0.1
-        done
     ) |
     dialog --backtitle "Foclabroc Toolbox" \
            --title "Installation de $GAME_NAME" \
@@ -136,14 +126,11 @@ afficher_barre_progression() {
     rm -f "$TMP_FILE"
 }
 
-
-
-
 # Fonction edit gamelist
 ajouter_entree_gamelist() {
     (
-        for i in {1..50..2}; do
-            echo "$i"; sleep 0.1
+        for i in {1..50..1}; do
+            echo "$i"; sleep 0.01
         done
         mkdir -p "$IMAGE_DIR"
         mkdir -p "$VIDEO_DIR"
@@ -178,8 +165,8 @@ ajouter_entree_gamelist() {
             fi
         fi
 
-        for i in {66..94..2}; do
-            echo "$i"; sleep 0.1
+        for i in {66..94..1}; do
+            echo "$i"; sleep 0.01
         done
 
         xmlstarlet ed -L \
@@ -202,7 +189,6 @@ ajouter_entree_gamelist() {
         for i in {95..99..2}; do
             echo "$i"; sleep 0.1
         done
-        curl -s http://127.0.0.1:1234/reloadgames
         echo "100"; sleep 0.2
     ) |
     dialog --backtitle "Foclabroc Toolbox" --title "Edition du gamelist" --gauge "\nAjout images et video au gamelist windows..." 8 60 0 2>&1 >/dev/tty

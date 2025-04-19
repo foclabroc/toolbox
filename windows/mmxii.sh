@@ -7,7 +7,7 @@ export LC_ALL=fr_FR.UTF-8
 ##############################################################################################################
 # VARIABLE DU JEU
 URL_TELECHARGEMENT="https://github.com/foclabroc/toolbox/releases/download/Fichiers/mmx-ii.zip"
-URL_TELECHARGEMENT_KEY="https://github.com/foclabroc/toolbox/releases/download/Fichiers/TMNT_Rescue-Palooza.wsquashfs.keys"
+URL_TELECHARGEMENT_KEY=""
 CHEMIN_SCRIPT=""
 FICHIER_ZIP=""
 PORTS_DIR="/userdata/roms/ports"
@@ -189,7 +189,6 @@ ajouter_entree_gamelist() {
         for i in {95..99..2}; do
             echo "$i"; sleep 0.1
         done
-        curl -s http://127.0.0.1:1234/reloadgames
         echo "100"; sleep 0.2
     ) |
     dialog --backtitle "Foclabroc Toolbox" --title "Edition du gamelist" --gauge "\nAjout images et video au gamelist windows..." 8 60 0 2>&1 >/dev/tty

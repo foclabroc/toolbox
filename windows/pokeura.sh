@@ -13,6 +13,8 @@ FICHIER_ZIP=""
 PORTS_DIR="/userdata/roms/ports"
 WIN_DIR="/userdata/roms/windows"
 GAME_FILE="Pokemon-Uranium.wsquashfs"
+GAME_FILE_FINAL="Pokemon-Uranium.wsquashfs"
+INFO_MESSAGE=""
 ##############################################################################################################
 ##############################################################################################################
 # VARIABLES GAMELIST
@@ -48,66 +50,87 @@ afficher_barre_progression() {
     TMP_FILE=$(mktemp)
 
     FILE_PATH="$WIN_DIR/$GAME_FILE"
-    # Vérification et suppression du fichier s'il existe déjà
+    FILE_PATH_PC="$WIN_DIR/$GAME_FILE_FINAL"
     if [ -f "$FILE_PATH" ]; then
         rm -f "$FILE_PATH"
-        echo "Fichier existant supprimé : $FILE_PATH"
+        rm -rf "$FILE_PATH_PC"
     fi
 
     (
-        for i in {5..19..1}; do
-            echo "$i"; sleep 0.1
+        echo "XXX"
+        echo -e "\n\nSuppression ancien $GAME_NAME si existant..."
+        echo "XXX"
+        for i in {0..10}; do
+            echo "$i"; sleep 0.10
         done
         mkdir -p "$WIN_DIR"
 
-        # Récupération de la taille totale du fichier
         FILE_SIZE=$(curl -sIL "$URL_TELECHARGEMENT" | grep -i Content-Length | tail -1 | awk '{print $2}' | tr -d '\r')
+        [ -z "$FILE_SIZE" ] && FILE_SIZE=0
 
-        # Téléchargement réel avec suivi des redirections
         curl -sL "$URL_TELECHARGEMENT" -o "$FILE_PATH" &
         PID_CURL=$!
+        START_TIME=$(date +%s)
 
-        # Affichage de la progression
         while kill -0 $PID_CURL 2>/dev/null; do
-            if [ -f "$FILE_PATH" ]; then
+            if [ -f "$FILE_PATH" ] && [ "$FILE_SIZE" -gt 0 ]; then
                 CURRENT_SIZE=$(stat -c%s "$FILE_PATH" 2>/dev/null)
-                if [ -n "$FILE_SIZE" ] && [ "$FILE_SIZE" -gt 0 ]; then
-                    PROGRESS=$(( CURRENT_SIZE * 40 / FILE_SIZE )) # progression de 20 à 60
-                    echo $(( 20 + PROGRESS ))
-                fi
+                NOW=$(date +%s)
+                ELAPSED=$((NOW - START_TIME))
+                [ "$ELAPSED" -eq 0 ] && ELAPSED=1
+                SPEED_KB=$((CURRENT_SIZE / ELAPSED / 1024))
+                CURRENT_MB=$((CURRENT_SIZE / 1024 / 1024))
+                TOTAL_MB=$((FILE_SIZE / 1024 / 1024))
+                PROGRESS_DL=$((CURRENT_SIZE * 90 / FILE_SIZE))  # 90 pts = 10 à 100
+                PROGRESS=$((10 + PROGRESS_DL))
+                [ "$PROGRESS" -gt 100 ] && PROGRESS=100
+
+                echo "XXX"
+                echo -e "\n\nTéléchargement de $GAME_NAME..."
+                echo -e "\nVitesse : ${SPEED_KB} ko/s | ${CURRENT_MB} / ${TOTAL_MB} Mo"
+                echo "XXX"
+                echo "$PROGRESS"
             fi
-            sleep 0.2
+            sleep 0.5
         done
 
         wait $PID_CURL
 
-        for i in {61..70..1}; do
-            echo "$i"; sleep 0.1
-        done
-
-        if [ -n "$URL_TELECHARGEMENT_KEY" ]; then
-            curl -L --progress-bar "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" > /dev/null 2>&1
-            echo "70"; sleep 0.3
+        if [[ "$FILE_PATH" == *.zip ]]; then
+            echo "XXX"
+            echo -e "\n\nDécompression de $GAME_NAME..."
+            echo "XXX"
+            for i in {0..100..2}; do
+                echo "$i"; sleep 0.05
+            done
+            unzip -o "$FILE_PATH" -d "$WIN_DIR" >/dev/null 2>&1
+            rm -f "$FILE_PATH"
         fi
 
-        for i in {71..100..1}; do
-            echo "$i"; sleep 0.1
-        done
+        if [ -n "$URL_TELECHARGEMENT_KEY" ]; then
+            echo "XXX"
+            echo -e "\n\nTéléchargement du pad2key..."
+            echo "XXX"
+            curl -L --progress-bar "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" > /dev/null 2>&1
+            for i in {0..100..2}; do
+                echo "$i"; sleep 0.01
+            done
+        fi
+
     ) |
     dialog --backtitle "Foclabroc Toolbox" \
            --title "Installation de $GAME_NAME" \
-           --gauge "\nTéléchargement et installation de $GAME_NAME en cours..." 9 60 0 \
+           --gauge "\nTéléchargement et installation de $GAME_NAME en cours..." 10 60 0 \
            2>&1 >/dev/tty
 
     rm -f "$TMP_FILE"
 }
 
-
 # Fonction edit gamelist
 ajouter_entree_gamelist() {
     (
-        for i in {1..50..2}; do
-            echo "$i"; sleep 0.1
+        for i in {1..50..1}; do
+            echo "$i"; sleep 0.01
         done
         mkdir -p "$IMAGE_DIR"
         mkdir -p "$VIDEO_DIR"
@@ -142,13 +165,13 @@ ajouter_entree_gamelist() {
             fi
         fi
 
-        for i in {66..94..2}; do
-            echo "$i"; sleep 0.1
+        for i in {66..94..1}; do
+            echo "$i"; sleep 0.01
         done
 
         xmlstarlet ed -L \
             -s "/gameList" -t elem -n "game" -v "" \
-            -s "/gameList/game[last()]" -t elem -n "path" -v "./$GAME_FILE" \
+            -s "/gameList/game[last()]" -t elem -n "path" -v "./$GAME_FILE_FINAL" \
             -s "/gameList/game[last()]" -t elem -n "name" -v "$GAME_NAME" \
             -s "/gameList/game[last()]" -t elem -n "desc" -v "$DESC" \
             -s "/gameList/game[last()]" -t elem -n "image" -v "./images/$GIT_NAME-s.png" \
@@ -166,7 +189,6 @@ ajouter_entree_gamelist() {
         for i in {95..99..2}; do
             echo "$i"; sleep 0.1
         done
-        curl -s http://127.0.0.1:1234/reloadgames
         echo "100"; sleep 0.2
     ) |
     dialog --backtitle "Foclabroc Toolbox" --title "Edition du gamelist" --gauge "\nAjout images et video au gamelist windows..." 8 60 0 2>&1 >/dev/tty
@@ -177,5 +199,5 @@ afficher_barre_progression
 ajouter_entree_gamelist
 
 # Message de fin
-dialog --backtitle "Foclabroc Toolbox" --title "Installation terminée" --msgbox "\n$GAME_NAME a été ajouté dans windows !\n\nPensez à mettre à jour les listes de jeux pour le voir apparaître dans le menu." 11 60 2>&1 >/dev/tty
+dialog --backtitle "Foclabroc Toolbox" --title "Installation terminée" --msgbox "\n$GAME_NAME a été ajouté dans windows !\n\nPensez à mettre à jour les listes de jeux pour le voir apparaître dans le menu. \n$INFO_MESSAGE" 13 60 2>&1 >/dev/tty
 clear

@@ -34,7 +34,11 @@ while true; do
         2>&1 >/dev/tty)
 
     # Annulation = sortie du menu
-    [ -z "$choix" ] && clear && exit 0
+    if [ -z "$choix" ]; then
+        clear
+        curl -s http://127.0.0.1:1234/reloadgames
+        exit 0
+    fi
 
     # Confirmation d'installation
     dialog --backtitle "Foclabroc Toolbox" --title "Confirmation" \
