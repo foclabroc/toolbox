@@ -113,7 +113,7 @@ afficher_barre_progression() {
             echo "XXX"
             curl -L --progress-bar "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" > /dev/null 2>&1
             for i in {0..100..2}; do
-                echo "$i"; sleep 0.01
+                echo "$i"; sleep 0.05
             done
         fi
 
