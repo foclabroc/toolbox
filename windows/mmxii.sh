@@ -7,7 +7,7 @@ export LC_ALL=fr_FR.UTF-8
 ##############################################################################################################
 # VARIABLE DU JEU
 URL_TELECHARGEMENT="https://github.com/foclabroc/toolbox/releases/download/Fichiers/mmx-ii.zip"
-URL_TELECHARGEMENT_KEY="https://github.com/foclabroc/toolbox/releases/download/Fichiers/minidoom-2.wsquashfs.keys"
+URL_TELECHARGEMENT_KEY=""
 CHEMIN_SCRIPT=""
 FICHIER_ZIP=""
 PORTS_DIR="/userdata/roms/ports"
