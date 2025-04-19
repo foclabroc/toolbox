@@ -7,7 +7,7 @@ export LC_ALL=fr_FR.UTF-8
 ##############################################################################################################
 # VARIABLE DU JEU
 URL_TELECHARGEMENT="https://github.com/foclabroc/toolbox/releases/download/Fichiers/mmx-ii.zip"
-URL_TELECHARGEMENT_KEY=""
+URL_TELECHARGEMENT_KEY="https://github.com/foclabroc/toolbox/releases/download/Fichiers/TMNT_Rescue-Palooza.wsquashfs.keys"
 CHEMIN_SCRIPT=""
 FICHIER_ZIP=""
 PORTS_DIR="/userdata/roms/ports"
@@ -52,17 +52,17 @@ afficher_barre_progression() {
     FILE_PATH="$WIN_DIR/$GAME_FILE"
     if [ -f "$FILE_PATH" ]; then
         rm -f "$FILE_PATH"
-        echo "Fichier existant supprimé : $FILE_PATH"
     fi
 
     (
-        # === Étape 1 : Préparation ===
+        echo "XXX"
+        echo -e "\n\nSuppression ancien $GAME_FILE si existant..."
+        echo "XXX"
         for i in {0..10}; do
-            echo "$i"; sleep 0.05
+            echo "$i"; sleep 0.10
         done
         mkdir -p "$WIN_DIR"
 
-        # === Étape 2 : Téléchargement ===
         FILE_SIZE=$(curl -sIL "$URL_TELECHARGEMENT" | grep -i Content-Length | tail -1 | awk '{print $2}' | tr -d '\r')
         [ -z "$FILE_SIZE" ] && FILE_SIZE=0
 
@@ -79,9 +79,9 @@ afficher_barre_progression() {
                 SPEED_KB=$((CURRENT_SIZE / ELAPSED / 1024))
                 CURRENT_MB=$((CURRENT_SIZE / 1024 / 1024))
                 TOTAL_MB=$((FILE_SIZE / 1024 / 1024))
-                PROGRESS_DL=$((CURRENT_SIZE * 60 / FILE_SIZE))  # 60 pts = 10 à 70
+                PROGRESS_DL=$((CURRENT_SIZE * 90 / FILE_SIZE))  # 90 pts = 10 à 100
                 PROGRESS=$((10 + PROGRESS_DL))
-                [ "$PROGRESS" -gt 70 ] && PROGRESS=100
+                [ "$PROGRESS" -gt 100 ] && PROGRESS=100
 
                 echo "XXX"
                 echo -e "\n\nTéléchargement de $GAME_FILE..."
@@ -94,7 +94,6 @@ afficher_barre_progression() {
 
         wait $PID_CURL
 
-        # === Étape 3 : Décompression ===
         if [[ "$FILE_PATH" == *.zip ]]; then
             echo "XXX"
             echo -e "\n\nDécompression de $GAME_FILE..."
@@ -106,7 +105,6 @@ afficher_barre_progression() {
             rm -f "$FILE_PATH"
         fi
 
-        # === Étape 4 : Téléchargement pad2key ===
         if [ -n "$URL_TELECHARGEMENT_KEY" ]; then
             echo "XXX"
             echo -e "\n\nTéléchargement du pad2key..."
