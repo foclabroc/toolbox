@@ -14,7 +14,7 @@ PORTS_DIR="/userdata/roms/ports"
 WIN_DIR="/userdata/roms/windows"
 GAME_FILE="SuperTuxKart.wsquashfs"
 GAME_FILE_FINAL="SuperTuxKart.wsquashfs"
-INFO_MESSAGE="\n\n!!Utiliser le runner WINE-TKG pour le lancement!!"
+INFO_MESSAGE="\n\n!Utiliser le runner WINE-TKG pour le lancement!"
 ##############################################################################################################
 ##############################################################################################################
 # VARIABLES GAMELIST
@@ -70,21 +70,36 @@ afficher_barre_progression() {
         PID_CURL=$!
 
         # Affichage de la progression
-        while kill -0 $PID_CURL 2>/dev/null; do
-            if [ -f "$FILE_PATH" ]; then
-                CURRENT_SIZE=$(stat -c%s "$FILE_PATH" 2>/dev/null)
-                if [ -n "$FILE_SIZE" ] && [ "$FILE_SIZE" -gt 0 ]; then
-				    # On peut afficher juste "Téléchargement en cours..."
-                    echo "XXX"
-                    echo "Téléchargement de $GAME_FILE..."
-                    echo "XXX"
-                    sleep 0.2
-                    PROGRESS=$(( CURRENT_SIZE * 40 / FILE_SIZE )) # progression de 20 à 60
-                    echo $(( 20 + PROGRESS ))
-                fi
-            fi
-            sleep 0.2
-        done
+		START_TIME=$(date +%s)
+
+		while kill -0 $PID_CURL 2>/dev/null; do
+			if [ -f "$FILE_PATH" ]; then
+				CURRENT_SIZE=$(stat -c%s "$FILE_PATH" 2>/dev/null)
+				NOW=$(date +%s)
+				ELAPSED=$((NOW - START_TIME))
+				[ "$ELAPSED" -eq 0 ] && ELAPSED=1  # éviter division par 0
+				SPEED=$((CURRENT_SIZE / ELAPSED)) # octets/seconde
+				SPEED_KB=$((SPEED / 1024))
+				SPEED_MB=$((SPEED_KB / 1024))
+
+				# Conversion Mo
+				CURRENT_MB=$((CURRENT_SIZE / 1024 / 1024))
+				TOTAL_MB=$((FILE_SIZE / 1024 / 1024))
+
+				if [ -n "$FILE_SIZE" ] && [ "$FILE_SIZE" -gt 0 ]; then
+					PROGRESS=$((CURRENT_SIZE * 40 / FILE_SIZE)) # 40 pts d'écart
+					PROGRESS=$((20 + PROGRESS))
+					[ "$PROGRESS" -gt 60 ] && PROGRESS=60
+
+					echo "XXX"
+					echo -e "\nTéléchargement de $GAME_FILE..."
+					echo -e "Vitesse : ${SPEED_KB} ko/s | ${CURRENT_MB} / ${TOTAL_MB} Mo"
+					echo "XXX"
+					echo "$PROGRESS"
+				fi
+			fi
+			sleep 0.5
+		done
 
         wait $PID_CURL
 
