@@ -92,8 +92,8 @@ afficher_barre_progression() {
 					[ "$PROGRESS" -gt 60 ] && PROGRESS=60
 
 					echo "XXX"
-					echo -e "\nTéléchargement de $GAME_FILE..."
-					echo -e "Vitesse : ${SPEED_KB} ko/s | ${CURRENT_MB} / ${TOTAL_MB} Mo"
+					echo -e "\n\nTéléchargement de $GAME_FILE..."
+					echo -e "\nVitesse : ${SPEED_KB} ko/s | ${CURRENT_MB} / ${TOTAL_MB} Mo"
 					echo "XXX"
 					echo "$PROGRESS"
 				fi
@@ -105,6 +105,9 @@ afficher_barre_progression() {
 
         # Décompression automatique si .zip
         if [[ "$FILE_PATH" == *.zip ]]; then
+		    echo "XXX"
+			echo -e "\n\nDécompression de $GAME_FILE..."
+			echo "XXX"
             unzip -o "$FILE_PATH" -d "$WIN_DIR" >/dev/null 2>&1
             rm -f "$FILE_PATH"
         fi
@@ -114,8 +117,11 @@ afficher_barre_progression() {
         done
 
         if [ -n "$URL_TELECHARGEMENT_KEY" ]; then
+		    echo "XXX"
+			echo -e "\n\nTélechargement du pad2key..."
+			echo "XXX"
             curl -L --progress-bar "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" > /dev/null 2>&1
-            echo "70"; sleep 0.3
+            echo "70"; sleep 1
         fi
 
         for i in {71..100..1}; do

@@ -70,21 +70,44 @@ afficher_barre_progression() {
         PID_CURL=$!
 
         # Affichage de la progression
-        while kill -0 $PID_CURL 2>/dev/null; do
-            if [ -f "$FILE_PATH" ]; then
-                CURRENT_SIZE=$(stat -c%s "$FILE_PATH" 2>/dev/null)
-                if [ -n "$FILE_SIZE" ] && [ "$FILE_SIZE" -gt 0 ]; then
-                    PROGRESS=$(( CURRENT_SIZE * 40 / FILE_SIZE )) # progression de 20 à 60
-                    echo $(( 20 + PROGRESS ))
-                fi
-            fi
-            sleep 0.2
-        done
+		START_TIME=$(date +%s)
+
+		while kill -0 $PID_CURL 2>/dev/null; do
+			if [ -f "$FILE_PATH" ]; then
+				CURRENT_SIZE=$(stat -c%s "$FILE_PATH" 2>/dev/null)
+				NOW=$(date +%s)
+				ELAPSED=$((NOW - START_TIME))
+				[ "$ELAPSED" -eq 0 ] && ELAPSED=1  # éviter division par 0
+				SPEED=$((CURRENT_SIZE / ELAPSED)) # octets/seconde
+				SPEED_KB=$((SPEED / 1024))
+				SPEED_MB=$((SPEED_KB / 1024))
+
+				# Conversion Mo
+				CURRENT_MB=$((CURRENT_SIZE / 1024 / 1024))
+				TOTAL_MB=$((FILE_SIZE / 1024 / 1024))
+
+				if [ -n "$FILE_SIZE" ] && [ "$FILE_SIZE" -gt 0 ]; then
+					PROGRESS=$((CURRENT_SIZE * 40 / FILE_SIZE)) # 40 pts d'écart
+					PROGRESS=$((20 + PROGRESS))
+					[ "$PROGRESS" -gt 60 ] && PROGRESS=60
+
+					echo "XXX"
+					echo -e "\n\nTéléchargement de $GAME_FILE..."
+					echo -e "\nVitesse : ${SPEED_KB} ko/s | ${CURRENT_MB} / ${TOTAL_MB} Mo"
+					echo "XXX"
+					echo "$PROGRESS"
+				fi
+			fi
+			sleep 0.5
+		done
 
         wait $PID_CURL
 
         # Décompression automatique si .zip
         if [[ "$FILE_PATH" == *.zip ]]; then
+		    echo "XXX"
+			echo -e "\n\nDécompression de $GAME_FILE..."
+			echo "XXX"
             unzip -o "$FILE_PATH" -d "$WIN_DIR" >/dev/null 2>&1
             rm -f "$FILE_PATH"
         fi
@@ -94,8 +117,11 @@ afficher_barre_progression() {
         done
 
         if [ -n "$URL_TELECHARGEMENT_KEY" ]; then
+		    echo "XXX"
+			echo -e "\n\nTélechargement du pad2key..."
+			echo "XXX"
             curl -L --progress-bar "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" > /dev/null 2>&1
-            echo "70"; sleep 0.3
+            echo "70"; sleep 1
         fi
 
         for i in {71..100..1}; do
