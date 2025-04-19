@@ -120,7 +120,7 @@ afficher_barre_progression() {
     ) |
     dialog --backtitle "Foclabroc Toolbox" \
            --title "Installation de $GAME_NAME" \
-           --gauge "\nTéléchargement et installation de $GAME_NAME en cours..." 9 60 0 \
+           --gauge "\nTéléchargement et installation de $GAME_NAME en cours..." 10 60 0 \
            2>&1 >/dev/tty
 
     rm -f "$TMP_FILE"
@@ -129,8 +129,8 @@ afficher_barre_progression() {
 # Fonction edit gamelist
 ajouter_entree_gamelist() {
     (
-        for i in {1..50..2}; do
-            echo "$i"; sleep 0.1
+        for i in {1..50..1}; do
+            echo "$i"; sleep 0.01
         done
         mkdir -p "$IMAGE_DIR"
         mkdir -p "$VIDEO_DIR"
@@ -165,8 +165,8 @@ ajouter_entree_gamelist() {
             fi
         fi
 
-        for i in {66..94..2}; do
-            echo "$i"; sleep 0.1
+        for i in {66..94..1}; do
+            echo "$i"; sleep 0.01
         done
 
         xmlstarlet ed -L \
@@ -200,5 +200,5 @@ afficher_barre_progression
 ajouter_entree_gamelist
 
 # Message de fin
-dialog --backtitle "Foclabroc Toolbox" --title "Installation terminée" --msgbox "\n$GAME_NAME a été ajouté dans windows !\n\nPensez à mettre à jour les listes de jeux pour le voir apparaître dans le menu. $INFO_MESSAGE" 12 60 2>&1 >/dev/tty
+dialog --backtitle "Foclabroc Toolbox" --title "Installation terminée" --msgbox "\n$GAME_NAME a été ajouté dans windows !\n\nPensez à mettre à jour les listes de jeux pour le voir apparaître dans le menu. \n$INFO_MESSAGE" 13 60 2>&1 >/dev/tty
 clear
