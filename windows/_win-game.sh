@@ -5,18 +5,19 @@ export LC_ALL=fr_FR.UTF-8
 
 # Déclaration des jeux : clé = identifiant, valeur = "Nom affiché - Description"
 declare -A jeux
-jeux["->Celeste 64"]="Le retour de Madeline mais en 3D.(39.8MB)"
-jeux["->Celeste pico8"]="Aidez Madeline à survivre à ses démons intérieurs au mont Celeste.(14.8MB)"
-jeux["->Crash Bandicoot bit"]="Crash Bandicoot Fan-Made avec editeur de stage personnalisé.(230MB)"
+jeux["->Celeste 64"]="Le retour de Madeline mais en 3D.(39.8Mo)"
+jeux["->Celeste pico8"]="Aidez Madeline à survivre à ses démons intérieurs au mont Celeste.(14.8Mo)"
+jeux["->Crash Bandicoot bit"]="Crash Bandicoot Fan-Made avec editeur de stage personnalisé.(230Mo)"
 jeux["->Donkey Kong Advanced"]="Un remake du jeu d'arcade classique.(19.4MB)"
 jeux["->TMNT Rescue Palooza"]="TMNT: Rescue-Palooza est un jeu de beat-em-up gratuit.(168MB)"
-jeux["->Spelunky"]="Spelunky jeu de plates-formes en deux dimensions. Le joueur incarne un spéléologue.(24.2MB)"
-jeux["->Sonic Triple Trouble"]="Sonic Triple Touble un fangame du jeu Game Gear Sonic Triple Trouble.(115MB)"
-jeux["->Pokemon Uranium"]="Fangame basé sur les series pokemon.(332MB)"
-jeux["->MiniDoom 2"]="Le jeu hommage qui transforme DOOM en un jeu de plateforme d'action.(114MB)"
-jeux["->AM2R"]="Another Metroid 2 Remake, remake non officiel du jeu Game Boy de 1991 Metroid II.(85.6MB)"
-jeux["->Megaman X II"]="Mega Man X Innocent Impulse FanGame style 8bits.(354MB)"
-jeux["->Super Tux Kart"]="Mario Kart like, opensource avec mode online.(662MB)"
+jeux["->Spelunky"]="Spelunky jeu de plates-formes en deux dimensions. Le joueur incarne un spéléologue.(24.2Mo)"
+jeux["->Sonic Triple Trouble"]="Sonic Triple Touble un fangame du jeu Game Gear Sonic Triple Trouble.(115Mo)"
+jeux["->Pokemon Uranium"]="Fangame basé sur les series pokemon.(332Mo)"
+jeux["->MiniDoom 2"]="Le jeu hommage qui transforme DOOM en un jeu de plateforme d'action.(114Mo)"
+jeux["->AM2R"]="Another Metroid 2 Remake, remake non officiel du jeu Game Boy de 1991 Metroid II.(85.6Mo)"
+jeux["->Megaman X II"]="Mega Man X Innocent Impulse FanGame style 8bits.(354Mo)"
+jeux["->Super Tux Kart"]="Mario Kart like, opensource avec mode online.(662Mo)"
+jeux["->Street of Rage remake 5.2"]="Remake de Street Of Rage 1/2/3 pour Windows.(331Mo)"
 
 while true; do
     # Construction dynamique du menu trié alphabétiquement par clé
@@ -82,6 +83,9 @@ while true; do
                 ;;
             "->Super Tux Kart")
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/supertuxkart.sh | bash
+                ;;
+            "->Street of Rage remake 5.2")
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/sorr52.sh | bash
                 ;;
         esac
         sleep 2
