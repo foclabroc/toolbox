@@ -49,79 +49,72 @@ CUSTOM_SH="/userdata/system/custom.sh"
 # Fonction de chargement
 afficher_barre_progression() {
     TMP_FILE=$(mktemp)
-
     FILE_PATH="$WIN_DIR/$GAME_FILE"
 
-    # Suppression de l'ancien fichier si besoin
+    # Nettoyage si fichier déjà présent
     if [ -f "$FILE_PATH" ]; then
         rm -f "$FILE_PATH"
         echo "Fichier existant supprimé : $FILE_PATH"
     fi
 
     (
-        for i in {5..19}; do
-            echo "$i"
-            sleep 0.1
-        done
-
         mkdir -p "$WIN_DIR"
+        echo "10"; sleep 0.1
 
-        # Taille totale à télécharger
-        FILE_SIZE=$(curl -sIL "$URL_TELECHARGEMENT" | grep -i Content-Length | tail -1 | awk '{print $2}' | tr -d '\r')
-        [ -z "$FILE_SIZE" ] && FILE_SIZE=0
+        echo "XXX"
+        echo "Préparation du téléchargement..."
+        echo "XXX"
+        sleep 0.5
+        echo "20"
 
-        START_TIME=$(date +%s)
+        echo "XXX"
+        echo "Téléchargement de $GAME_FILE en cours..."
+        echo "XXX"
+        sleep 0.5
 
-        # Lancement du téléchargement en tâche de fond
-        curl -sL "$URL_TELECHARGEMENT" -o "$FILE_PATH" &
-        PID_CURL=$!
+        # Téléchargement réel avec barre de progression simulée
+        TOTAL_SIZE=$(curl -sIL "$URL_TELECHARGEMENT" | grep -i Content-Length | tail -1 | awk '{print $2}' | tr -d '\r')
+        [ -z "$TOTAL_SIZE" ] && TOTAL_SIZE=0
 
-        # Suivi de progression
-        while kill -0 $PID_CURL 2>/dev/null; do
-            if [ -f "$FILE_PATH" ]; then
-                CURRENT_SIZE=$(stat -c%s "$FILE_PATH" 2>/dev/null)
-                NOW=$(date +%s)
-                ELAPSED=$((NOW - START_TIME))
-                [ "$ELAPSED" -eq 0 ] && ELAPSED=1
+        echo "30"
 
-                SPEED_KB=$((CURRENT_SIZE / 1024 / ELAPSED))
-                [ "$SPEED_KB" -gt 1024 ] && SPEED_STR="$((SPEED_KB / 1024)) Mo/s" || SPEED_STR="${SPEED_KB} Ko/s"
-
-                if [ "$FILE_SIZE" -gt 0 ]; then
-                    PERCENT=$((CURRENT_SIZE * 100 / FILE_SIZE))
-                    PROGRESS=$((CURRENT_SIZE * 40 / FILE_SIZE))
-                    echo $((20 + PROGRESS))
-                    echo "XXX"
-                    echo "Téléchargement de $GAME_FILE... $PERCENT% à $SPEED_STR"
-                    echo "XXX"
-                fi
-            fi
-            sleep 0.5
+        # Téléchargement bloquant avec suivi manuel
+        curl -L "$URL_TELECHARGEMENT" -o "$FILE_PATH" --progress-bar | \
+        while IFS= read -r line; do
+            # On peut afficher juste "Téléchargement en cours..."
+            echo "XXX"
+            echo "Téléchargement de $GAME_FILE..."
+            echo "XXX"
+            sleep 0.2
         done
 
-        wait $PID_CURL
+        echo "60"; sleep 0.3
 
-        # Décompression auto si zip
+        # Décompression si zip
         if [[ "$FILE_PATH" == *.zip ]]; then
+            echo "XXX"
+            echo "Décompression de l'archive..."
+            echo "XXX"
             unzip -o "$FILE_PATH" -d "$WIN_DIR" >/dev/null 2>&1
             rm -f "$FILE_PATH"
         fi
 
-        for i in {61..70}; do
-            echo "$i"
-            sleep 0.1
-        done
+        echo "70"; sleep 0.3
 
         if [ -n "$URL_TELECHARGEMENT_KEY" ]; then
-            curl -L --progress-bar "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" > /dev/null 2>&1
-            echo "70"
-            sleep 0.3
+            echo "XXX"
+            echo "Téléchargement de la clé complémentaire..."
+            echo "XXX"
+            curl -L "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" > /dev/null 2>&1
         fi
 
-        for i in {71..100}; do
-            echo "$i"
-            sleep 0.1
-        done
+        echo "90"; sleep 0.2
+
+        echo "XXX"
+        echo "Finalisation de l'installation..."
+        echo "XXX"
+        sleep 0.5
+        echo "100"
     ) |
     dialog --backtitle "Foclabroc Toolbox" \
            --title "Installation de $GAME_NAME" \
@@ -130,6 +123,7 @@ afficher_barre_progression() {
 
     rm -f "$TMP_FILE"
 }
+
 
 
 
