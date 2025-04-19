@@ -79,6 +79,7 @@ afficher_barre_progression() {
                 ELAPSED=$((NOW - START_TIME))
                 [ "$ELAPSED" -eq 0 ] && ELAPSED=1
                 SPEED_KB=$((CURRENT_SIZE / ELAPSED / 1024))
+                SPEED_MBPS=$(echo "scale=2; $SPEED_KB * 8 / 1024" | bc)
                 CURRENT_MB=$((CURRENT_SIZE / 1024 / 1024))
                 TOTAL_MB=$((FILE_SIZE / 1024 / 1024))
                 PROGRESS_DL=$((CURRENT_SIZE * 90 / FILE_SIZE))  # 90 pts = 10 à 100
@@ -87,7 +88,7 @@ afficher_barre_progression() {
 
                 echo "XXX"
                 echo -e "\n\nTéléchargement de $GAME_NAME..."
-                echo -e "\nVitesse : ${SPEED_KB} ko/s | ${CURRENT_MB} / ${TOTAL_MB} Mo"
+                echo -e "\nVitesse : ${SPEED_MBPS} Mb/s | Téléchargé : ${CURRENT_MB} / ${TOTAL_MB} Mo"
                 echo "XXX"
                 echo "$PROGRESS"
             fi
