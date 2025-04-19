@@ -6,8 +6,7 @@ export LC_ALL=fr_FR.UTF-8
 ##############################################################################################################
 ##############################################################################################################
 # VARIABLE DU JEU
-URL_TELECHARGEMENT="https://github.com/foclabroc/toolbox/releases/download/Fichiers/SuperTuxKart.wsquashfs
-"
+URL_TELECHARGEMENT="https://github.com/foclabroc/toolbox/releases/download/Fichiers/SuperTuxKart.wsquashfs"
 URL_TELECHARGEMENT_KEY=""
 CHEMIN_SCRIPT=""
 FICHIER_ZIP=""
@@ -15,7 +14,7 @@ PORTS_DIR="/userdata/roms/ports"
 WIN_DIR="/userdata/roms/windows"
 GAME_FILE="SuperTuxKart.wsquashfs"
 GAME_FILE_FINAL="SuperTuxKart.wsquashfs"
-INFO_MESSAGE="\n\n!!!Utiliser le runner WINE-TKG pour le lancement!!!"
+INFO_MESSAGE="\n\n!!Utiliser le runner WINE-TKG pour le lancement!!"
 ##############################################################################################################
 ##############################################################################################################
 # VARIABLES GAMELIST
