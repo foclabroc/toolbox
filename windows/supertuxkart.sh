@@ -15,7 +15,7 @@ PORTS_DIR="/userdata/roms/ports"
 WIN_DIR="/userdata/roms/windows"
 GAME_FILE="SuperTuxKart.wsquashfs"
 GAME_FILE_FINAL="SuperTuxKart.wsquashfs"
-INFO_MESSAGE="\n!!!Utiliser le runner WINE-TKG pour le lancement!!!"
+INFO_MESSAGE="\n\n!!!Utiliser le runner WINE-TKG pour le lancement!!!"
 ##############################################################################################################
 ##############################################################################################################
 # VARIABLES GAMELIST
@@ -49,76 +49,68 @@ CUSTOM_SH="/userdata/system/custom.sh"
 # Fonction de chargement
 afficher_barre_progression() {
     TMP_FILE=$(mktemp)
-    FILE_PATH="$WIN_DIR/$GAME_FILE"
 
-    # Nettoyage si fichier déjà présent
+    FILE_PATH="$WIN_DIR/$GAME_FILE"
+    # Vérification et suppression du fichier s'il existe déjà
     if [ -f "$FILE_PATH" ]; then
         rm -f "$FILE_PATH"
         echo "Fichier existant supprimé : $FILE_PATH"
     fi
 
     (
+        for i in {5..19..1}; do
+            echo "$i"; sleep 0.1
+        done
         mkdir -p "$WIN_DIR"
-        echo "10"; sleep 0.1
 
-        echo "XXX"
-        echo "Préparation du téléchargement..."
-        echo "XXX"
-        sleep 0.5
-        echo "20"
+        # Récupération de la taille totale du fichier
+        FILE_SIZE=$(curl -sIL "$URL_TELECHARGEMENT" | grep -i Content-Length | tail -1 | awk '{print $2}' | tr -d '\r')
 
-        echo "XXX"
-        echo "Téléchargement de $GAME_FILE en cours..."
-        echo "XXX"
-        sleep 0.5
+        # Téléchargement réel avec suivi des redirections
+        curl -sL "$URL_TELECHARGEMENT" -o "$FILE_PATH" &
+        PID_CURL=$!
 
-        # Téléchargement réel avec barre de progression simulée
-        TOTAL_SIZE=$(curl -sIL "$URL_TELECHARGEMENT" | grep -i Content-Length | tail -1 | awk '{print $2}' | tr -d '\r')
-        [ -z "$TOTAL_SIZE" ] && TOTAL_SIZE=0
-
-        echo "30"
-
-        # Téléchargement bloquant avec suivi manuel
-        curl -L "$URL_TELECHARGEMENT" -o "$FILE_PATH" --progress-bar | \
-        while IFS= read -r line; do
-            # On peut afficher juste "Téléchargement en cours..."
-            echo "XXX"
-            echo "Téléchargement de $GAME_FILE..."
-            echo "XXX"
+        # Affichage de la progression
+        while kill -0 $PID_CURL 2>/dev/null; do
+            if [ -f "$FILE_PATH" ]; then
+                CURRENT_SIZE=$(stat -c%s "$FILE_PATH" 2>/dev/null)
+                if [ -n "$FILE_SIZE" ] && [ "$FILE_SIZE" -gt 0 ]; then
+				    # On peut afficher juste "Téléchargement en cours..."
+                    echo "XXX"
+                    echo "Téléchargement de $GAME_FILE..."
+                    echo "XXX"
+                    sleep 0.2
+                    PROGRESS=$(( CURRENT_SIZE * 40 / FILE_SIZE )) # progression de 20 à 60
+                    echo $(( 20 + PROGRESS ))
+                fi
+            fi
             sleep 0.2
         done
 
-        echo "60"; sleep 0.3
+        wait $PID_CURL
 
-        # Décompression si zip
+        # Décompression automatique si .zip
         if [[ "$FILE_PATH" == *.zip ]]; then
-            echo "XXX"
-            echo "Décompression de l'archive..."
-            echo "XXX"
             unzip -o "$FILE_PATH" -d "$WIN_DIR" >/dev/null 2>&1
             rm -f "$FILE_PATH"
         fi
 
-        echo "70"; sleep 0.3
+        for i in {61..70..1}; do
+            echo "$i"; sleep 0.1
+        done
 
         if [ -n "$URL_TELECHARGEMENT_KEY" ]; then
-            echo "XXX"
-            echo "Téléchargement de la clé complémentaire..."
-            echo "XXX"
-            curl -L "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" > /dev/null 2>&1
+            curl -L --progress-bar "$URL_TELECHARGEMENT_KEY" -o "$WIN_DIR/${GAME_FILE}.keys" > /dev/null 2>&1
+            echo "70"; sleep 0.3
         fi
 
-        echo "90"; sleep 0.2
-
-        echo "XXX"
-        echo "Finalisation de l'installation..."
-        echo "XXX"
-        sleep 0.5
-        echo "100"
+        for i in {71..100..1}; do
+            echo "$i"; sleep 0.1
+        done
     ) |
     dialog --backtitle "Foclabroc Toolbox" \
            --title "Installation de $GAME_NAME" \
-           --gauge "\nTéléchargement et installation de $GAME_NAME en cours..." 10 70 0 \
+           --gauge "\nTéléchargement et installation de $GAME_NAME en cours..." 9 60 0 \
            2>&1 >/dev/tty
 
     rm -f "$TMP_FILE"
