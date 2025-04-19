@@ -16,7 +16,7 @@ jeux["->Pokemon Uranium"]="Fangame basé sur les series pokemon.(332MB)"
 jeux["->MiniDoom 2"]="Le jeu hommage qui transforme DOOM en un jeu de plateforme d'action.(114MB)"
 jeux["->AM2R"]="Another Metroid 2 Remake, remake non officiel du jeu Game Boy de 1991 Metroid II.(85.6MB)"
 jeux["->Megaman X II"]="Mega Man X Innocent Impulse FanGame style 8bits.(354MB)"
-
+jeux["->Super Tux Kart"]="Mario Kart like, opensource avec mode online.(662MB)"
 
 while true; do
     # Construction dynamique du menu trié alphabétiquement par clé
@@ -75,6 +75,9 @@ while true; do
                 ;;
             "->Megaman X II")
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/mmxii.sh | bash
+                ;;
+            "->Super Tux Kart")
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/supertuxkart.sh | bash
                 ;;
         esac
         sleep 2
