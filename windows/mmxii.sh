@@ -50,13 +50,15 @@ afficher_barre_progression() {
     TMP_FILE=$(mktemp)
 
     FILE_PATH="$WIN_DIR/$GAME_FILE"
+    FILE_PATH_PC="$WIN_DIR/$GAME_FILE_FINAL"
     if [ -f "$FILE_PATH" ]; then
         rm -f "$FILE_PATH"
+        rm -rf "$FILE_PATH_PC"
     fi
 
     (
         echo "XXX"
-        echo -e "\n\nSuppression ancien $GAME_FILE si existant..."
+        echo -e "\n\nSuppression ancien $GAME_NAME si existant..."
         echo "XXX"
         for i in {0..10}; do
             echo "$i"; sleep 0.10
@@ -84,7 +86,7 @@ afficher_barre_progression() {
                 [ "$PROGRESS" -gt 100 ] && PROGRESS=100
 
                 echo "XXX"
-                echo -e "\n\nTéléchargement de $GAME_FILE..."
+                echo -e "\n\nTéléchargement de $GAME_NAME..."
                 echo -e "\nVitesse : ${SPEED_KB} ko/s | ${CURRENT_MB} / ${TOTAL_MB} Mo"
                 echo "XXX"
                 echo "$PROGRESS"
@@ -96,7 +98,7 @@ afficher_barre_progression() {
 
         if [[ "$FILE_PATH" == *.zip ]]; then
             echo "XXX"
-            echo -e "\n\nDécompression de $GAME_FILE..."
+            echo -e "\n\nDécompression de $GAME_NAME..."
             echo "XXX"
             for i in {0..100..2}; do
                 echo "$i"; sleep 0.05
