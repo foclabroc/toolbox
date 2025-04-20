@@ -8,6 +8,7 @@ DEST_DIR="/userdata/roms"
 INSTALL_DIR="$DEST_DIR/openlara"
 DIALOG_BACKTITLE="Foclabroc Toolbox"
 GAME_NAME="OpenLara"
+INFO_MSG="!!!Information!!\nAssurez vous que le systeme OpenLara est bien coché dans\nParamètres des collections->systèmes affichés\net qu'il n'est pas coché dans\nParamètres des collections->systèmes groupés."
 # ========================================
 
 # Boîte de confirmation
@@ -25,7 +26,7 @@ if [ -d "$INSTALL_DIR" ]; then
         for i in {0..100}; do
             echo "$i"; sleep 0.05
         done
-    } | dialog --backtitle "$DIALOG_BACKTITLE" --title "Nettoyage" --gauge "" 10 50
+    } | dialog --backtitle "$DIALOG_BACKTITLE" --title "Nettoyage" --gauge "" 8 50
 
     rm -rf "$INSTALL_DIR"
     sleep 0.5
@@ -58,7 +59,7 @@ telechargement_zip() {
 
                 echo "XXX"
                 echo -e "\n\nTéléchargement de $GAME_NAME..."
-                echo -e "\nVitesse : ${SPEED_MO} Mo/s | Téléchargé : ${CURRENT_MB} / ${TOTAL_MB} Mo"
+                echo -e "\nVitesse : ${SPEED_MO} Mo/s | Progression : ${CURRENT_MB} / ${TOTAL_MB} Mo"
                 echo "XXX"
                 echo "$PROGRESS"
             fi
@@ -102,8 +103,8 @@ extraction_zip
 
 # Message final
 dialog --backtitle "$DIALOG_BACKTITLE" --title "Installation terminée" \
---msgbox "\nLe $NOM_PACK a été installé avec succès !" 8 50
-
+--msgbox "\nLe $NOM_PACK a été installé avec succès !\n\n$INFO_MSG" 14 80
+curl -s http://127.0.0.1:1234/reloadgames
 clear
 exit 0
 
