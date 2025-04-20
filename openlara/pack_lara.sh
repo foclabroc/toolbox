@@ -12,7 +12,7 @@ GAME_NAME="OpenLara"
 
 # Boîte de confirmation
 dialog --backtitle "$DIALOG_BACKTITLE" --title "$NOM_PACK" \
---yesno "\nScript d'installation du $NOM_PACK.\n\nCela supprimera complètement le dossier $GAME_NAME\n\net le remplacera par ce pack.
+--yesno "\nScript d'installation du $NOM_PACK.\n\nCela supprimera complètement le dossier $INSTALL_DIR\n\net le remplacera par ce pack.
 
 Souhaitez-vous continuer ?" 15 60 || exit 0
 
