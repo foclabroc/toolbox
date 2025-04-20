@@ -182,5 +182,5 @@ curl http://127.0.0.1:1234/reloadgames
 echo
 echo -e "\e[1;32mInstallation complete! You can now launch YouTube TV from the Ports menu."
 echo -e "-----------------------------------------------------------------------------------------"
-echo -e "Installation terminée ! Vous pouvez désormais lancer YouTube TV depuis le menu « Ports ».\e[1;37m"
+echo -e "Installation terminée !! Vous pouvez désormais lancer YouTube TV depuis le menu « Ports ».\e[1;37m"
 sleep 5
