@@ -21,9 +21,9 @@ if [ -d "$INSTALL_DIR" ]; then
     {
         for i in {0..100..2}; do
             echo $i
-            sleep 0.01
+            sleep 0.05
         done
-    } | dialog --gauge --backtitle "$DIALOG_BACKTITLE" --title "Nettoyage" "\nSuppression de l'ancien dossier $GAME_NAME..." 6 50 2>&1 >/dev/tty
+    } | dialog --gauge --backtitle "$DIALOG_BACKTITLE" --title "Nettoyage" "\nSuppression de l'ancien dossier $GAME_NAME..." 6 50
     rm -rf "$INSTALL_DIR"
     sleep 1
 fi
