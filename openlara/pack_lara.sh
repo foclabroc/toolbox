@@ -28,12 +28,12 @@ fi
 # Fonction de téléchargement avec progression et vitesse
 telechargement_zip() {
     FILE_PATH="$FICHIER_ZIP"
-    FILE_SIZE=$(curl -sI "$URL_ZIP" | grep -i Content-Length | awk '{print $2}' | tr -d '\r')
-    [ -z "$FILE_SIZE" ] && FILE_SIZE=1
+    FILE_SIZE=$(curl -sIL "$URL_ZIP" | grep -i Content-Length | tail -1 | awk '{print $2}' | tr -d '\r')
+    [ -z "$FILE_SIZE" ] && FILE_SIZE=0
 
     START_TIME=$(date +%s)
 
-    curl -L -o "$FILE_PATH" "$URL_ZIP" 2>/dev/null &
+    curl -sL -o "$FILE_PATH" "$URL_ZIP" &
     PID_CURL=$!
 
     (
@@ -46,14 +46,15 @@ telechargement_zip() {
                 SPEED_MO=$(echo "scale=2; $CURRENT_SIZE / $ELAPSED / 1048576" | bc)
                 CURRENT_MB=$((CURRENT_SIZE / 1024 / 1024))
                 TOTAL_MB=$((FILE_SIZE / 1024 / 1024))
-                PROGRESS_DL=$((CURRENT_SIZE * 90 / FILE_SIZE))  # 90 pts = 10 à 100
+                PROGRESS_DL=$((CURRENT_SIZE * 100 / FILE_SIZE))
                 PROGRESS=$((10 + PROGRESS_DL))
                 [ "$PROGRESS" -gt 100 ] && PROGRESS=100
 
                 echo "XXX"
-                echo "$PROGRESS"
-                echo -e "Téléchargement de $GAME_NAME...\nVitesse : ${SPEED_MO} Mo/s\nTéléchargé : ${CURRENT_MB} / ${TOTAL_MB} Mo"
+                echo -e "\n\nTéléchargement de $GAME_NAME..."
+                echo -e "\nVitesse : ${SPEED_MO} Mo/s | Téléchargé : ${CURRENT_MB} / ${TOTAL_MB} Mo"
                 echo "XXX"
+                echo "$PROGRESS"
             fi
             sleep 0.5
         done
