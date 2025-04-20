@@ -4,7 +4,7 @@
 NOM_PACK="Pack OpenLara"
 URL_ZIP="https://github.com/foclabroc/toolbox/releases/download/Fichiers/openlara.zip"
 FICHIER_ZIP="/tmp/openlara.zip"
-DEST_DIR="/userdata/system/roms"
+DEST_DIR="/userdata/roms"
 INSTALL_DIR="$DEST_DIR/openlara"
 DIALOG_BACKTITLE="Foclabroc Toolbox"
 GAME_NAME="OpenLara"
@@ -12,10 +12,7 @@ GAME_NAME="OpenLara"
 
 # Boîte de confirmation
 dialog --backtitle "$DIALOG_BACKTITLE" --title "$NOM_PACK" \
---yesno "\nScript d'installation du $NOM_PACK.
-
-⚠️  Cela supprimera complètement le dossier $GAME_NAME
-et le remplacera par ce pack.
+--yesno "\nScript d'installation du $NOM_PACK.\n\nCela supprimera complètement le dossier $GAME_NAME\n\net le remplacera par ce pack.
 
 Souhaitez-vous continuer ?" 15 60 || exit 0
 
@@ -60,7 +57,7 @@ telechargement_zip() {
             fi
             sleep 0.5
         done
-    ) | dialog --title "Téléchargement" --gauge "" 10 60 0
+    ) | dialog --backtitle "$DIALOG_BACKTITLE" --title "Téléchargement" --gauge "" 10 60 0 2>&1 >/dev/tty
 
     wait $PID_CURL
 
@@ -87,7 +84,7 @@ extraction_zip() {
             echo "Extraction de $GAME_NAME... ($PERCENT %)"
             echo "XXX"
         done
-    ) | dialog --title "Décompression" --gauge "" 10 60 0
+    ) | dialog --backtitle "$DIALOG_BACKTITLE" --title "Décompression" --gauge "" 8 60 0 2>&1 >/dev/tty
 
     rm -f "$FICHIER_ZIP"
 }
@@ -98,7 +95,7 @@ extraction_zip
 
 # Message final
 dialog --backtitle "$DIALOG_BACKTITLE" --title "Installation terminée" \
---msgbox "✅ Le $NOM_PACK a été installé avec succès !" 6 50
+--msgbox "\nLe $NOM_PACK a été installé avec succès !" 8 50
 
 clear
 exit 0
