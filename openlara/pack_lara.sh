@@ -8,7 +8,7 @@ DEST_DIR="/userdata/roms"
 INSTALL_DIR="$DEST_DIR/openlara"
 DIALOG_BACKTITLE="Foclabroc Toolbox"
 GAME_NAME="OpenLara"
-INFO_MSG="!!!Information!!\nAssurez vous que le systeme OpenLara est bien coché dans\nParamètres des collections->systèmes affichés\net qu'il n'est pas coché dans\nParamètres des collections->systèmes groupés."
+INFO_MSG="!!!Information!!\n\nAssurez vous que le systeme OpenLara est bien coché dans :\nParamètres des collections->systèmes affichés\n\net qu'il n'est pas coché dans :\nParamètres des collections->systèmes groupés."
 # ========================================
 
 # Boîte de confirmation
@@ -24,7 +24,7 @@ if [ -d "$INSTALL_DIR" ]; then
         echo -e "\n\nSuppression de l'ancien dossier $GAME_NAME..."
         echo "XXX"
         for i in {0..100}; do
-            echo "$i"; sleep 0.05
+            echo "$i"; sleep 0.01
         done
     } | dialog --backtitle "$DIALOG_BACKTITLE" --title "Nettoyage" --gauge "" 8 50
 
