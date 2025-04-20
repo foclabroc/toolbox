@@ -12,15 +12,16 @@ GAME_NAME="OpenLara"
 
 # Boîte de confirmation
 dialog --backtitle "$DIALOG_BACKTITLE" --title "$NOM_PACK" \
---yesno "\nScript d'installation du $NOM_PACK.\n\nCela supprimera complètement le dossier $INSTALL_DIR\n\net le remplacera par ce pack.
-
-Souhaitez-vous continuer ?" 15 60 || exit 0
+--yesno "\nScript d'installation du $NOM_PACK.\n\nCela supprimera complètement le dossier :\n$INSTALL_DIR\n\net le remplacera par ce pack.\nSouhaitez-vous continuer ?" 15 60 || exit 0
 
 clear
 
 # Suppression de l'ancien dossier
 if [ -d "$INSTALL_DIR" ]; then
-    dialog --infobox "Suppression de l'ancien dossier $GAME_NAME..." 5 50 2>&1 >/dev/tty
+    for i in {0..100..2}; do
+        echo "$i"; sleep 0.01
+    done
+    dialog --gauge --backtitle "$DIALOG_BACKTITLE" --title "Nettoyage" "\nSuppression de l'ancien dossier $GAME_NAME..." 6 50 2>&1 >/dev/tty
     rm -rf "$INSTALL_DIR"
     sleep 1
 fi
@@ -63,7 +64,7 @@ telechargement_zip() {
     wait $PID_CURL
 
     if [ ! -s "$FILE_PATH" ]; then
-        dialog --msgbox "Erreur : le téléchargement a échoué." 6 50 2>&1 >/dev/tty
+        dialog --backtitle "$DIALOG_BACKTITLE" --msgbox "Erreur : le téléchargement a échoué." 6 50 2>&1 >/dev/tty
         exit 1
     fi
 }
@@ -82,7 +83,7 @@ extraction_zip() {
 
             echo "XXX"
             echo "$PERCENT"
-            echo "Extraction de $GAME_NAME... ($PERCENT %)"
+            echo "\nExtraction de $GAME_NAME..."
             echo "XXX"
         done
     ) | dialog --backtitle "$DIALOG_BACKTITLE" --title "Décompression" --gauge "" 8 60 0 2>&1 >/dev/tty
