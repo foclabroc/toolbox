@@ -59,7 +59,7 @@ telechargement_zip() {
                 echo "XXX"
                 echo "$PROGRESS"
             fi
-            sleep 0.5
+            sleep 0.2
         done
     ) | dialog --backtitle "$DIALOG_BACKTITLE" --title "Téléchargement" --gauge "" 10 60 0 2>&1 >/dev/tty
 
