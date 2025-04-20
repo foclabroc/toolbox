@@ -8,7 +8,7 @@ DEST_DIR="/userdata/roms"
 INSTALL_DIR="$DEST_DIR/openlara"
 DIALOG_BACKTITLE="Foclabroc Toolbox"
 GAME_NAME="OpenLara"
-INFO_MSG="!!!Information!!\n\nAssurez vous que le systeme OpenLara est bien coché dans :\nParamètres des collections->systèmes affichés\n\net qu'il n'est pas coché dans :\nParamètres des collections->systèmes groupés."
+INFO_MSG="!!!Information!!!\n\nAssurez vous que le systeme OpenLara est bien coché dans :\n->Paramètres des collections->systèmes affichés.\n\nEt qu'il n'est pas coché dans :\n->Paramètres des collections->systèmes groupés."
 # ========================================
 
 # Boîte de confirmation
@@ -103,7 +103,7 @@ extraction_zip
 
 # Message final
 dialog --backtitle "$DIALOG_BACKTITLE" --title "Installation terminée" \
---msgbox "\nLe $NOM_PACK a été installé avec succès !\n\n$INFO_MSG" 14 80
+--msgbox "\nLe $NOM_PACK a été installé avec succès !\n\n$INFO_MSG" 16 80
 curl -s http://127.0.0.1:1234/reloadgames
 clear
 exit 0
