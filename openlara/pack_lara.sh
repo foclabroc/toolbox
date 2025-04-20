@@ -19,13 +19,16 @@ clear
 # Suppression de l'ancien dossier
 if [ -d "$INSTALL_DIR" ]; then
     {
-        for i in {0..100..2}; do
-            echo $i
-            sleep 0.05
+        echo "XXX"
+        echo -e "\n\nSuppression de l'ancien dossier $GAME_NAME..."
+        echo "XXX"
+        for i in {0..100}; do
+            echo "$i"; sleep 0.05
         done
-    } | dialog --gauge --backtitle "$DIALOG_BACKTITLE" --title "Nettoyage" "\nSuppression de l'ancien dossier $GAME_NAME..." 6 50
+    } | dialog --backtitle "$DIALOG_BACKTITLE" --title "Nettoyage" --gauge "" 10 50
+
     rm -rf "$INSTALL_DIR"
-    sleep 1
+    sleep 0.5
 fi
 
 # Fonction de téléchargement avec progression et vitesse
