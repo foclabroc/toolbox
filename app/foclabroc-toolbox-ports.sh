@@ -163,16 +163,17 @@ main_menu() {
     while true; do
         main_menu=$(dialog --clear --backtitle "Foclabroc Toolbox" \
             --title "Menu Principal" \
-            --menu "\nSélectionnez une option :\n " 22 100 9 \
+            --menu "\nSélectionnez une option :\n " 22 100 10 \
             1 "[Nintendo Switch] -> Installer l'émulation Switch sur Batocera" \
             2 "[Youtube TV]      -> Installer Youtube TV" \
             3 "[Gparted]         -> Installer Gparted" \
             4 "[Pack Kodi]       -> Installer le pack streaming/iptv kodi" \
             5 "[Pack Nes3D]      -> Installer le pack Nintendo Nes 3D" \
-            6 "[Jeux Pc]         -> Téléchargement de Jeux Windows et linux..." \
-            7 "[Wine Toolbox]    -> Téléchargement de Runner Wine et outils wsquash..." \
-            8 "[Tools]           -> Outils pour Batocera version light. (Plus d'options dispo via ssh)" \
-            9 "[Exit]            -> Quitter le script" \
+            6 "[Pack OpenLara]   -> Installer le pack OpenLara" \
+            7 "[Jeux Pc]         -> Téléchargement de Jeux Windows et linux..." \
+            8 "[Wine Toolbox]    -> Téléchargement de Runner Wine et outils wsquash..." \
+            9 "[Tools]           -> Outils pour Batocera version light. (Plus d'options dispo via ssh)" \
+            10 "[Exit]            -> Quitter le script" \
             2>&1 >/dev/tty)
         clear
 
@@ -202,19 +203,24 @@ main_menu() {
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/3d/pack_3d.sh | bash"
                 ;;
-            6)  #Jeux windows et linux
+            6)
+                confirm_install "Pack OpenLara" || continue
+                clear
+                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/openlara/pack_lara.sh | bash"
+                ;;
+            7)  #Jeux windows et linux
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/_win-game.sh | bash | bash"
                 ;;
-            7)  #wine tools
+            8)  #wine tools
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash | bash"
                 ;;
-            8)  #record tools
+            9)  #record tools
                 clear
                 tools_options
                 ;;
-            9)# Afficher un message de remerciement
+            10)# Afficher un message de remerciement
                 dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --msgbox "\nMerci d'avoir utilisé le script !" 7 40 2>&1 >/dev/tty
                 killall -9 xterm
                 clear
