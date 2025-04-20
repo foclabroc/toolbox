@@ -23,7 +23,7 @@ if [ -d "$INSTALL_DIR" ]; then
             echo $i
             sleep 0.01
         done
-    } | dialog --gauge --backtitle "$DIALOG_BACKTITLE" --title "Nettoyage" "\nSuppression de l'ancien dossier $GAME_NAME..." 6 50
+    } | dialog --gauge --backtitle "$DIALOG_BACKTITLE" --title "Nettoyage" "\nSuppression de l'ancien dossier $GAME_NAME..." 6 50 2>&1 >/dev/tty
     rm -rf "$INSTALL_DIR"
     sleep 1
 fi
@@ -88,7 +88,7 @@ extraction_zip() {
             echo "\nExtraction de [$GAME_NAME] dans :\n\n[$INSTALL_DIR]"
             echo "XXX"
         done
-    ) | dialog --backtitle "$DIALOG_BACKTITLE" --title "Décompression" --gauge "" 8 60 0 2>&1 >/dev/tty
+    ) | dialog --backtitle "$DIALOG_BACKTITLE" --title "Décompression" --gauge "" 10 60 0 2>&1 >/dev/tty
 
     rm -f "$FICHIER_ZIP"
 }
