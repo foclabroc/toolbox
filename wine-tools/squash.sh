@@ -55,7 +55,7 @@ case "$compression_choice" in
       mv "$old_output" "$final_output"
       dialog --backtitle "Foclabroc Toolbox" --msgbox "\nCompression du dossier $selected_folder en $final_output terminée !" 9 70 2>&1 >/dev/tty
     else
-      dialog --backtitle "Foclabroc Toolbox" --infobox "\nErreur de compression : .TGZ introuvable..." 6 60 2>&1 >/dev/tty
+      dialog --backtitle "Foclabroc Toolbox" --msgbox "\nErreur de compression : .TGZ introuvable ou espace disque insuffisant..." 6 80 2>&1 >/dev/tty
       sleep 2
       curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/squash.sh | bash
       exit 1
@@ -70,7 +70,7 @@ case "$compression_choice" in
       mv "$old_output" "$final_output"
       dialog --backtitle "Foclabroc Toolbox" --msgbox "\nCompression du dossier $selected_folder en $final_output terminée !" 9 70 2>&1 >/dev/tty
     else
-      dialog --backtitle "Foclabroc Toolbox" --infobox "\nErreur de compression : .SquashFS introuvable..." 6 60 2>&1 >/dev/tty
+      dialog --backtitle "Foclabroc Toolbox" --msgbox "\nErreur de compression : .Squashfs introuvable ou espace disque insuffisant..." 6 80 2>&1 >/dev/tty
       sleep 2
       curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/squash.sh | bash
       exit 1
