@@ -14,7 +14,7 @@ PORTS_DIR="/userdata/roms/ports"
 WIN_DIR="/userdata/roms/windows"
 GAME_FILE="Megaman.2.5D.wsquashfs"
 GAME_FILE_FINAL="Megaman.2.5D.wsquashfs"
-INFO_MESSAGE="Runner -> Wine-TKG"
+INFO_MESSAGE="\nRunner -> Wine-TKG"
 ##############################################################################################################
 ##############################################################################################################
 # VARIABLES GAMELIST
