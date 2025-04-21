@@ -116,20 +116,28 @@ while true; do
        case "$compression_choice" in
          1-wtgz)
            dialog --backtitle "Foclabroc Toolbox" --infobox "\nConversion du dossier au format TGZ (tgz)... Veuillez patienter." 6 50 2>&1 >/dev/tty
-           batocera-wine windows wine2winetgz "$new_path" 2>&1 >/dev/tty
-           old_output="${new_path}.wtgz"
-           final_output="${new_path%.wine}.wtgz"
-           if [ -f "$old_output" ]; then
-             mv "$old_output" "$final_output"
+           if batocera-wine windows wine2winetgz "$new_path" 2>&1 >/dev/tty; then
+             old_output="${new_path}.wtgz"
+             final_output="${new_path%.wine}.wtgz"
+             if [ -f "$old_output" ]; then
+               mv "$old_output" "$final_output"
+             fi
+             dialog --backtitle "Foclabroc Toolbox" --msgbox "\nCompression du dossier $new_name en $final_output terminée !" 8 70 2>&1 >/dev/tty
+           else
+             dialog --backtitle "Foclabroc Toolbox" --msgbox "\nÉchec de la compression (vérifier si assez espace disque)." 6 60 2>&1 >/dev/tty
            fi
            ;;
          2-wsquashfs)
            dialog --backtitle "Foclabroc Toolbox" --infobox "\nConversion du dossier au format SquashFS (wsquashfs)... Veuillez patienter." 6 50 2>&1 >/dev/tty
-           batocera-wine windows wine2squashfs "$new_path" 2>&1 >/dev/tty
-           old_output="${new_path}.wsquashfs"
-           final_output="${new_path%.wine}.wsquashfs"
-           if [ -f "$old_output" ]; then
-             mv "$old_output" "$final_output"
+           if batocera-wine windows wine2squashfs "$new_path" 2>&1 >/dev/tty; then
+             old_output="${new_path}.wsquashfs"
+             final_output="${new_path%.wine}.wsquashfs"
+             if [ -f "$old_output" ]; then
+               mv "$old_output" "$final_output"
+             fi
+             dialog --backtitle "Foclabroc Toolbox" --msgbox "\nCompression du dossier $new_name en $final_output terminée !" 8 70 2>&1 >/dev/tty
+           else
+             dialog --backtitle "Foclabroc Toolbox" --msgbox "\nÉchec de la compression (vérifier si assez espace disque)." 6 60 2>&1 >/dev/tty
            fi
            ;;
          *)
@@ -139,7 +147,6 @@ while true; do
            exit 1
            ;;
        esac
-       dialog --backtitle "Foclabroc Toolbox" --msgbox "\nCompression du dossier $new_name en $final_output terminée !" 8 70 2>&1 >/dev/tty
 
        # Vérifier si le fichier compressé existe avant de proposer la suppression du dossier .wine
        if [ -f "$final_output" ]; then
