@@ -17,7 +17,7 @@ jeux["->MiniDoom 2"]="Le jeu hommage qui transforme DOOM en un jeu de plateforme
 jeux["->AM2R"]="Another Metroid 2 Remake, remake non officiel du jeu Game Boy de 1991 Metroid II.(85.6Mo)"
 jeux["->Megaman X II"]="Mega Man X Innocent Impulse FanGame style 8bits.(354Mo)"
 jeux["->Super Tux Kart"]="Mario Kart like, opensource avec mode online.(662Mo)"
-jeux["->Street of Rage remake 5.2"]="Remake de Street Of Rage 1/2/3 pour Windows.(331Mo)"
+jeux["->Street of Rage R 5.2"]="Remake de Street Of Rage 1/2/3 pour Windows.(331Mo)"
 jeux["->Megaman 2.5D"]="Fangame de Mega Man en 2.5D pour Windows.(855Mo)"
 jeux["->Sonic Smackdown"]="Fangame de combat, faite combattre vos heros de l'univers Sonic.(1.6Go)"
 
@@ -33,7 +33,7 @@ while true; do
     # Affichage du menu principal
     choix=$(dialog --clear --backtitle "Foclabroc Toolbox" \
         --title "Jeux disponibles" \
-        --menu "\nSélectionnez un jeu à installer :\n " 30 123 10 \
+        --menu "\nSélectionnez un jeu à installer :\n " 30 124 10 \
         "${menu_entries[@]}" \
         2>&1 >/dev/tty)
 
@@ -87,14 +87,14 @@ while true; do
             "->Super Tux Kart")
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/supertuxkart.sh | bash
                 ;;
-            "->Street of Rage remake 5.2")
+            "->Street of Rage R 5.2")
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/sorr52.sh | bash
                 ;;
             "->Megaman 2.5D")
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/megaman25.sh | bash
                 ;;
             "->Sonic Smackdown")
-                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/sonicsmach.sh | bash
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/sonicsmash.sh | bash
                 ;;
         esac
         sleep 2
