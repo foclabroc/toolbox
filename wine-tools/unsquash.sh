@@ -39,7 +39,7 @@ case "$extension" in
     mkdir -p "$final_dir"
     tar -xzf "$selected_file" -C "$final_dir" >/dev/tty 2>&1
     if [ $? -ne 0 ]; then
-      dialog --backtitle "Foclabroc Toolbox" --infobox "\nErreur de décompression du .TGZ répertoire deja existant\nOu espace disque insuffisant" 7 60 2>&1 >/dev/tty
+      dialog --backtitle "Foclabroc Toolbox" --msgbox "\nErreur de décompression du .TGZ répertoire deja existant\nOu espace disque insuffisant" 7 60 2>&1 >/dev/tty
       sleep 2
       curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/unsquash.sh | bash
     fi
@@ -52,7 +52,7 @@ case "$extension" in
     rm -rf "$final_dir"
     unsquashfs -d "$final_dir" "$selected_file" 2>&1 >/dev/tty
     if [ $? -ne 0 ]; then
-      dialog --backtitle "Foclabroc Toolbox" --infobox "\nErreur de décompression du .TGZ répertoire deja existant\nOu espace disque insuffisant" 7 60 2>&1 >/dev/tty
+      dialog --backtitle "Foclabroc Toolbox" --msgbox "\nErreur de décompression du .TGZ répertoire deja existant\nOu espace disque insuffisant" 7 60 2>&1 >/dev/tty
       sleep 2
       curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/unsquash.sh | bash
     fi
