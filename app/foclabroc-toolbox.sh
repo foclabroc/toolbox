@@ -109,7 +109,7 @@ tools_options() {
       sleep 2 #pour eviter la corruption de la capture
       tmux kill-session -t record_session 2>/dev/null
       rm /tmp/record_pid
-      show_message "Capture vidéo enregistrée avec succès dans le dossier Recordings.\n"
+      show_message "\nCapture vidéo enregistrée avec succès dans le dossier Recordings.\n"
     else
       show_message "\nAucun enregistrement en cours.\n"
     fi
@@ -139,7 +139,7 @@ show_batocera_info() {
         1)
           # Option Screenshot
           batocera-screenshot
-          show_message "Screenshot enregistré dans le dossier Screenshots avec succès."
+          show_message "\nScreenshot enregistré dans le dossier Screenshots avec succès."
           ;;
         2)
           # Option Reload

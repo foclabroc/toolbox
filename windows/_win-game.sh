@@ -18,6 +18,7 @@ jeux["->AM2R"]="Another Metroid 2 Remake, remake non officiel du jeu Game Boy de
 jeux["->Megaman X II"]="Mega Man X Innocent Impulse FanGame style 8bits.(354Mo)"
 jeux["->Super Tux Kart"]="Mario Kart like, opensource avec mode online.(662Mo)"
 jeux["->Street of Rage remake 5.2"]="Remake de Street Of Rage 1/2/3 pour Windows.(331Mo)"
+jeux["->Megaman 2.5D"]="Fangame de megaman en 2.5D pour Windows.(855Mo)"
 
 while true; do
     # Construction dynamique du menu trié alphabétiquement par clé
@@ -86,6 +87,9 @@ while true; do
                 ;;
             "->Street of Rage remake 5.2")
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/sorr52.sh | bash
+                ;;
+            "->Megaman 2.5D")
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/megaman25.sh | bash
                 ;;
         esac
         sleep 2
