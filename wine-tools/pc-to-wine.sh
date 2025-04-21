@@ -124,7 +124,7 @@ while true; do
              fi
              dialog --backtitle "Foclabroc Toolbox" --msgbox "\nCompression du dossier $new_name en $final_output terminée !" 8 70 2>&1 >/dev/tty
            else
-             dialog --backtitle "Foclabroc Toolbox" --msgbox "\nÉchec de la compression (vérifier si assez espace disque)." 6 60 2>&1 >/dev/tty
+             dialog --backtitle "Foclabroc Toolbox" --title "Erreur!" --msgbox "\nÉchec de la compression\n(vérifier si assez espace disque)." 9 60 2>&1 >/dev/tty
            fi
            ;;
          2-wsquashfs)
@@ -137,7 +137,7 @@ while true; do
              fi
              dialog --backtitle "Foclabroc Toolbox" --msgbox "\nCompression du dossier $new_name en $final_output terminée !" 8 70 2>&1 >/dev/tty
            else
-             dialog --backtitle "Foclabroc Toolbox" --msgbox "\nÉchec de la compression (vérifier si assez espace disque)." 6 60 2>&1 >/dev/tty
+             dialog --backtitle "Foclabroc Toolbox" --title "Erreur!" --msgbox "\nÉchec de la compression\n(vérifier si assez espace disque)." 9 60 2>&1 >/dev/tty
            fi
            ;;
          *)
