@@ -171,7 +171,7 @@ main_menu() {
             5 "[Pack Nes3D]      -> Installer le pack Nintendo Nes 3D" \
             6 "[Pack OpenLara]   -> Installer le pack OpenLara" \
             7 "[Pack Music]      -> Installer le pack Music pour ES" \
-            8 "[Jeux Pc]         -> Téléchargement de Jeux Windows et linux..." \
+            8 "[Jeux Pc]         -> Téléchargement de Jeux Windows..." \
             9 "[Wine Toolbox]    -> Téléchargement de Runner Wine et outils wsquash..." \
             10 "[Tools]           -> Outils pour Batocera version light. (Plus d'options dispo via ssh)" \
             11 "[Exit]            -> Quitter le script" \
