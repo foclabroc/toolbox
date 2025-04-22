@@ -163,17 +163,18 @@ main_menu() {
     while true; do
         main_menu=$(dialog --clear --backtitle "Foclabroc Toolbox" \
             --title "Menu Principal" \
-            --menu "\nSélectionnez une option :\n " 22 100 10 \
+            --menu "\nSélectionnez une option :\n " 22 100 11 \
             1 "[Nintendo Switch] -> Installer l'émulation Switch sur Batocera" \
             2 "[Youtube TV]      -> Installer Youtube TV" \
             3 "[Gparted]         -> Installer Gparted" \
             4 "[Pack Kodi]       -> Installer le pack streaming/iptv kodi" \
             5 "[Pack Nes3D]      -> Installer le pack Nintendo Nes 3D" \
             6 "[Pack OpenLara]   -> Installer le pack OpenLara" \
-            7 "[Jeux Pc]         -> Téléchargement de Jeux Windows et linux..." \
-            8 "[Wine Toolbox]    -> Téléchargement de Runner Wine et outils wsquash..." \
-            9 "[Tools]           -> Outils pour Batocera version light. (Plus d'options dispo via ssh)" \
-            10 "[Exit]            -> Quitter le script" \
+            7 "[Pack Music]      -> Installer le pack Music pour ES" \
+            8 "[Jeux Pc]         -> Téléchargement de Jeux Windows et linux..." \
+            9 "[Wine Toolbox]    -> Téléchargement de Runner Wine et outils wsquash..." \
+            10 "[Tools]           -> Outils pour Batocera version light. (Plus d'options dispo via ssh)" \
+            11 "[Exit]            -> Quitter le script" \
             2>&1 >/dev/tty)
         clear
 
@@ -203,24 +204,27 @@ main_menu() {
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/3d/pack_3d.sh | bash"
                 ;;
-            6)
-                confirm_install "Pack OpenLara" || continue
+            6)  #Pack openlara
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/openlara/pack_lara.sh | bash"
                 ;;
-            7)  #Jeux windows et linux
+            7)  #Pack Music
                 clear
-                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/_win-game.sh | bash | bash"
+                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/music/music.sh | bash"
                 ;;
-            8)  #wine tools
+            8)  #Jeux windows et linux
                 clear
-                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash | bash"
+                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/_win-game.sh | bash"
                 ;;
-            9)  #record tools
+            9)  #wine tools
+                clear
+                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash"
+                ;;
+            10)  #record tools
                 clear
                 tools_options
                 ;;
-            10)# Afficher un message de remerciement
+            11)# Afficher un message de remerciement
                 dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --msgbox "\nMerci d'avoir utilisé le script !" 7 40 2>&1 >/dev/tty
                 killall -9 xterm
                 clear

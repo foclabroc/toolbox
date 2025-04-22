@@ -180,18 +180,19 @@ main_menu() {
     while true; do
         main_menu=$(dialog --clear --backtitle "Foclabroc Toolbox" \
             --title "Menu Principal" \
-            --menu "\nSélectionnez une option :\n " 22 90 11 \
+            --menu "\nSélectionnez une option :\n " 22 90 12 \
             1 "[Nintendo Switch]     -> Installer l'émulation Switch sur Batocera" \
             2 "[Youtube TV]          -> Installer Youtube TV" \
             3 "[Gparted]             -> Installer Gparted" \
             4 "[Pack Kodi]           -> Installer le pack streaming/iptv kodi" \
             5 "[Pack Nes3D]          -> Installer le pack Nintendo Nes 3D" \
             6 "[Pack OpenLara]       -> Installer le pack OpenLara" \
-            7 "[Jeux Pc]             -> Téléchargement de Jeux Windows..." \
-            8 "[Wine Toolbox]        -> Téléchargement de Runner Wine et outils wsquash..." \
-            9 "[Tools]               -> Outils pour Batocera. Screenshot, Records..." \
-            10 "[Install dans Ports]  -> Ajoute ce menu aux ports Batocera" \
-            11 "[Exit]                -> Quitter le script" \
+            7 "[Pack Music]          -> Installer le pack Music pour ES" \
+            8 "[Jeux Pc]             -> Téléchargement de Jeux Windows..." \
+            9 "[Wine Toolbox]        -> Téléchargement de Runner Wine et outils wsquash..." \
+            10 "[Tools]               -> Outils pour Batocera. Screenshot, Records..." \
+            11 "[Install dans Ports]  -> Ajoute ce menu aux ports Batocera" \
+            12 "[Exit]                -> Quitter le script" \
             2>&1 >/dev/tty)
         clear
 
@@ -221,29 +222,32 @@ main_menu() {
                 clear
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/3d/pack_3d.sh | bash
                 ;;
-            6)
-                confirm_install "Pack OpenLara" || continue
+            6)  #Pack openlara
                 clear
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/openlara/pack_lara.sh | bash
                 ;;
-            7)  #Jeux windows et linux
+            7)  #Pack Music
+                clear
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/music/music.sh | bash
+                ;;
+            8)  #Jeux windows et linux
                 clear
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/_win-game.sh | bash
                 ;;
-            8)  #wine tools
+            9)  #wine tools
                 clear
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
                 ;;
-            9)
+            10)
                 clear
                 tools_options
                 ;;
-            10)
+            11)
                 confirm_install "Ports Installer" || continue 
                 clear
                 wget -q --tries=30 --no-check-certificate -O /tmp/runner https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/install-to-port.sh && chmod +x /tmp/runner && bash /tmp/runner
                 ;;
-            11)
+            12)
                 # Afficher un message de remerciement
                 dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --msgbox "\nMerci d'avoir utilisé le script !" 7 40 2>&1 >/dev/tty
                 killall -9 xterm
