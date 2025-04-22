@@ -21,6 +21,7 @@ jeux["->Street of Rage R 5.2"]="Remake de Street Of Rage 1/2/3 pour Windows.(331
 jeux["->Megaman 2.5D"]="Fangame de Mega Man en 2.5D pour Windows.(855Mo)"
 jeux["->Sonic Smackdown"]="Fangame de combat, faite combattre vos heros de l'univers Sonic.(1.6Go)"
 jeux["->Maldita Castilla"]="Fanmade dans le style de Ghouls 'n Ghosts.(60.2Mo)"
+jeux["->Super Smash Crusade"]="Fanmade Super Smash Bros Crusade.(1.45Go)"
 
 while true; do
     # Construction dynamique du menu trié alphabétiquement par clé
@@ -98,6 +99,9 @@ while true; do
                 ;;
             "->Maldita Castilla")
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/maldita.sh | bash
+                ;;
+            "->Super Smash Crusade")
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/supersc.sh | bash
                 ;;
         esac
         sleep 2
