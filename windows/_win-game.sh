@@ -25,6 +25,7 @@ jeux["->Super Smash Crusade"]="Fanmade Super Smash Bros Crusade.(1.45Go)"
 jeux["->Rayman Redemption"]="Fanmade Rayman Redemption.(976Mo)"
 jeux["->Power Bomberman"]="Fanmade de Bomberman.(616Mo)"
 jeux["->Mushroom Kingdom Fusion"]="Fanmade Mario croisé avec de nombreuses autres franchises de jeux.(962Mo)"
+jeux["->Dr. Robotnik's Ring Racers"]="Fanmade Mario Kart like dans l'univers de Sonic.(698Mo)"
 
 
 while true; do
@@ -38,7 +39,7 @@ while true; do
     # Affichage du menu principal
     choix=$(dialog --clear --backtitle "Foclabroc Toolbox" \
         --title "Jeux disponibles" \
-        --menu "\nSélectionnez un jeu à installer :\n " 30 124 10 \
+        --menu "\nSélectionnez un jeu à installer :\n " 33 124 10 \
         "${menu_entries[@]}" \
         2>&1 >/dev/tty)
 
@@ -115,6 +116,9 @@ while true; do
                 ;;
             "->Mushroom Kingdom Fusion")
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/mushkf.sh | bash
+                ;;
+            "->Dr. Robotnik's Ring Racers")
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/drrobo.sh | bash
                 ;;
         esac
         sleep 2
