@@ -24,7 +24,7 @@ jeux["->Maldita Castilla"]="Fanmade dans le style de Ghouls 'n Ghosts.(60.2Mo)"
 jeux["->Super Smash Crusade"]="Fanmade Super Smash Bros Crusade.(1.45Go)"
 jeux["->Rayman Redemption"]="Fanmade Rayman Redemption.(976Mo)"
 jeux["->Power Bomberman"]="Fanmade de Bomberman.(616Mo)"
-jeux["->Mushroom Kingdom Fusion"]="Fanmade Mario croisé avec de nombreuses autres franchises de jeux.(616Mo)"
+jeux["->Mushroom Kingdom Fusion"]="Fanmade Mario croisé avec de nombreuses autres franchises de jeux.(962Mo)"
 
 
 while true; do
