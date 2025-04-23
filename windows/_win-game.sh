@@ -23,6 +23,7 @@ jeux["->Sonic Smackdown"]="Fangame de combat, faite combattre vos heros de l'uni
 jeux["->Maldita Castilla"]="Fanmade dans le style de Ghouls 'n Ghosts.(60.2Mo)"
 jeux["->Super Smash Crusade"]="Fanmade Super Smash Bros Crusade.(1.45Go)"
 jeux["->Rayman Redemption"]="Fanmade Rayman Redemption.(976Mo)"
+jeux["->Power Bomberman"]="Fanmade de Bomberman.(616Mo)"
 
 
 while true; do
@@ -107,6 +108,9 @@ while true; do
                 ;;
             "->Rayman Redemption")
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/raymanr.sh | bash
+                ;;
+            "->Power Bomberman")
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/powerb.sh | bash
                 ;;
         esac
         sleep 2
