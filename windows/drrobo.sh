@@ -51,9 +51,9 @@ afficher_barre_progression() {
 
     FILE_PATH="$WIN_DIR/$GAME_FILE"
     FILE_PATH_PC="$WIN_DIR/$GAME_FILE_FINAL"
-    if [ -f "$FILE_PATH" ]; then
-        rm -f "$FILE_PATH"
-        rm -rf "$FILE_PATH_PC"
+    if [ -f "$FILE_PATH" ] || [ -e "$FILE_PATH_PC" ]; then
+        [ -f "$FILE_PATH" ] && rm -f "$FILE_PATH"
+        [ -e "$FILE_PATH_PC" ] && rm -rf "$FILE_PATH_PC"
     fi
 
     (
