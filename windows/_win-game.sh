@@ -24,6 +24,7 @@ jeux["->Maldita Castilla"]="Fanmade dans le style de Ghouls 'n Ghosts.(60.2Mo)"
 jeux["->Super Smash Crusade"]="Fanmade Super Smash Bros Crusade.(1.45Go)"
 jeux["->Rayman Redemption"]="Fanmade Rayman Redemption.(976Mo)"
 jeux["->Power Bomberman"]="Fanmade de Bomberman.(616Mo)"
+jeux["->Mushroom Kingdom Fusion"]="Fanmade Mario croisé avec de nombreuses autres franchises de jeux.(616Mo)"
 
 
 while true; do
@@ -111,6 +112,9 @@ while true; do
                 ;;
             "->Power Bomberman")
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/powerb.sh | bash
+                ;;
+            "->Mushroom Kingdom Fusion")
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/mushkf.sh | bash
                 ;;
         esac
         sleep 2
