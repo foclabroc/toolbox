@@ -18,11 +18,11 @@ tmpfile="/tmp/underground_script.sh"
 # Téléchargement et exécution
 if curl -fsSL "$url" -o "$tmpfile"; then
     chmod +x "$tmpfile"
-    dialog --backtitle "Foclabroc Toolbox" --infobox "Mot de passe correct." 5 30 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nMot de passe correct..." 5 30 2>&1 >/dev/tty
     sleep 2
     bash "$tmpfile"
     rm -f "$tmpfile"
 else
-    dialog --backtitle "Foclabroc Toolbox" --msgbox "\nMot de passe incorrect ou erreur réseau.\nRetour menu" 6 50 2>&1 >/dev/tty
+    dialog --backtitle "Foclabroc Toolbox" --msgbox "\nMot de passe incorrect ou erreur réseau.\nRetour menu" 8 50 2>&1 >/dev/tty
 fi
 

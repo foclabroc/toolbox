@@ -180,7 +180,7 @@ main_menu() {
     while true; do
         main_menu=$(dialog --clear --backtitle "Foclabroc Toolbox" \
             --title "Menu Principal" \
-            --menu "\nSélectionnez une option :\n " 22 90 12 \
+            --menu "\nSélectionnez une option :\n " 22 90 13 \
             1 "[Nintendo Switch]     -> Installer l'émulation Switch sur Batocera" \
             2 "[Youtube TV]          -> Installer Youtube TV" \
             3 "[Gparted]             -> Installer Gparted" \
@@ -192,7 +192,8 @@ main_menu() {
             9 "[Wine Toolbox]        -> Téléchargement de Runner Wine et outils wsquash..." \
             10 "[Tools]               -> Outils pour Batocera. Screenshot, Records..." \
             11 "[Install dans Ports]  -> Ajoute ce menu aux ports Batocera" \
-            12 "[Exit]                -> Quitter le script" \
+            12 "[Underground]         -> !!!Mot de passe nécessaire!!!" \
+            13 "[Exit]                -> Quitter le script" \
             2>&1 >/dev/tty)
         clear
 
@@ -247,7 +248,11 @@ main_menu() {
                 clear
                 wget -q --tries=30 --no-check-certificate -O /tmp/runner https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/install-to-port.sh && chmod +x /tmp/runner && bash /tmp/runner
                 ;;
-            12)
+            9)  #Underground
+                clear
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/underground.sh | bash
+                ;;
+            13)
                 # Afficher un message de remerciement
                 dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --msgbox "\nMerci d'avoir utilisé le script !" 7 40 2>&1 >/dev/tty
                 killall -9 xterm

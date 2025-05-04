@@ -174,7 +174,7 @@ main_menu() {
             8 "[Jeux Pc]         -> Téléchargement de Jeux Windows..." \
             9 "[Wine Toolbox]    -> Téléchargement de Runner Wine et outils wsquash..." \
             10 "[Tools]           -> Outils pour Batocera version light. (Plus d'options dispo via ssh)" \
-            11 "[Underground]     -> Mot de passe nécessaire" \
+            11 "[Underground]     -> !!!Mot de passe nécessaire!!!" \
             12 "[Exit]            -> Quitter le script" \
             2>&1 >/dev/tty)
         clear
@@ -215,11 +215,11 @@ main_menu() {
                 ;;
             8)  #Jeux windows et linux
                 clear
-                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/_win-game.sh | bash"
+                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/_win-game.sh | bash"
                 ;;
             9)  #wine tools
                 clear
-                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash"
+                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash"
                 ;;
             10)  #record tools
                 clear
@@ -227,7 +227,7 @@ main_menu() {
                 ;;
             11)  #Underground
                 clear
-                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/underground.sh | bash"
+                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/underground.sh | bash"
                 ;;
             12)# Afficher un message de remerciement
                 dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --msgbox "\nMerci d'avoir utilisé le script !" 7 40 2>&1 >/dev/tty
