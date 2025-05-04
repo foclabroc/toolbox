@@ -10,20 +10,21 @@ tmpfile1=$(mktemp)
 
 # Contenu ASCII dans le fichier
 cat <<'EOF' > "$tmpfile1"
+                                                                          
 ███████╗ ██████╗  ██████╗██╗      █████╗ ██████╗ ██████╗  ██████╗  ██████╗
 ██╔════╝██╔═══██╗██╔════╝██║     ██╔══██╗██╔══██╗██╔══██╗██╔═══██╗██╔════╝
 █████╗  ██║   ██║██║     ██║     ███████║██████╔╝██████╔╝██║   ██║██║     
 ██╔══╝  ██║   ██║██║     ██║     ██╔══██║██╔══██╗██╔══██╗██║   ██║██║     
 ██║     ╚██████╔╝╚██████╗███████╗██║  ██║██████╔╝██║  ██║╚██████╔╝╚██████╗
 ╚═╝      ╚═════╝  ╚═════╝╚══════╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝ ╚═════╝  ╚═════╝
-    ████████╗ ██████╗  ██████╗ ██╗     ██████╗  ██████╗ ██╗  ██╗          
-    ╚══██╔══╝██╔═══██╗██╔═══██╗██║     ██╔══██╗██╔═══██╗╚██╗██╔╝          
-       ██║   ██║   ██║██║   ██║██║     ██████╔╝██║   ██║ ╚███╔╝           
-       ██║   ██║   ██║██║   ██║██║     ██╔══██╗██║   ██║ ██╔██╗           
-       ██║   ╚██████╔╝╚██████╔╝███████╗██████╔╝╚██████╔╝██╔╝ ██╗          
-       ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝╚═════╝  ╚═════╝ ╚═╝  ╚═╝          
+       ████████╗ ██████╗  ██████╗ ██╗     ██████╗  ██████╗ ██╗  ██╗       
+       ╚══██╔══╝██╔═══██╗██╔═══██╗██║     ██╔══██╗██╔═══██╗╚██╗██╔╝       
+          ██║   ██║   ██║██║   ██║██║     ██████╔╝██║   ██║ ╚███╔╝        
+          ██║   ██║   ██║██║   ██║██║     ██╔══██╗██║   ██║ ██╔██╗        
+          ██║   ╚██████╔╝╚██████╔╝███████╗██████╔╝╚██████╔╝██╔╝ ██╗       
+          ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝╚═════╝  ╚═════╝ ╚═╝  ╚═╝       
                                                                           
-                    MERCI D'AVOIR UTILISÉ MA TOOLBOX                      
+                     MERCI D'AVOIR UTILISÉ MA TOOLBOX                     
 EOF
 
 show_info() {
@@ -254,13 +255,13 @@ main_menu() {
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/underground.sh | bash"
                 ;;
             12)# Afficher un message de remerciement
-                dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --textbox "$tmpfile1" 20 80 2>&1 >/dev/tty
+                dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --textbox "$tmpfile1" 20 78 2>&1 >/dev/tty
                 killall -9 xterm
                 clear
                 exit 0
                 ;;
             *)
-                dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --textbox "$tmpfile1" 20 80 2>&1 >/dev/tty
+                dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --textbox "$tmpfile1" 20 78 2>&1 >/dev/tty
                 killall -9 xterm
                 clear
                 exit 0
