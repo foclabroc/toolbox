@@ -120,6 +120,11 @@
             "trigger": "joystick2up",
             "type": "key",
             "target": "KEY_R"
+        },
+        {
+            "trigger": "y",
+            "type": "key",
+            "target": "KEY_BACKSPACE"
         }
     ]
 }
