@@ -2,11 +2,11 @@
 clear
 
 # Demande du mot de passe via dialog
-mdp=$(dialog --backtitle "Foclabroc Toolbox" --passwordbox "Mot de passe nécessaire :" 8 40 2>&1 >/dev/tty)
+mdp=$(dialog --backtitle "Foclabroc Toolbox" --inputbox "Mot de passe nécessaire :" 8 40 2>&1 >/dev/tty)
 
 if [[ $? -ne 0 || -z "$mdp" ]]; then
     clear
-    echo "Erreur retour menu."
+    dialog --backtitle "Foclabroc Toolbox" --infobox "\nAnnulé retour menu." 5 30 2>&1 >/dev/tty
     sleep 3
     exit 0
 fi
@@ -18,11 +18,11 @@ tmpfile="/tmp/underground_script.sh"
 # Téléchargement et exécution
 if curl -fsSL "$url" -o "$tmpfile"; then
     chmod +x "$tmpfile"
-    dialog --infobox "Mot de passe correct." 5 30
-    sleep 1
+    dialog --backtitle "Foclabroc Toolbox" --infobox "Mot de passe correct." 5 30 2>&1 >/dev/tty
+    sleep 2
     bash "$tmpfile"
     rm -f "$tmpfile"
 else
-    dialog --msgbox "Mot de passe incorrect ou erreur réseau." 8 50
+    dialog --backtitle "Foclabroc Toolbox" --msgbox "\nMot de passe incorrect ou erreur réseau.\nRetour menu" 6 50 2>&1 >/dev/tty
 fi
 
