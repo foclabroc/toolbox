@@ -163,7 +163,7 @@ main_menu() {
     while true; do
         main_menu=$(dialog --clear --backtitle "Foclabroc Toolbox" \
             --title "Menu Principal" \
-            --menu "\nSélectionnez une option :\n " 22 100 11 \
+            --menu "\nSélectionnez une option :\n " 22 100 12 \
             1 "[Nintendo Switch] -> Installer l'émulation Switch sur Batocera" \
             2 "[Youtube TV]      -> Installer Youtube TV" \
             3 "[Gparted]         -> Installer Gparted" \
@@ -174,7 +174,8 @@ main_menu() {
             8 "[Jeux Pc]         -> Téléchargement de Jeux Windows..." \
             9 "[Wine Toolbox]    -> Téléchargement de Runner Wine et outils wsquash..." \
             10 "[Tools]           -> Outils pour Batocera version light. (Plus d'options dispo via ssh)" \
-            11 "[Exit]            -> Quitter le script" \
+            11 "[Underground]     -> Mot de passe nécessaire" \
+            12 "[Exit]            -> Quitter le script" \
             2>&1 >/dev/tty)
         clear
 
@@ -224,7 +225,11 @@ main_menu() {
                 clear
                 tools_options
                 ;;
-            11)# Afficher un message de remerciement
+            11)  #Underground
+                clear
+                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls curl -L https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/underground.sh | bash"
+                ;;
+            12)# Afficher un message de remerciement
                 dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --msgbox "\nMerci d'avoir utilisé le script !" 7 40 2>&1 >/dev/tty
                 killall -9 xterm
                 clear

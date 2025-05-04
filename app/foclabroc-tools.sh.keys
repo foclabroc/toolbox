@@ -63,34 +63,22 @@
         {
             "trigger": "pageup",
             "type": "exec",
-            "target": [
-            "batocera-audio setSystemVolume -5"
-            ]
+            "target": "batocera-audio setSystemVolume -5"
         },
         {
             "trigger": "pagedown",
             "type": "exec",
-            "target": [
-            "batocera-audio setSystemVolume +5"
-            ]
+            "target": "batocera-audio setSystemVolume +5"
         },
         {
             "trigger": "l2",
             "type": "exec",
-            "target": [
-            "batocera-audio setSystemVolume -5"
-            ]
+            "target": "batocera-audio setSystemVolume -5"
         },
         {
             "trigger": "r2",
             "type": "exec",
-            "target": [
-            "batocera-audio setSystemVolume +5"
-            ]
-        },
-        {
-            "trigger": "joystick2",
-            "type": "mouse"
+            "target": "batocera-audio setSystemVolume +5"
         },
         {
             "trigger": [
@@ -99,9 +87,39 @@
             ],
             "type": "key",
             "target": [
-              "KEY_LEFTALT",
-              "KEY_F4"
-          ]
+                "KEY_LEFTALT",
+                "KEY_F4"
+            ]
+        },
+        {
+            "trigger": "r3",
+            "type": "key",
+            "target": "KEY_DOT"
+        },
+        {
+            "trigger": "l3",
+            "type": "key",
+            "target": "KEY_F"
+        },
+        {
+            "trigger": "joystick2left",
+            "type": "key",
+            "target": "KEY_M"
+        },
+        {
+            "trigger": "joystick2right",
+            "type": "key",
+            "target": "KEY_P"
+        },
+        {
+            "trigger": "joystick2down",
+            "type": "key",
+            "target": "KEY_I"
+        },
+        {
+            "trigger": "joystick2up",
+            "type": "key",
+            "target": "KEY_R"
         }
     ]
 }
