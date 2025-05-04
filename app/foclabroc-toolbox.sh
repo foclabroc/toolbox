@@ -2,6 +2,31 @@
 
 clear
 
+# Nettoyage si interruption
+trap 'rm -f "$tmpfile1"; exit' INT TERM EXIT
+
+# Création fichier temporaire
+tmpfile1=$(mktemp)
+
+# Contenu ASCII dans le fichier
+cat <<'EOF' > "$tmpfile1"
+                                                                          
+███████╗ ██████╗  ██████╗██╗      █████╗ ██████╗ ██████╗  ██████╗  ██████╗
+██╔════╝██╔═══██╗██╔════╝██║     ██╔══██╗██╔══██╗██╔══██╗██╔═══██╗██╔════╝
+█████╗  ██║   ██║██║     ██║     ███████║██████╔╝██████╔╝██║   ██║██║     
+██╔══╝  ██║   ██║██║     ██║     ██╔══██║██╔══██╗██╔══██╗██║   ██║██║     
+██║     ╚██████╔╝╚██████╗███████╗██║  ██║██████╔╝██║  ██║╚██████╔╝╚██████╗
+╚═╝      ╚═════╝  ╚═════╝╚══════╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝ ╚═════╝  ╚═════╝
+       ████████╗ ██████╗  ██████╗ ██╗     ██████╗  ██████╗ ██╗  ██╗       
+       ╚══██╔══╝██╔═══██╗██╔═══██╗██║     ██╔══██╗██╔═══██╗╚██╗██╔╝       
+          ██║   ██║   ██║██║   ██║██║     ██████╔╝██║   ██║ ╚███╔╝        
+          ██║   ██║   ██║██║   ██║██║     ██╔══██╗██║   ██║ ██╔██╗        
+          ██║   ╚██████╔╝╚██████╔╝███████╗██████╔╝╚██████╔╝██╔╝ ██╗       
+          ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝╚═════╝  ╚═════╝ ╚═╝  ╚═╝       
+                                                                          
+                     MERCI D'AVOIR UTILISÉ MA TOOLBOX                     
+EOF
+
 show_info() {
 dialog --backtitle "Foclabroc Toolbox" --title "Foclabroc Toolbox" --msgbox \
 "\nBienvenue dans ma Toolbox !\n\n
@@ -254,13 +279,13 @@ main_menu() {
                 ;;
             13)
                 # Afficher un message de remerciement
-                dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --msgbox "\nMerci d'avoir utilisé le script !" 7 40 2>&1 >/dev/tty
+                dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --textbox "$tmpfile1" 20 78 2>&1 >/dev/tty
                 killall -9 xterm
                 clear
                 exit 0
                 ;;
             *)
-                dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --msgbox "\nMerci d'avoir utilisé le script !" 7 40 2>&1 >/dev/tty
+                dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --textbox "$tmpfile1" 20 78 2>&1 >/dev/tty
                 killall -9 xterm
                 clear
                 exit 0
