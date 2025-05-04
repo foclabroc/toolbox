@@ -252,14 +252,14 @@ main_menu() {
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/underground.sh | bash"
                 ;;
             12)# Afficher un message de remerciement
-                dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --textbox "$tmpfile1\nMerci d'avoir utilisé le script !" 30 125 2>&1 >/dev/tty
+                dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --textbox "$tmpfile1" 30 125 2>&1 >/dev/tty
                 sleep 3
                 killall -9 xterm
                 clear
                 exit 0
                 ;;
             *)
-                dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --textbox "$tmpfile1\nMerci d'avoir utilisé le script !" 30 125 2>&1 >/dev/tty
+                dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --textbox "$tmpfile1" 30 125 2>&1 >/dev/tty
                 sleep 3
                 killall -9 xterm
                 clear
