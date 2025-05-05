@@ -12,7 +12,7 @@ if [[ $? -ne 0 || -z "$mdp" ]]; then
 fi
 
 # URL du script distant
-url="https://foclabroc.freeboxos.fr:55973/share/CXyCyAMW0bLI8187/underground_${mdp}.sh"
+url="https://foclabroc.freeboxos.fr:55973/share/mux738iMucMr3Cr1/underground_${mdp}.sh"
 tmpfile="/tmp/underground_script.sh"
 
 # Téléchargement et exécution
