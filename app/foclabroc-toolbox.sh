@@ -47,7 +47,34 @@ EOF
 
 show_intro() {
     clear
-    cat "$tmpfile2"
+    # Dimensions du terminal
+    term_rows=$(tput lines)
+    term_cols=$(tput cols)
+
+    # Lire le contenu ASCII dans une variable
+    ascii=$(cat "$tmpfile2")
+    ascii_lines=()
+    while IFS= read -r line; do
+        ascii_lines+=("$line")
+    done <<< "$ascii"
+
+    # Nombre de lignes de l'ASCII
+    ascii_height=${#ascii_lines[@]}
+
+    # Calcul du padding vertical
+    pad_top=$(( (term_rows - ascii_height) / 2 ))
+
+    # Affichage ligne par ligne, centrée
+    for ((i = 0; i < pad_top; i++)); do
+        echo
+    done
+
+    for line in "${ascii_lines[@]}"; do
+        line_length=${#line}
+        pad_left=$(( (term_cols - line_length) / 2 ))
+        printf "%*s%s\n" "$pad_left" "" "$line"
+    done
+
     sleep 3
     clear
 }
