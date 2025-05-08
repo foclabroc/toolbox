@@ -53,15 +53,9 @@ show_intro() {
 
     # Lire le contenu ASCII dans une variable
     ascii=$(cat "$tmpfile2")
-    ascii_lines=()
-    while IFS= read -r line; do
-        ascii_lines+=("$line")
-    done <<< "$ascii"
-
-    # Nombre de lignes de l'ASCII
-    ascii_height=${#ascii_lines[@]}
 
     # Calcul du padding vertical
+    ascii_height=$(echo -e "$ascii" | wc -l)
     pad_top=$(( (term_rows - ascii_height) / 2 ))
 
     # Affichage ligne par ligne, centrée
@@ -69,11 +63,8 @@ show_intro() {
         echo
     done
 
-    for line in "${ascii_lines[@]}"; do
-        line_length=${#line}
-        pad_left=$(( (term_cols - line_length) / 2 ))
-        echo "$line"
-    done
+    # Affichage de l'ASCII avec echo -e
+    echo -e "$ascii" 2>&1 >/dev/tty
 
     sleep 3
     clear
