@@ -48,27 +48,32 @@ EOF
 show_intro() {
     clear
 
-    # Dimensions du terminal
-    term_rows=$(tput lines)
-    term_cols=$(tput cols)
+    # Tenter de récupérer les dimensions
+    term_rows=$(tput lines 2>/dev/null)
+    term_cols=$(tput cols 2>/dev/null)
 
-    # Lire l'ASCII dans une variable tableau
+    # Vérification de validité
+    if [[ -z "$term_rows" || "$term_rows" -le 0 || -z "$term_cols" || "$term_cols" -le 0 ]]; then
+        # Fallback vers dialog si dimensions invalides
+        dialog --backtitle "Foclabroc Toolbox" --title "Foclabroc Toolbox" \
+               --textbox "$tmpfile2" 25 90 2>&1 >/dev/tty
+        return
+    fi
+
+    # Lecture ASCII dans un tableau
     ascii_lines=()
     while IFS= read -r line; do
         ascii_lines+=("$line")
     done < "$tmpfile2"
 
-    # Nombre de lignes de l'ASCII
     ascii_height=${#ascii_lines[@]}
     pad_top=$(( (term_rows - ascii_height) / 2 ))
 
-    # Padding vertical
     for ((i = 0; i < pad_top; i++)); do echo; done
 
-    # Affichage centré
     for line in "${ascii_lines[@]}"; do
         pad_left=$(( (term_cols - ${#line}) / 2 ))
-        printf "%*s%s\n" "$pad_left" "" "$line" 30 70 2>&1 >/dev/tty
+        printf "%*s%s\n" "$pad_left" "" "$line" 2>&1 >/dev/tty
     done
 
     sleep 3
