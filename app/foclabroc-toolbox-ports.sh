@@ -72,7 +72,7 @@ show_intro() {
     for line in "${ascii_lines[@]}"; do
         line_length=${#line}
         pad_left=$(( (term_cols - line_length) / 2 ))
-        echo "$line" 2>&1 >/dev/tty
+        echo "$line"
     done
 
     sleep 3
