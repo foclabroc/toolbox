@@ -25,7 +25,7 @@ jeux["->Super Smash Crusade"]="Fanmade Super Smash Bros Crusade.(1.45Go)"
 jeux["->Rayman Redemption"]="Fanmade Rayman Redemption.(976Mo)"
 jeux["->Power Bomberman"]="Fanmade de Bomberman.(616Mo)"
 jeux["->Mushroom Kingdom Fusion"]="Fanmade Mario croisé avec de nombreuses autres franchises de jeux.(962Mo)"
-jeux["->Dr. Robotnik's Ring Racers"]="Fanmade Mario Kart like dans l'univers de Sonic.(698Mo)"
+jeux["->Dr. Robotnik's Racers"]="Fanmade Mario Kart like dans l'univers de Sonic.(698Mo)"
 
 
 while true; do
@@ -117,7 +117,7 @@ while true; do
             "->Mushroom Kingdom Fusion")
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/mushkf.sh | bash
                 ;;
-            "->Dr. Robotnik's Ring Racers")
+            "->Dr. Robotnik's Racers")
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/drrobo.sh | bash
                 ;;
         esac

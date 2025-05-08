@@ -47,7 +47,7 @@ EOF
 
 show_intro() {
     # Affichage sans fermeture automatique
-    dialog --backtitle "Foclabroc Toolbox" --title "Foclabroc Toolbox" --textbox "$tmpfile2" 20 78 &
+    dialog --backtitle "Foclabroc Toolbox" --title "Bienvenue" --textbox "$tmpfile2" 20 78 &
     pid=$!
     sleep 3
     kill "$pid"
