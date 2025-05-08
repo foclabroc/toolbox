@@ -68,7 +68,7 @@ show_intro() {
     # Affichage centré
     for line in "${ascii_lines[@]}"; do
         pad_left=$(( (term_cols - ${#line}) / 2 ))
-        printf "%*s%s\n" "$pad_left" "" "$line"
+        printf "%*s%s\n" "$pad_left" "" "$line" 30 70 2>&1 >/dev/tty
     done
 
     sleep 3
