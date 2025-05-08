@@ -46,9 +46,10 @@ cat <<'EOF' > "$tmpfile2"
 EOF
 
 show_intro() {
-    dialog --backtitle "Foclabroc Toolbox" \
-           --title "Foclabroc Toolbox" \
-           --msgbox "$(cat "$tmpfile2")" 25 90 2>&1 >/dev/tty
+# Affichage avec fermeture automatique après 3 secondes
+    timeout 3 dialog --backtitle "Foclabroc Toolbox" \
+        --title "Foclabroc Toolbox" \
+        --textbox "$tmpfile2" 20 78 2>&1 >/dev/tty
 }
 
 show_info() {
