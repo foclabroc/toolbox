@@ -47,7 +47,7 @@ EOF
 
 show_intro() {
 dialog --backtitle "Foclabroc Toolbox" --title "Foclabroc Toolbox" --msgbox \
-"$(cat $tmpfile2)" 20 78 2>&1 >/dev/tty
+"$(cat $tmpfile2)" 20 85 2>&1 >/dev/tty
 }
 
 show_info() {
@@ -296,7 +296,7 @@ main_menu() {
                 clear
                 wget -q --tries=30 --no-check-certificate -O /tmp/runner https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/install-to-port.sh && chmod +x /tmp/runner && bash /tmp/runner
                 ;;
-            9)  #Underground
+            12)  #Underground
                 clear
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/underground.sh | bash
                 ;;
