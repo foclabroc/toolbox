@@ -46,38 +46,9 @@ cat <<'EOF' > "$tmpfile2"
 EOF
 
 show_intro() {
-    clear
-
-    # Tenter de récupérer les dimensions
-    term_rows=$(tput lines 2>/dev/null)
-    term_cols=$(tput cols 2>/dev/null)
-
-    # Vérification de validité
-    if [[ -z "$term_rows" || "$term_rows" -le 0 || -z "$term_cols" || "$term_cols" -le 0 ]]; then
-        # Fallback vers dialog si dimensions invalides
-        dialog --backtitle "Foclabroc Toolbox" --title "Foclabroc Toolbox" \
-               --textbox "$tmpfile2" 25 90 2>&1 >/dev/tty
-        return
-    fi
-
-    # Lecture ASCII dans un tableau
-    ascii_lines=()
-    while IFS= read -r line; do
-        ascii_lines+=("$line")
-    done < "$tmpfile2"
-
-    ascii_height=${#ascii_lines[@]}
-    pad_top=$(( (term_rows - ascii_height) / 2 ))
-
-    for ((i = 0; i < pad_top; i++)); do echo; done
-
-    for line in "${ascii_lines[@]}"; do
-        pad_left=$(( (term_cols - ${#line}) / 2 ))
-        printf "%*s%s\n" "$pad_left" "" "$line" 2>&1 >/dev/tty
-    done
-
-    sleep 3
-    clear
+    dialog --backtitle "Foclabroc Toolbox" \
+           --title "Foclabroc Toolbox" \
+           --textbox "$tmpfile2" 25 90 2>&1 >/dev/tty
 }
 
 show_info() {
