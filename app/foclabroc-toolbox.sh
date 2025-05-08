@@ -46,7 +46,7 @@ cat <<'EOF' > "$tmpfile2"
 EOF
 
 show_intro() {
-dialog --backtitle "Foclabroc Toolbox" --title "Foclabroc Toolbox" --msgbox "$(cat $tmpfile2)" 25 90 2>&1 >/dev/tty
+dialog --backtitle "Foclabroc Toolbox" --title "Foclabroc Toolbox" --textbox "$tmpfile2" 25 90 2>&1 >/dev/tty
 }
 
 show_info() {
