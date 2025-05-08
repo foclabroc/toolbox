@@ -24,7 +24,7 @@ cat <<'EOF' > "$tmpfile1"
           ██║   ╚██████╔╝╚██████╔╝███████╗██████╔╝╚██████╔╝██╔╝ ██╗       
           ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝╚═════╝  ╚═════╝ ╚═╝  ╚═╝       
                                                                           
-                     MERCI D'AVOIR UTILISÉ MA TOOLBOX                     
+                      MERCI D'AVOIR UTILISÉ MA TOOLBOX                    
 EOF
 
 cat <<'EOF' > "$tmpfile2"
