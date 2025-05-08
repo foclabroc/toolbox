@@ -47,7 +47,7 @@ EOF
 
 show_intro() {
 dialog --backtitle "Foclabroc Toolbox" --title "Foclabroc Toolbox" --msgbox \
-"$tmpfile2" 20 78 2>&1 >/dev/tty
+"$(cat $tmpfile2)" 20 78 2>&1 >/dev/tty
 }
 
 show_info() {
