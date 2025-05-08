@@ -3,10 +3,10 @@
 clear
 
 # Nettoyage si interruption
-trap 'rm -f "$tmpfile1"; exit' INT TERM EXIT
+trap 'rm -f "$tmpfile1" "$tmpfile2"; exit' INT TERM EXIT
 
 # Création fichier temporaire
-tmpfile1=$(mktemp)
+tmpfile1=$(mktemp) && tmpfile2=$(mktemp)
 
 # Contenu ASCII dans le fichier
 cat <<'EOF' > "$tmpfile1"

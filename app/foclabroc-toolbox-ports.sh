@@ -3,10 +3,10 @@
 clear
 
 # Nettoyage si interruption
-trap 'rm -f "$tmpfile1"; exit' INT TERM EXIT
+trap 'rm -f "$tmpfile1" "$tmpfile2"; exit' INT TERM EXIT
 
 # Création fichier temporaire
-tmpfile1=$(mktemp)
+tmpfile1=$(mktemp) && tmpfile2=$(mktemp)
 
 # Contenu ASCII dans le fichier
 cat <<'EOF' > "$tmpfile1"
@@ -26,6 +26,29 @@ cat <<'EOF' > "$tmpfile1"
                                                                           
                      MERCI D'AVOIR UTILISÉ MA TOOLBOX                     
 EOF
+
+cat <<'EOF' > "$tmpfile2"
+                                                                          
+███████╗ ██████╗  ██████╗██╗      █████╗ ██████╗ ██████╗  ██████╗  ██████╗
+██╔════╝██╔═══██╗██╔════╝██║     ██╔══██╗██╔══██╗██╔══██╗██╔═══██╗██╔════╝
+█████╗  ██║   ██║██║     ██║     ███████║██████╔╝██████╔╝██║   ██║██║     
+██╔══╝  ██║   ██║██║     ██║     ██╔══██║██╔══██╗██╔══██╗██║   ██║██║     
+██║     ╚██████╔╝╚██████╗███████╗██║  ██║██████╔╝██║  ██║╚██████╔╝╚██████╗
+╚═╝      ╚═════╝  ╚═════╝╚══════╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝ ╚═════╝  ╚═════╝
+       ████████╗ ██████╗  ██████╗ ██╗     ██████╗  ██████╗ ██╗  ██╗       
+       ╚══██╔══╝██╔═══██╗██╔═══██╗██║     ██╔══██╗██╔═══██╗╚██╗██╔╝       
+          ██║   ██║   ██║██║   ██║██║     ██████╔╝██║   ██║ ╚███╔╝        
+          ██║   ██║   ██║██║   ██║██║     ██╔══██╗██║   ██║ ██╔██╗        
+          ██║   ╚██████╔╝╚██████╔╝███████╗██████╔╝╚██████╔╝██╔╝ ██╗       
+          ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝╚═════╝  ╚═════╝ ╚═╝  ╚═╝       
+                                                                          
+                    POUR BATOCERA PC X86_64 UNIQUEMENT                    
+EOF
+
+show_intro() {
+dialog --backtitle "Foclabroc Toolbox" --title "Foclabroc Toolbox" --msgbox \
+"$tmpfile2" 20 78 2>&1 >/dev/tty
+}
 
 show_info() {
 dialog --backtitle "Foclabroc Toolbox" --title "Foclabroc Toolbox" --msgbox \
@@ -271,6 +294,7 @@ main_menu() {
 }
 
 # Lancer les vérifications et afficher le menu
+show_intro
 show_info
 arch_check
 check_internet
