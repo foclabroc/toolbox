@@ -52,7 +52,7 @@ show_intro() {
     term_cols=$(tput cols)
 
     # Lire le contenu ASCII dans une variable
-    ascii="$tmpfile2"
+    ascii=$(cat "$tmpfile2")
 
     # Calcul du padding vertical
     ascii_height=$(echo -e "$ascii" | wc -l)
@@ -64,7 +64,7 @@ show_intro() {
     done
 
     # Affichage de l'ASCII avec echo -e
-    echo -e "$ascii" 2>&1 >/dev/tty
+    echo -e "$ascii" > /dev/tty0
 
     sleep 3
     clear
