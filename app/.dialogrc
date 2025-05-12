@@ -93,7 +93,7 @@ item_color = dialog_color
 item_selected_color = button_active_color
 
 # Tag color
-tag_color = (MAGENTA,WHITE,ON)
+tag_color = (BLUE,WHITE,ON)
 
 # Selected tag color
 tag_selected_color = button_label_active_color
