@@ -58,14 +58,14 @@ EOF
 
 show_intro() {
     # Affichage sans fermeture automatique
-    dialog --backtitle "Foclabroc Toolbox" --exit-label "(^o^)" --title "Bienvenue" --textbox "$tmpfile2" 20 78 &
+    dialog --backtitle "Foclabroc Toolbox" --exit-label ">POUPIPOU<" --title "Bienvenue" --textbox "$tmpfile2" 20 78 &
     pid=$!
     sleep 3
     kill "$pid"
 }
 
 show_info() {
-dialog --backtitle "Foclabroc Toolbox" --ok-label "POUPIPOU" --title "Foclabroc Toolbox" --msgbox \
+dialog --backtitle "Foclabroc Toolbox" --ok-label ">CONTINUE<" --title "Foclabroc Toolbox" --msgbox \
 "\nBienvenue dans ma Toolbox !\n\n
 Elle regroupe un ensemble de scripts conçus pour vous faciliter l'installation de mes différents packs (Switch, Kodi, NES 3D, etc.).\n\n
 Vous y trouverez aussi plusieurs outils pratiques, comme le téléchargement et la gestion de vos bouteilles et Runners Wine.\n
