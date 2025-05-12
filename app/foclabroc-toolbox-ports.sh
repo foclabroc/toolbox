@@ -236,7 +236,7 @@ main_menu() {
             8 "[Jeux Pc]         -> Téléchargement de Jeux Windows..." \
             9 "[Wine Toolbox]    -> Téléchargement de Runner Wine et outils wsquash..." \
             10 "[Tools]           -> Outils pour Batocera version light. (Plus d'options dispo via ssh)" \
-            11 "[Underground]     -> 🔒Mot de passe nécessaire🔒" \
+            11 "[Underground]     -> !!!Mot de passe nécessaire !!!" \
             12 "[Exit]            -> Quitter le script" \
             2>&1 >/dev/tty)
         clear

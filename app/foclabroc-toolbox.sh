@@ -254,7 +254,7 @@ main_menu() {
             9 "[Wine Toolbox]        -> Téléchargement de Runner Wine et outils wsquash..." \
             10 "[Tools]               -> Outils pour Batocera. Screenshot, Records..." \
             11 "[Install dans Ports]  -> Ajoute ce menu aux ports Batocera" \
-            12 "[Underground]         -> 🔒Mot de passe nécessaire🔒" \
+            12 "[Underground]         -> !!!Mot de passe nécessaire !!!" \
             13 "[Exit]                -> Quitter le script" \
             2>&1 >/dev/tty)
         clear
