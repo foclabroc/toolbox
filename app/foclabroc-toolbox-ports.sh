@@ -2,6 +2,17 @@
 
 clear
 
+# Vérification et téléchargement de .dialogrc si nécessaire
+DIALOGRC_PATH="/userdata/system/pro/extra/.dialogrc"
+DIALOGRC_URL="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/.dialogrc"
+
+if [ ! -f "$DIALOGRC_PATH" ]; then
+    mkdir -p "$(dirname "$DIALOGRC_PATH")"
+    curl -Ls "$DIALOGRC_URL" -o "$DIALOGRC_PATH"
+fi
+
+export DIALOGRC="$DIALOGRC_PATH"
+
 # Nettoyage si interruption
 trap 'rm -f "$tmpfile1" "$tmpfile2"; exit' INT TERM EXIT
 
