@@ -93,13 +93,13 @@ item_color = dialog_color
 item_selected_color = button_active_color
 
 # Tag color
-tag_color = (BLUE,WHITE,ON)
+tag_color = (MAGENTA,WHITE,ON)
 
 # Selected tag color
 tag_selected_color = button_label_active_color
 
 # Tag key color
-tag_key_color = (BLUE,WHITE,ON)
+tag_key_color = tag_color
 
 # Selected tag key color
 tag_key_selected_color = button_label_active_color
@@ -129,7 +129,7 @@ form_text_color = (WHITE,CYAN,ON)
 form_item_readonly_color = (CYAN,WHITE,ON)
 
 # Dialog box gauge color
-gauge_color = button_active_color
+gauge_color = (GREEN,WHITE,OFF)
 
 # Dialog box border2 color
 border2_color = dialog_color
