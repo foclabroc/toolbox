@@ -45,7 +45,7 @@ title_color = (BLUE,WHITE,ON)
 border_color = (WHITE,WHITE,ON)
 
 # Active button color
-button_active_color = (RED,WHITE,ON)
+button_active_color = (WHITE,RED,ON)
 
 # Inactive button color
 button_inactive_color = dialog_color
@@ -78,7 +78,7 @@ searchbox_title_color = title_color
 searchbox_border_color = border_color
 
 # File position indicator color
-position_indicator_color = title_color
+position_indicator_color = (BLACK,WHITE,ON)
 
 # Menu box color
 menubox_color = dialog_color
@@ -93,13 +93,13 @@ item_color = dialog_color
 item_selected_color = button_active_color
 
 # Tag color
-tag_color = title_color
+tag_color = (BLUE,WHITE,ON)
 
 # Selected tag color
 tag_selected_color = button_label_active_color
 
 # Tag key color
-tag_key_color = button_key_inactive_color
+tag_key_color = (BLUE,WHITE,ON)
 
 # Selected tag key color
 tag_key_selected_color = button_label_active_color
