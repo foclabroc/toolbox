@@ -93,4 +93,4 @@ sleep 2
 
 # Affichage du message de confirmation
 dialog --backtitle "Foclabroc Toolbox" --title "Terminé" \
---msgbox "Installation du pack Nes3D terminée avec succès.\n\nAu tout premier lancement patientez 30sec à 1 minutes\n\npour l'installation des winetricks" 10 50
+--msgbox "Installation du pack Nes3D terminée avec succès.\n\nAu tout premier lancement patientez 30sec à 1 minutes\npour l'installation des winetricks" 10 70
