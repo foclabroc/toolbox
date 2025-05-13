@@ -17,7 +17,7 @@ if [ "$VERSION" -le 40 ]; then
     ARCHIVE_URL="$URL_40"
 elif [ "$VERSION" -eq 41 ]; then
     ARCHIVE_URL="$URL_41"
-elif [ "$VERSION" -eq 42 ]; then
+elif [ "$VERSION" -ge 42 ]; then
     ARCHIVE_URL="$URL_42"
 else
     echo "Version non prise en charge."
@@ -33,7 +33,10 @@ DESTINATION="/userdata/"
 # Suppression des anciens dossiers
 echo "Suppression des anciens fichiers..."
 rm -rf /userdata/system/3dnes
+rm -rf /userdata/system/nes3d
 rm -rf /userdata/roms/nes3d
+rm -rf /userdata/system/wine-bottles/3dnes
+rm -rf /userdata/system/wine-bottles/nes3d
 
 echo "Téléchargement de l'archive..."
 wget -q --show-progress -O "$DESTINATION$ARCHIVE_NAME" "$ARCHIVE_URL"
