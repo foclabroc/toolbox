@@ -38,6 +38,20 @@ rm -rf /userdata/roms/nes3d
 rm -rf /userdata/system/wine-bottles/3dnes
 rm -rf /userdata/system/wine-bottles/nes3d
 
+# Vérification de l'espace disque
+ARCHIVE_SIZE_MB=1080
+REQUIRED_SPACE_MB=$((ARCHIVE_SIZE_MB * 2 + 200))
+
+# Récupérer l’espace libre sur /userdata (en Mo)
+FREE_SPACE_MB=$(df -m /userdata | awk 'NR==2 {print $4}')
+
+if [ "$FREE_SPACE_MB" -lt "$REQUIRED_SPACE_MB" ]; then
+    dialog --backtitle "Foclabroc Toolbox" --title "Espace disque insuffisant" \
+    --msgbox "Espace disque disponible : ${FREE_SPACE_MB} Mo\n\nEspace requis : ${REQUIRED_SPACE_MB} Mo\n\nVeuillez libérer de l’espace sur /userdata." 10 60
+    exit 1
+fi
+
+#Lancement telechargement
 echo "Téléchargement de l'archive..."
 wget -q --show-progress -O "$DESTINATION$ARCHIVE_NAME" "$ARCHIVE_URL"
 
@@ -79,4 +93,4 @@ sleep 2
 
 # Affichage du message de confirmation
 dialog --backtitle "Foclabroc Toolbox" --title "Terminé" \
---msgbox "Installation du pack Nes3D terminée avec succès." 6 50
+--msgbox "Installation du pack Nes3D terminée avec succès.\n\nAu tout premier lancement patientez 30sec à 1 minutes\n\npour l'installation des winetricks" 10 50
