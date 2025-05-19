@@ -66,7 +66,7 @@ stdbuf -oL -eL batocera-upgrade "$URL" > "$LOG" 2>&1 &
 UP_PID=$!
 
 # Lire le log en live et parser les lignes pour mise à jour gauge
-tail -n0 -F "$LOG" | \
+tail -n0 -F "$LOG" 2>/dev/null | \
 while IFS= read -r line; do
     [[ $line =~ stat: ]] && continue  # Ignorer les messages stat erreur
     if [[ $line =~ ([0-9]+)\ of\ ([0-9]+)\ MB\ downloaded\ \.\.\.\ \>\>\>\ ([0-9]+)% ]]; then
