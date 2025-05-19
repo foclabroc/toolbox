@@ -5,21 +5,21 @@ MINSIZE_GIB=3
 USERDATA="/userdata"
 UP_FILE="/userdata/system/upgrade/upgrade.tar"
 
-# ─── Espace libre ────────────────────────────────────────────────────────────
+# ─── Vérification d’espace libre ──────────────────────────────────────────────
 FREE_GIB=$(df -BG --output=avail "$USERDATA" | tail -1 | tr -dc '0-9')
 (( FREE_GIB < MINSIZE_GIB )) && {
     dialog --backtitle "$BACKTITLE" --title "Espace disque insuffisant" \
            --msgbox "Il reste ${FREE_GIB} Gio dans ${USERDATA} (≥ ${MINSIZE_GIB} Gio requis)." 8 60
     clear; exit 1; }
 
-# ─── Liste des versions ≥ 31 ─────────────────────────────────────────────────
+# ─── Récupération des versions ≥ 31 ──────────────────────────────────────────
 versions=$(curl -s "$MIRROR_ROOT" | grep -oP '(?<=href=")[0-9]+/' |
            tr -d '/' | awk '$1>=31' | sort -n)
 [[ -z $versions ]] && {
     dialog --backtitle "$BACKTITLE" --msgbox "Aucune version ≥ 31 disponible." 6 40
     clear; exit 1; }
 
-MENU_ITEMS=(); for v in $versions; do MENU_ITEMS+=("$v" "Mettre à jour vers Batocera v$v"); done
+MENU_ITEMS=(); for v in $versions; do MENU_ITEMS+=("$v" "à jour vers Batocera v$v"); done
 CHOIX=$(dialog --backtitle "$BACKTITLE" \
                --title "Mise à jour (espace libre : ${FREE_GIB} Gio)" \
                --menu  "Choisissez la version :" 15 70 10 "${MENU_ITEMS[@]}" \
@@ -29,12 +29,12 @@ ret=$?; clear
 
 URL="${MIRROR_ROOT}${CHOIX}/"
 
-# ─── Lancement de la gauge (coprocess) ───────────────────────────────────────
+# ─── Lancement de la gauge ───────────────────────────────────────────────────
 coproc DLG { dialog --backtitle "$BACKTITLE" --title "Téléchargement v${CHOIX}" \
                     --cancel-label "Annuler" --gauge "Initialisation…" 10 70 0; }
 exec 4>&"${DLG[1]}"
 
-# ─── Fonction de nettoyage si annulation ─────────────────────────────────────
+# ─── Fonction nettoyage si annulation ────────────────────────────────────────
 stop_upgrade_cleanup () {
     kill "$UP_PID" 2>/dev/null
     exec 4>&-; wait "$DLG_PID" 2>/dev/null; clear
@@ -44,22 +44,27 @@ stop_upgrade_cleanup () {
     clear; exit 0
 }
 
-# ─── Exécution de batocera-upgrade, sortie captée via un pipe ───────────────
-stdbuf -oL -eL batocera-upgrade "$URL" 2>&1 | while IFS= read -r line; do
-    # Détecter fermeture de la gauge (= clic Annuler ou ESC)
+# ─── Exécution de batocera-upgrade sur le TTY 2 ──────────────────────────────
+# 1. On change sur la console 2, lance l’upgrade, puis revient sur la console 1.
+# 2. Sa sortie (stdout+stderr) est captée par le pipe et parsée en temps réel.
+(
+    chvt 2
+    stdbuf -oL -eL batocera-upgrade "$URL"
+    chvt 1
+) 2>&1 | while IFS= read -r line; do
+    # Détection fermeture gauge  → confirmation annulation
     if ! kill -0 "${DLG_PID:=${DLG[0]}}" 2>/dev/null; then
         dialog --backtitle "$BACKTITLE" --title "Confirmation" \
                --yesno "Êtes-vous sûr de vouloir annuler la mise à jour ?" 7 50
         [[ $? -eq 0 ]] && stop_upgrade_cleanup
-        # sinon on recrée la gauge
+        # Sinon on recrée la gauge
         exec 4>&-
         coproc DLG { dialog --backtitle "$BACKTITLE" --title "Téléchargement v${CHOIX}" \
                             --cancel-label "Annuler" --gauge "Reprise…" 10 70 0; }
         exec 4>&"${DLG[1]}"
     fi
 
-    [[ $line =~ stat: ]] && continue   # ignorer messages « stat »
-
+    [[ $line =~ stat: ]] && continue           # Ignore erreurs stat
     if [[ $line =~ ([0-9]+)\ of\ ([0-9]+)\ MB\ downloaded\ \.\.\.\ \>\>\>\ ([0-9]+)% ]]; then
         dl=${BASH_REMATCH[1]} ; total=${BASH_REMATCH[2]} ; pct=${BASH_REMATCH[3]}
         printf "%s\nXXX\nTéléchargé : %s / %s MB  |  %s %%\nXXX\n" \
@@ -71,11 +76,11 @@ UP_PID=$!
 wait "$UP_PID"
 FIN=$?
 
-# ─── Fermeture propre de la gauge ────────────────────────────────────────────
+# ─── Fermeture de la gauge et nettoyage ──────────────────────────────────────
 exec 4>&-; wait "$DLG_PID" 2>/dev/null; clear
-rm -f "$UP_FILE" 2>/dev/null  # résidu éventuel
+rm -f "$UP_FILE" 2>/dev/null      # résidu éventuel
 
-# ─── Message final ──────────────────────────────────────────────────────────
+# ─── Message final ───────────────────────────────────────────────────────────
 if [[ $FIN -eq 0 ]]; then
     dialog --backtitle "$BACKTITLE" --title "Succès" \
            --msgbox "Mise à jour vers v${CHOIX} terminée !" 6 40
