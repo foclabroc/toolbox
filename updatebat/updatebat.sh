@@ -160,7 +160,7 @@ extraire_et_mettre_a_jour() {
   COUNT=0
 
   (
-    tar -xvf "$DEST_FILE" --no-same-owner | while read -r file; do
+    tar -xvf "$DEST_FILE" --no-same-owner -C /boot | while read -r file; do
       COUNT=$((COUNT + 1))
       PERCENT=$((COUNT * 100 / TOTAL_FILES))
       echo "XXX"
