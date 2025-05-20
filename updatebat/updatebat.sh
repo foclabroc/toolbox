@@ -15,17 +15,10 @@ declare -A poids_versions=(
     [41]=3400
 )
 
-# Affichage initial
-dialog --backtitle "$BACKTITLE" \
-  --title "Mise à jour / Downgrade Batocera" \
-  --yesno "Script de mise à jour ou Downgrade de Batocera.\n\nPermet de monter ou descendre la version de votre Batocera facilement si votre version actuelle ne vous convient pas.\n\nÊtes-vous sûr de vouloir continuer ?" 12 70 2>&1 >/dev/tty
+# Détecter version actuelle Batocera
+VERSION=$(batocera-es-swissknife --version 2>/dev/null | awk '{print $1}' | sed -E 's/^([0-9]+).*/\1/')
 
-if [ $? -ne 0 ]; then
-  clear
-  exit 0
-fi
-
-# Fonction: vérifie la connexion Internet
+# Vérifier connexion internet
 verifier_connexion() {
   if ! ping -c 1 -W 2 1.1.1.1 >/dev/null 2>&1; then
     dialog --backtitle "$BACKTITLE" --title "Erreur" --msgbox "Pas de connexion Internet." 6 40 2>&1 >/dev/tty
@@ -34,7 +27,7 @@ verifier_connexion() {
   fi
 }
 
-# Fonction: sélectionne la version
+# Sélectionner version
 selectionner_version() {
   choix=$(dialog --backtitle "$BACKTITLE" --title "Choisir une version" --menu "Sélectionnez une version à télécharger :" 15 50 8 \
     31 "boot-31.tar.xz" \
@@ -50,7 +43,19 @@ selectionner_version() {
   numero_version="$choix"
 }
 
-# Fonction: vérifie l'espace disponible
+# Confirmation oui/non après sélection version
+confirmer_installation() {
+  dialog --backtitle "$BACKTITLE" \
+    --title "Confirmation" \
+    --yesno "Version de Batocera actuelle : $VERSION\nVoulez-vous installer la version $numero_version ?" 10 60 2>&1 >/dev/tty
+
+  if [ $? -ne 0 ]; then
+    clear
+    exit 0
+  fi
+}
+
+# Vérifier espace disque
 verifier_espace() {
   poids=${poids_versions[$numero_version]}
   espace_libre=$(df -Pm /userdata | awk 'NR==2 {print $4}')
@@ -61,22 +66,7 @@ verifier_espace() {
   fi
 }
 
-# Fonction: confirme la version avant installation
-confirmer_version() {
-  # Détecter version actuelle de Batocera
-  VERSION=$(batocera-es-swissknife --version | awk '{print $1}' | sed -E 's/^([0-9]+).*/\1/')
-
-  dialog --backtitle "$BACKTITLE" \
-    --title "Confirmation" \
-    --yesno "Version de Batocera actuelle : $VERSION\n\nÊtes-vous sûr de vouloir installer la version $numero_version ?" 10 60 2>&1 >/dev/tty
-
-  if [ $? -ne 0 ]; then
-    clear
-    exit 0
-  fi
-}
-
-# Fonction: télécharge avec annulation possible et progress info dans mixedgauge
+# Télécharger fichier avec progress dialog et infos détaillées
 telecharger_fichier() {
   url="https://foclabroc.freeboxos.fr:55973/share/wz8r37M_mq6Y5inK/boot-${numero_version}.tar.xz"
   poids=${poids_versions[$numero_version]}
@@ -84,30 +74,42 @@ telecharger_fichier() {
   rm -f "$DEST_FILE"
 
   (
-    curl -L "$url" --silent --output "$DEST_FILE" --fail &
-    curl_pid=$!
-
-    while kill -0 $curl_pid 2>/dev/null; do
+    curl -sL "$url" -o "$DEST_FILE" &
+    PID_CURL=$!
+    START_TIME=$(date +%s)
+    FILE_SIZE=$((poids * 1024 * 1024))
+    while kill -0 $PID_CURL 2>/dev/null; do
       if [ -f "$DEST_FILE" ]; then
-        downloaded=$(du -m "$DEST_FILE" | awk '{print $1}')
-        [ "$downloaded" -gt "$poids" ] && downloaded=$poids
-        percent=$((downloaded * 100 / poids))
-        echo "$percent"
-        echo "Téléchargement version $numero_version"
-        echo "$downloaded Mo sur $poids Mo téléchargés"
-        echo ""
-        echo "Veuillez patienter..."
-      else
-        echo "0"
-        echo "Téléchargement version $numero_version"
-        echo "Début du téléchargement..."
-        echo ""
-        echo ""
+        CURRENT_SIZE=$(stat -c%s "$DEST_FILE" 2>/dev/null)
+        NOW=$(date +%s)
+        ELAPSED=$((NOW - START_TIME))
+        [ "$ELAPSED" -eq 0 ] && ELAPSED=1
+        SPEED_BPS=$((CURRENT_SIZE / ELAPSED))
+        SPEED_MO=$(echo "scale=2; $CURRENT_SIZE / $ELAPSED / 1048576" | bc)
+        CURRENT_MB=$((CURRENT_SIZE / 1024 / 1024))
+        TOTAL_MB=$((FILE_SIZE / 1024 / 1024))
+        REMAINING_BYTES=$((FILE_SIZE - CURRENT_SIZE))
+        [ "$SPEED_BPS" -eq 0 ] && SPEED_BPS=1
+        ETA_SEC=$((REMAINING_BYTES / SPEED_BPS))
+        ETA_MIN=$((ETA_SEC / 60))
+        ETA_REST_SEC=$((ETA_SEC % 60))
+        ETA_FORMAT=$(printf "%02d:%02d" "$ETA_MIN" "$ETA_REST_SEC")
+
+        PROGRESS_DL=$((CURRENT_SIZE * 90 / FILE_SIZE))
+        PROGRESS=$((10 + PROGRESS_DL))
+        [ "$PROGRESS" -gt 100 ] && PROGRESS=100
+
+        echo "XXX"
+        echo -e "\n\nTéléchargement de boot-$numero_version.tar.xz..."
+        echo -e "\nVitesse : ${SPEED_MO} Mo/s | Téléchargé : ${CURRENT_MB} / ${TOTAL_MB} Mo"
+        echo -e "Temps restant estimé : ${ETA_FORMAT}"
+        echo "XXX"
+        echo "$PROGRESS"
       fi
-      sleep 1
+      sleep 0.5
     done
 
-    wait $curl_pid
+    wait $PID_CURL
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
       rm -f "$DEST_FILE"
@@ -117,7 +119,7 @@ telecharger_fichier() {
       sleep 2
       exit 1
     fi
-  ) | dialog --backtitle "$BACKTITLE" --title "Téléchargement" --mixedgauge "Progression du téléchargement" 15 70 0 2>&1 >/dev/tty
+  ) | dialog --backtitle "$BACKTITLE" --title "Téléchargement" --gauge "Téléchargement de la version $numero_version..." 10 60 0 2>&1 >/dev/tty
 
   if [ ! -f "$DEST_FILE" ]; then
     dialog --backtitle "$BACKTITLE" --title "Annulé" --msgbox "Téléchargement annulé ou échoué." 6 40 2>&1 >/dev/tty
@@ -126,8 +128,29 @@ telecharger_fichier() {
   fi
 }
 
-# Fonction: mise à jour /boot avec extraction dans mixedgauge et suivi extraction
+# Extraire et mettre à jour /boot avec sauvegarde/restauration configs
 extraire_et_mettre_a_jour() {
+  echo "remounting /boot in rw"
+  if ! mount -o remount,rw /boot; then
+    dialog --backtitle "$BACKTITLE" --title "Erreur" --msgbox "Impossible de remonter /boot en lecture-écriture." 6 50 2>&1 >/dev/tty
+    clear
+    exit 1
+  fi
+
+  dialog --backtitle "$BACKTITLE" --infobox "Sauvegarde des fichiers de configuration..." 5 50 2>&1 >/dev/tty
+  sleep 1
+
+  BOOTFILES="config.txt batocera-boot.conf"
+  for BOOTFILE in ${BOOTFILES}; do
+    if [ -e "/boot/${BOOTFILE}" ]; then
+      cp "/boot/${BOOTFILE}" "/boot/${BOOTFILE}.upgrade" || {
+        dialog --backtitle "$BACKTITLE" --title "Erreur" --msgbox "Impossible de sauvegarder $BOOTFILE." 6 50 2>&1 >/dev/tty
+        clear
+        exit 1
+      }
+    fi
+  done
+
   taille_archive=${poids_versions[$numero_version]}
   taille_min_requise_boot=$((taille_archive + 200))
   espace_libre_boot=$(df -Pm /boot | awk 'NR==2 {print $4}')
@@ -139,64 +162,34 @@ extraire_et_mettre_a_jour() {
     exit 1
   fi
 
-  echo "remounting /boot in rw"
-  if ! mount -o remount,rw /boot; then
+  dialog --backtitle "$BACKTITLE" --title "Extraction" --infobox "Extraction de l'archive dans /boot..." 5 50 2>&1 >/dev/tty
+  sleep 1
+
+  if ! (cd /boot && xz -dc < "$DEST_FILE" | tar xvf - --no-same-owner); then
+    dialog --backtitle "$BACKTITLE" --title "Erreur" --msgbox "Erreur lors de l'extraction." 6 50 2>&1 >/dev/tty
+    clear
     exit 1
   fi
 
-  dialog --backtitle "$BACKTITLE" --infobox "Sauvegarde des fichiers de configuration..." 5 40 2>&1 >/dev/tty
+  dialog --backtitle "$BACKTITLE" --infobox "Restauration des fichiers de configuration..." 5 50 2>&1 >/dev/tty
   sleep 1
-
-  BOOTFILES="config.txt batocera-boot.conf"
-  for BOOTFILE in ${BOOTFILES}; do
-    if [ -e "/boot/${BOOTFILE}" ]; then
-      cp "/boot/${BOOTFILE}" "/boot/${BOOTFILE}.upgrade" || exit 1
-    fi
-  done
-
-  # Extraction avec suivi via mixedgauge
-  total_files=$(tar -tf "$DEST_FILE" | wc -l)
-  count=0
-
-  (
-    echo "0"
-    echo "Extraction de l'archive dans /boot"
-    echo "0 / $total_files fichiers extraits"
-    echo ""
-    echo ""
-
-    cd /boot || exit 1
-    # Extraire en listant les fichiers, chaque fichier affiche la progression
-    xz -dc < "$DEST_FILE" | tar --no-same-owner -xv | while read -r file; do
-      count=$((count + 1))
-      percent=$((count * 100 / total_files))
-      echo "$percent"
-      echo "Extraction de l'archive dans /boot"
-      echo "$count / $total_files fichiers extraits"
-      echo "$file"
-      echo ""
-      sleep 0.05
-    done
-
-  ) | dialog --backtitle "$BACKTITLE" --title "Extraction" --mixedgauge "Progression de l'extraction" 15 70 0 2>&1 >/dev/tty
-
-  dialog --backtitle "$BACKTITLE" --infobox "Restauration des fichiers de configuration..." 5 40 2>&1 >/dev/tty
-  sleep 1
-
   for BOOTFILE in ${BOOTFILES}; do
     if [ -e "/boot/${BOOTFILE}.upgrade" ]; then
       mv "/boot/${BOOTFILE}.upgrade" "/boot/${BOOTFILE}" || echo "Erreur restauration $BOOTFILE" >&2
     fi
   done
 
-  dialog --backtitle "$BACKTITLE" --infobox "Remontée de /boot en lecture seule..." 5 40 2>&1 >/dev/tty
+  dialog --backtitle "$BACKTITLE" --infobox "Remontée de /boot en lecture seule..." 5 50 2>&1 >/dev/tty
   sleep 1
-  mount -o remount,ro /boot || exit 1
+  mount -o remount,ro /boot || {
+    dialog --backtitle "$BACKTITLE" --title "Erreur" --msgbox "Impossible de remonter /boot en lecture seule." 6 50 2>&1 >/dev/tty
+    clear
+    exit 1
+  }
 
-  # Supprimer l’archive téléchargée
   rm -f "$DEST_FILE"
 
-  dialog --backtitle "$BACKTITLE" --title "Terminé" --msgbox "Mise à jour terminée avec succès !" 6 40 2>&1 >/dev/tty
+  dialog --backtitle "$BACKTITLE" --title "Succès" --msgbox "Mise à jour vers la version $numero_version effectuée avec succès !" 8 50 2>&1 >/dev/tty
 
   dialog --backtitle "$BACKTITLE" \
     --title "Redémarrage nécessaire" \
@@ -207,15 +200,15 @@ extraire_et_mettre_a_jour() {
   if [ "$reponse" -eq 0 ]; then
     reboot
   else
-    echo "Redémarrage annulé. Pensez à redémarrer manuellement plus tard."
-    exit 0
+    echo "Redémarrage annulé par l'utilisateur."
   fi
 }
 
-# Main
+# --- Main ---
+
 verifier_connexion
 selectionner_version
+confirmer_installation
 verifier_espace
-confirmer_version
 telecharger_fichier
 extraire_et_mettre_a_jour
