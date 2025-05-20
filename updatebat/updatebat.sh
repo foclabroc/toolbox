@@ -1,14 +1,5 @@
 #!/bin/bash
 
-dialog --backtitle "Foclabroc Toolbox" \
-  --title "Mise à jour / Downgrade Batocera" \
-  --yesno "Script de mise à jour ou Downgrade de Batocera.\n\nPermet de monter ou descendre la version de votre Batocera facilement si votre version actuelle ne vous convient pas.\n\nÊtes-vous sûr de vouloir continuer ?" 12 70 2>&1 >/dev/tty
-
-if [ $? -ne 0 ]; then
-  clear
-  exit 0
-fi
-
 BACKTITLE="Foclabroc Toolbox"
 UPGRADE_DIR="/userdata/system/upgrade"
 DEST_FILE="$UPGRADE_DIR/boot.tar.xz"
@@ -40,7 +31,7 @@ verifier_connexion() {
 
 # Fonction: sélectionner version
 selectionner_version() {
-  choix=$(dialog --backtitle "$BACKTITLE" --title "Choisir une version" --menu "\nSélectionnez une version à télécharger :\n " 16 50 8 \
+  choix=$(dialog --backtitle "$BACKTITLE" --title "Choisir une version" --menu "\nSélectionnez une version à télécharger :\n " 18 50 8 \
     31 "boot-31.tar.xz" \
     35 "boot-35.tar.xz" \
     36 "boot-36.tar.xz" \
@@ -113,12 +104,14 @@ telecharger_fichier() {
 
         echo "XXX"
         echo -e "\n\nTéléchargement de la version $numero_version..."
+        echo ""
         echo -e "Vitesse : ${SPEED_MO} Mo/s | Téléchargé : ${CURRENT_MB} / ${TOTAL_MB} Mo"
+        echo ""
         echo -e "Temps restant estimé : ${ETA_FORMAT}"
         echo "XXX"
         echo "$PROGRESS"
       fi
-      sleep 0.05
+      sleep 0.5
     done
 
     wait $PID_CURL
@@ -173,7 +166,7 @@ extraire_et_mettre_a_jour() {
       echo "XXX"
       echo "$PERCENT"
       echo ""
-      echo "Extraction en cours..."
+      echo "Extraction en cours... (Fichier Batocera.update long)"
       echo ""
       echo "Fichier extrait : $file"
       echo "($COUNT / $TOTAL_FILES)"
