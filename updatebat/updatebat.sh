@@ -207,4 +207,15 @@ extraire_et_mettre_a_jour() {
   if [ "$reponse" -eq 0 ]; then
     reboot
   else
-    echo "Redémarrage annulé
+    echo "Redémarrage annulé. Pensez à redémarrer manuellement plus tard."
+    exit 0
+  fi
+}
+
+# Main
+verifier_connexion
+selectionner_version
+verifier_espace
+confirmer_version
+telecharger_fichier
+extraire_et_mettre_a_jour
