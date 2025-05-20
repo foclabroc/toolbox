@@ -32,14 +32,14 @@ verifier_connexion() {
 # Fonction: sélectionner version
 selectionner_version() {
   choix=$(dialog --backtitle "$BACKTITLE" --title "Choisir une version" --menu "\nSélectionnez une version à télécharger :\n " 18 50 8 \
-    31 "boot-31.tar.xz" \
-    35 "boot-35.tar.xz" \
-    36 "boot-36.tar.xz" \
-    37 "boot-37.tar.xz" \
-    38 "boot-38.tar.xz" \
-    39 "boot-39.tar.xz" \
-    40 "boot-40.tar.xz" \
-    41 "boot-41.tar.xz" \
+    31 "Version 31" \
+    35 "Version 35" \
+    36 "Version 36" \
+    37 "Version 37" \
+    38 "Version 38" \
+    39 "Version 39" \
+    40 "Version 40" \
+    41 "Version 41" \
     2>&1 >/dev/tty)
   numero_version="$choix"
 }
@@ -61,7 +61,7 @@ verifier_espace_boot() {
   espace_libre_boot=$(df -Pm /boot | awk 'NR==2 {print $4}')
   if (( espace_libre_boot < taille_min_requise_boot )); then
     dialog --backtitle "$BACKTITLE" --title "\nEspace insuffisant dans /boot" --msgbox \
-      "Espace libre sur /boot : ${espace_libre_boot} Mo\nRequis : ${taille_min_requise_boot} Mo (archive + marge 200 Mo)" 12 60 2>&1 >/dev/tty
+      "Espace libre sur /boot : ${espace_libre_boot} Mo\nRequis : ${taille_min_requise_boot} Mo\n\nAugmenter la taille de votre boot\nou mettez à jour manuelement en vous référant\nau wiki de batocera." 15 60 2>&1 >/dev/tty
     clear; exit 1
   fi
 }
@@ -124,7 +124,7 @@ telecharger_fichier() {
       sleep 2
       exit 1
     fi
-  ) | dialog --backtitle "$BACKTITLE" --title "Téléchargement" --gauge "Téléchargement en cours..." 14 70 0 2>&1 >/dev/tty
+  ) | dialog --backtitle "$BACKTITLE" --title "Téléchargement" --gauge "Téléchargement en cours..." 13 70 0 2>&1 >/dev/tty
 
   if [ ! -f "$DEST_FILE" ]; then
     dialog --backtitle "$BACKTITLE" --title "Annulé" --msgbox "\nTéléchargement annulé ou échoué." 7 40 2>&1 >/dev/tty
@@ -137,13 +137,15 @@ telecharger_fichier() {
 extraire_et_mettre_a_jour() {
   verifier_espace_boot
 
-  echo "remounting /boot in rw"
+  dialog --backtitle "$BACKTITLE" --infobox "\nPassage en mode lecture-écriture de la partition Boot..." 6 50 2>&1 >/dev/tty
+  sleep 2
   if ! mount -o remount,rw /boot; then
     dialog --backtitle "$BACKTITLE" --title "Erreur" --msgbox "\nImpossible de remonter /boot en lecture-écriture." 8 50 2>&1 >/dev/tty
     clear; exit 1
   fi
 
   dialog --backtitle "$BACKTITLE" --infobox "\nSauvegarde des fichiers de configuration..." 6 40 2>&1 >/dev/tty
+  sleep 2
 
   BOOTFILES="config.txt batocera-boot.conf"
   for BOOTFILE in ${BOOTFILES}; do
@@ -154,6 +156,8 @@ extraire_et_mettre_a_jour() {
       }
     fi
   done
+
+  dialog --backtitle "$BACKTITLE" --infobox "\nAnalyse du boot.tar.xz V$numero_version avant extraction patientez..." 6 50 2>&1 >/dev/tty
 
   TOTAL_FILES=$(tar -tf "$DEST_FILE" | wc -l)
   [ "$TOTAL_FILES" -eq 0 ] && TOTAL_FILES=1
@@ -166,33 +170,44 @@ extraire_et_mettre_a_jour() {
       echo "XXX"
       echo "$PERCENT"
       echo ""
-      echo "Extraction en cours... (Fichier Batocera.update long)"
+      echo "Extraction en cours... (Fichier Batocera.update lent car volumineux) patience..."
       echo ""
       echo "Fichier extrait : $file"
       echo "($COUNT / $TOTAL_FILES)"
       echo "XXX"
     done
-  ) | dialog --backtitle "$BACKTITLE" --title "Extraction" --gauge "Extraction de l’archive en cours..." 15 70 0 2>&1 >/dev/tty
+  ) | dialog --backtitle "$BACKTITLE" --title "Extraction" --gauge "Extraction de l’archive en cours..." 13 70 0 2>&1 >/dev/tty
 
   dialog --backtitle "$BACKTITLE" --infobox "Restauration des fichiers de configuration..." 5 40 2>&1 >/dev/tty
-  sleep 1
+  sleep 2
   for BOOTFILE in ${BOOTFILES}; do
     if [ -e "/boot/${BOOTFILE}.upgrade" ]; then
-      mv "/boot/${BOOTFILE}.upgrade" "/boot/${BOOTFILE}" || echo "Erreur restauration $BOOTFILE" >&2
+      if ! mv "/boot/${BOOTFILE}.upgrade" "/boot/${BOOTFILE}"; then
+        dialog --backtitle "$BACKTITLE" --title "Erreur" --msgbox "Erreur lors de la restauration de $BOOTFILE" 7 50 2>&1 >/dev/tty
+        clear
+        exit 1
+      fi
     fi
   done
 
   dialog --backtitle "$BACKTITLE" --infobox "\nRemontée de /boot en lecture seule..." 6 40 2>&1 >/dev/tty
-  sleep 1
+  sleep 2
   mount -o remount,ro /boot || {
     dialog --backtitle "$BACKTITLE" --title "Erreur" --msgbox "\nImpossible de remonter /boot en lecture seule." 7 50 2>&1 >/dev/tty
     clear; exit 1
   }
 
   # Supprimer l’archive téléchargée
+  dialog --backtitle "$BACKTITLE" --infobox "\nNettoyage..." 6 40 2>&1 >/dev/tty
+  sleep 2
   rm -f "$DEST_FILE"
 
-  dialog --backtitle "$BACKTITLE" --title "Terminé" --msgbox "\nMise à jour terminée avec succès !" 7 40 2>&1 >/dev/tty
+  dialog --backtitle "$BACKTITLE" --title "Mise à jour terminée" --msgbox "\
+  La mise à jour est terminée, vous êtes maintenant en V${numero_version}.\n\n\
+  Après redémarrage :\n\
+  - Veuillez bien mettre à jour vos BIOS en V${numero_version}.\n\
+  - Mettez également à jour vos différents romsets MAME, FBNeo... en conséquence.\n\
+  - Et mettez à jour les systèmes tels que Switch, 3Dnes.\n" 12 70 2>&1 >/dev/tty
 
   dialog --backtitle "$BACKTITLE" --title "Redémarrage nécessaire" --yesno "\nUn redémarrage de Batocera est nécessaire.\n\nVoulez-vous redémarrer maintenant ?" 9 50 2>&1 >/dev/tty
   reponse=$?
@@ -211,7 +226,7 @@ VERSION=$(batocera-es-swissknife --version | awk '{print $1}' | sed -E 's/^([0-9
 confirmer_version() {
   dialog --backtitle "$BACKTITLE" \
     --title "Confirmation" \
-    --yesno "\nVersion de Batocera actuelle : $VERSION\nVoulez-vous installer la version $numero_version ?" 10 60 2>&1 >/dev/tty
+    --yesno "\nVersion de Batocera actuelle : $VERSION\n\nVoulez-vous installer la version $numero_version ?" 10 60 2>&1 >/dev/tty
 
   if [ $? -ne 0 ]; then
     clear

@@ -242,7 +242,7 @@ main_menu() {
     while true; do
         main_menu=$(dialog --clear --backtitle "Foclabroc Toolbox" \
             --title "Menu Principal" \
-            --menu "\nSélectionnez une option :\n " 22 90 14 \
+            --menu "\nSélectionnez une option :\n " 24 90 14 \
             1 "[Nintendo Switch]     -> Installer l'émulation Switch sur Batocera" \
             2 "[Youtube TV]          -> Installer Youtube TV" \
             3 "[Gparted]             -> Installer Gparted" \
@@ -252,7 +252,7 @@ main_menu() {
             7 "[Pack Music]          -> Installer le pack Music pour ES" \
             8 "[Jeux Pc]             -> Téléchargement de Jeux Windows..." \
             9 "[Wine Toolbox]        -> Téléchargement de Runner Wine et outils wsquash..." \
-            10 "[Update/Downgrade]    -> *EN TEST*Mise à jour ou Downgrade de Batocera..." \
+            10 "[Update/Downgrade]    -> Mise à jour et Downgrade de Batocera..." \
             11 "[Tools]               -> Outils pour Batocera. Screenshot, Records..." \
             12 "[Install dans Ports]  -> Ajoute ce menu aux ports Batocera" \
             13 "[Underground]         -> !!!Mot de passe nécessaire !!!" \
