@@ -1,5 +1,14 @@
 #!/bin/bash
 
+dialog --backtitle "Foclabroc Toolbox" \
+  --title "Mise à jour / Downgrade Batocera" \
+  --yesno "Script de mise à jour ou Downgrade de Batocera.\n\nPermet de monter ou descendre la version de votre Batocera facilement si votre version actuelle ne vous convient pas.\n\nÊtes-vous sûr de vouloir continuer ?" 12 70 2>&1 >/dev/tty
+
+if [ $? -ne 0 ]; then
+  clear
+  exit 0
+fi
+
 BACKTITLE="Foclabroc Toolbox"
 UPGRADE_DIR="/userdata/system/upgrade"
 DEST_FILE="$UPGRADE_DIR/boot.tar.xz"
@@ -95,8 +104,7 @@ telecharger_fichier() {
         ETA_REST_SEC=$((ETA_SEC % 60))
         ETA_FORMAT=$(printf "%02d:%02d" "$ETA_MIN" "$ETA_REST_SEC")
 
-        PROGRESS_DL=$((CURRENT_SIZE * 90 / FILE_SIZE))
-        PROGRESS=$((10 + PROGRESS_DL))
+        PROGRESS=$((CURRENT_SIZE * 100 / FILE_SIZE))
         [ "$PROGRESS" -gt 100 ] && PROGRESS=100
 
         echo "XXX"
@@ -151,26 +159,35 @@ extraire_et_mettre_a_jour() {
     fi
   done
 
-  taille_archive=${poids_versions[$numero_version]}
-  taille_min_requise_boot=$((taille_archive + 200))
-  espace_libre_boot=$(df -Pm /boot | awk 'NR==2 {print $4}')
-  if (( espace_libre_boot < taille_min_requise_boot )); then
-    dialog --backtitle "$BACKTITLE" \
-           --title "Espace insuffisant dans /boot" \
-           --msgbox "Espace libre sur /boot : ${espace_libre_boot} Mo\nRequis : ${taille_min_requise_boot} Mo (archive + marge de 200 Mo)" 10 60 2>&1 >/dev/tty
-    clear
-    exit 1
-  fi
+  # Compter les fichiers dans l'archive xz (avec tar via xz -dc)
+  TOTAL_FILES=$(xz -dc "$DEST_FILE" | tar -tvf - 2>/dev/null | wc -l)
+  [ "$TOTAL_FILES" -eq 0 ] && TOTAL_FILES=1
 
-  dialog --backtitle "$BACKTITLE" --title "Extraction" --infobox "Extraction de l'archive dans /boot..." 5 50 2>&1 >/dev/tty
-  sleep 1
+  TMP_COUNT="/tmp/count_$$.tmp"
+  echo "0" > "$TMP_COUNT"
 
-  if ! (cd /boot && xz -dc < "$DEST_FILE" | tar xvf - --no-same-owner); then
-    dialog --backtitle "$BACKTITLE" --title "Erreur" --msgbox "Erreur lors de l'extraction." 6 50 2>&1 >/dev/tty
-    clear
-    exit 1
-  fi
+  # Extraction avec progression et messages dans dialog gauge
+  (
+    xz -dc "$DEST_FILE" | tar -xvf - -C /boot --no-same-owner | while read -r line; do
+      COUNT=$(<"$TMP_COUNT")
+      COUNT=$((COUNT + 1))
+      echo "$COUNT" > "$TMP_COUNT"
 
+      PERCENT=$((COUNT * 100 / TOTAL_FILES))
+      [ "$PERCENT" -gt 100 ] && PERCENT=100
+
+      echo "XXX"
+      echo "$PERCENT"
+      echo ""
+      echo "Extraction dans /boot"
+      echo ""
+      echo "Fichier $COUNT / $TOTAL_FILES"
+      echo "XXX"
+    done
+    rm -f "$TMP_COUNT"
+  ) | dialog --backtitle "$BACKTITLE" --title "Extraction" --gauge "Extraction en cours..." 10 60 0 2>&1 >/dev/tty
+
+  # Restauration des configs
   dialog --backtitle "$BACKTITLE" --infobox "Restauration des fichiers de configuration..." 5 50 2>&1 >/dev/tty
   sleep 1
   for BOOTFILE in ${BOOTFILES}; do
