@@ -137,14 +137,14 @@ telecharger_fichier() {
 extraire_et_mettre_a_jour() {
   verifier_espace_boot
 
-  dialog --backtitle "$BACKTITLE" --infobox "\nPassage en mode lecture-écriture de la partition Boot..." 5 50 2>&1 >/dev/tty
+  dialog --backtitle "$BACKTITLE" --infobox "\nPassage en mode lecture-écriture de la partition Boot..." 6 50 2>&1 >/dev/tty
   sleep 2
   if ! mount -o remount,rw /boot; then
     dialog --backtitle "$BACKTITLE" --title "Erreur" --msgbox "\nImpossible de remonter /boot en lecture-écriture." 8 50 2>&1 >/dev/tty
     clear; exit 1
   fi
 
-  dialog --backtitle "$BACKTITLE" --infobox "\nSauvegarde des fichiers de configuration..." 5 40 2>&1 >/dev/tty
+  dialog --backtitle "$BACKTITLE" --infobox "\nSauvegarde des fichiers de configuration..." 6 40 2>&1 >/dev/tty
   sleep 2
 
   BOOTFILES="config.txt batocera-boot.conf"
@@ -176,9 +176,9 @@ extraire_et_mettre_a_jour() {
       echo "($COUNT / $TOTAL_FILES)"
       echo "XXX"
     done
-  ) | dialog --backtitle "$BACKTITLE" --title "Extraction" --gauge "Extraction de l’archive en cours..." 13 90 0 2>&1 >/dev/tty
+  ) | dialog --backtitle "$BACKTITLE" --title "Extraction" --gauge "Extraction de l’archive en cours..." 12 90 0 2>&1 >/dev/tty
 
-  dialog --backtitle "$BACKTITLE" --infobox "\nRestauration des fichiers de configuration..." 5 40 2>&1 >/dev/tty
+  dialog --backtitle "$BACKTITLE" --infobox "\nRestauration des fichiers de configuration..." 6 40 2>&1 >/dev/tty
   sleep 2
   for BOOTFILE in ${BOOTFILES}; do
     if [ -e "/boot/${BOOTFILE}.upgrade" ]; then
@@ -190,7 +190,7 @@ extraire_et_mettre_a_jour() {
     fi
   done
 
-  dialog --backtitle "$BACKTITLE" --infobox "\nRemontée de /boot en lecture seule..." 5 40 2>&1 >/dev/tty
+  dialog --backtitle "$BACKTITLE" --infobox "\nRemontée de /boot en lecture seule..." 6 40 2>&1 >/dev/tty
   sleep 2
   mount -o remount,ro /boot || {
     dialog --backtitle "$BACKTITLE" --title "Erreur" --msgbox "\nImpossible de remonter /boot en lecture seule." 7 50 2>&1 >/dev/tty
@@ -202,7 +202,7 @@ extraire_et_mettre_a_jour() {
   sleep 2
   rm -f "$DEST_FILE"
 
-  dialog --backtitle "$BACKTITLE" --title "Mise à jour terminée" --msgbox "\
+  dialog --backtitle "$BACKTITLE" --title "Mise à jour terminée" --msgbox "\n\
 La mise à jour est terminée, vous êtes maintenant en V${numero_version}.\n\n\
 Après redémarrage :\n\
 - Veuillez bien mettre à jour vos BIOS en V${numero_version}.\n\
