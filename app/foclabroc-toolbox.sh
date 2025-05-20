@@ -252,7 +252,7 @@ main_menu() {
             7 "[Pack Music]          -> Installer le pack Music pour ES" \
             8 "[Jeux Pc]             -> Téléchargement de Jeux Windows..." \
             9 "[Wine Toolbox]        -> Téléchargement de Runner Wine et outils wsquash..." \
-            10 "[Update/Downgrade]    -> Mise à jour ou Downgrade de Batocera..." \
+            10 "[Update/Downgrade]    -> *EN TEST*Mise à jour ou Downgrade de Batocera..." \
             11 "[Tools]               -> Outils pour Batocera. Screenshot, Records..." \
             12 "[Install dans Ports]  -> Ajoute ce menu aux ports Batocera" \
             13 "[Underground]         -> !!!Mot de passe nécessaire !!!" \
