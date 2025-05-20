@@ -304,7 +304,7 @@ main_menu() {
                 ;;
             10)  #update tools
                 clear
-                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/updatebat/updatebatWIP.sh | bash
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/updatebat/updatebat.sh | bash
                 ;;
             11)
                 clear
