@@ -225,19 +225,20 @@ main_menu() {
     while true; do
         main_menu=$(dialog --clear --backtitle "Foclabroc Toolbox" \
             --title "Menu Principal" \
-            --menu "\nSélectionnez une option :\n " 22 100 12 \
-            1 "[Nintendo Switch] -> Installer l'émulation Switch sur Batocera" \
-            2 "[Youtube TV]      -> Installer Youtube TV" \
-            3 "[Gparted]         -> Installer Gparted" \
-            4 "[Pack Kodi]       -> Installer le pack streaming/iptv kodi" \
-            5 "[Pack Nes3D]      -> Installer le pack Nintendo Nes 3D" \
-            6 "[Pack OpenLara]   -> Installer le pack OpenLara" \
-            7 "[Pack Music]      -> Installer le pack Music pour ES" \
-            8 "[Jeux Pc]         -> Téléchargement de Jeux Windows..." \
-            9 "[Wine Toolbox]    -> Téléchargement de Runner Wine et outils wsquash..." \
-            10 "[Tools]           -> Outils pour Batocera version light. (Plus d'options dispo via ssh)" \
-            11 "[Underground]     -> !!!Mot de passe nécessaire !!!" \
-            12 "[Exit]            -> Quitter le script" \
+            --menu "\nSélectionnez une option :\n " 24 100 13 \
+            1 "[Nintendo Switch]  -> Installer l'émulation Switch sur Batocera" \
+            2 "[Youtube TV]       -> Installer Youtube TV" \
+            3 "[Gparted]          -> Installer Gparted" \
+            4 "[Pack Kodi]        -> Installer le pack streaming/iptv kodi" \
+            5 "[Pack Nes3D]       -> Installer le pack Nintendo Nes 3D" \
+            6 "[Pack OpenLara]    -> Installer le pack OpenLara" \
+            7 "[Pack Music]       -> Installer le pack Music pour ES" \
+            8 "[Jeux Pc]          -> Téléchargement de Jeux Windows..." \
+            9 "[Wine Toolbox]     -> Téléchargement de Runner Wine et outils wsquash..." \
+            10 "[Update/Downgrade] -> Mise à jour et Downgrade de Batocera..." \
+            11 "[Tools]            -> Outils pour Batocera version light. (Plus d'options dispo via ssh)" \
+            12 "[Underground]      -> !!!Mot de passe nécessaire !!!" \
+            13 "[Exit]             -> Quitter le script" \
             2>&1 >/dev/tty)
         clear
 
@@ -283,15 +284,19 @@ main_menu() {
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash"
                 ;;
-            10)  #record tools
+            10)  #update tools
+                clear
+                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/updatebat/updatebat.sh | bash"
+                ;;
+            11)  #record tools
                 clear
                 tools_options
                 ;;
-            11)  #Underground
+            12)  #Underground
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/underground.sh | bash"
                 ;;
-            12)# Afficher un message de remerciement
+            13)# Afficher un message de remerciement
                 dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --textbox "$tmpfile1" 20 78 2>&1 >/dev/tty
                 killall -9 xterm
                 clear
