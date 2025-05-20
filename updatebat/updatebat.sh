@@ -31,15 +31,15 @@ verifier_connexion() {
 
 # Fonction: sélectionner version
 selectionner_version() {
-  choix=$(dialog --backtitle "$BACKTITLE" --title "Choisir une version" --menu "\nSélectionnez une version à télécharger :\n " 18 50 8 \
-    31 "Version 31" \
-    35 "Version 35" \
-    36 "Version 36" \
-    37 "Version 37" \
-    38 "Version 38" \
-    39 "Version 39" \
-    40 "Version 40" \
-    41 "Version 41" \
+  choix=$(dialog --backtitle "$BACKTITLE" --title "Choisir une version" --menu "\nVersion actuelle : $VERSION\n\nSélectionnez une version à télécharger :\n " 20 55 8 \
+    31 "->Version 31 (1.81 Go)" \
+    35 "->Version 35 (2.52 Go)" \
+    36 "->Version 36 (2.73 Go)" \
+    37 "->Version 37 (2.90 Go)" \
+    38 "->Version 38 (3.02 Go)" \
+    39 "->Version 39 (3.16 Go)" \
+    40 "->Version 40 (3.34 Go)" \
+    41 "->Version 41 (3.40 Go)" \
     2>&1 >/dev/tty)
   numero_version="$choix"
 }
@@ -137,14 +137,14 @@ telecharger_fichier() {
 extraire_et_mettre_a_jour() {
   verifier_espace_boot
 
-  dialog --backtitle "$BACKTITLE" --infobox "\nPassage en mode lecture-écriture de la partition Boot..." 6 50 2>&1 >/dev/tty
+  dialog --backtitle "$BACKTITLE" --infobox "\nPassage en mode lecture-écriture de la partition Boot..." 5 50 2>&1 >/dev/tty
   sleep 2
   if ! mount -o remount,rw /boot; then
     dialog --backtitle "$BACKTITLE" --title "Erreur" --msgbox "\nImpossible de remonter /boot en lecture-écriture." 8 50 2>&1 >/dev/tty
     clear; exit 1
   fi
 
-  dialog --backtitle "$BACKTITLE" --infobox "\nSauvegarde des fichiers de configuration..." 6 40 2>&1 >/dev/tty
+  dialog --backtitle "$BACKTITLE" --infobox "\nSauvegarde des fichiers de configuration..." 5 40 2>&1 >/dev/tty
   sleep 2
 
   BOOTFILES="config.txt batocera-boot.conf"
@@ -157,7 +157,7 @@ extraire_et_mettre_a_jour() {
     fi
   done
 
-  dialog --backtitle "$BACKTITLE" --infobox "\nAnalyse du boot.tar.xz V$numero_version avant extraction patientez..." 6 50 2>&1 >/dev/tty
+  dialog --backtitle "$BACKTITLE" --infobox "\nAnalyse du boot.tar.xz V$numero_version avant extraction patientez..." 5 60 2>&1 >/dev/tty
 
   TOTAL_FILES=$(tar -tf "$DEST_FILE" | wc -l)
   [ "$TOTAL_FILES" -eq 0 ] && TOTAL_FILES=1
@@ -176,9 +176,9 @@ extraire_et_mettre_a_jour() {
       echo "($COUNT / $TOTAL_FILES)"
       echo "XXX"
     done
-  ) | dialog --backtitle "$BACKTITLE" --title "Extraction" --gauge "Extraction de l’archive en cours..." 13 70 0 2>&1 >/dev/tty
+  ) | dialog --backtitle "$BACKTITLE" --title "Extraction" --gauge "Extraction de l’archive en cours..." 13 90 0 2>&1 >/dev/tty
 
-  dialog --backtitle "$BACKTITLE" --infobox "Restauration des fichiers de configuration..." 5 40 2>&1 >/dev/tty
+  dialog --backtitle "$BACKTITLE" --infobox "\nRestauration des fichiers de configuration..." 5 40 2>&1 >/dev/tty
   sleep 2
   for BOOTFILE in ${BOOTFILES}; do
     if [ -e "/boot/${BOOTFILE}.upgrade" ]; then
@@ -190,7 +190,7 @@ extraire_et_mettre_a_jour() {
     fi
   done
 
-  dialog --backtitle "$BACKTITLE" --infobox "\nRemontée de /boot en lecture seule..." 6 40 2>&1 >/dev/tty
+  dialog --backtitle "$BACKTITLE" --infobox "\nRemontée de /boot en lecture seule..." 5 40 2>&1 >/dev/tty
   sleep 2
   mount -o remount,ro /boot || {
     dialog --backtitle "$BACKTITLE" --title "Erreur" --msgbox "\nImpossible de remonter /boot en lecture seule." 7 50 2>&1 >/dev/tty
@@ -198,16 +198,16 @@ extraire_et_mettre_a_jour() {
   }
 
   # Supprimer l’archive téléchargée
-  dialog --backtitle "$BACKTITLE" --infobox "\nNettoyage..." 6 40 2>&1 >/dev/tty
+  dialog --backtitle "$BACKTITLE" --infobox "\nNettoyage..." 5 40 2>&1 >/dev/tty
   sleep 2
   rm -f "$DEST_FILE"
 
   dialog --backtitle "$BACKTITLE" --title "Mise à jour terminée" --msgbox "\
-  La mise à jour est terminée, vous êtes maintenant en V${numero_version}.\n\n\
-  Après redémarrage :\n\
-  - Veuillez bien mettre à jour vos BIOS en V${numero_version}.\n\
-  - Mettez également à jour vos différents romsets MAME, FBNeo... en conséquence.\n\
-  - Et mettez à jour les systèmes tels que Switch, 3Dnes.\n" 12 70 2>&1 >/dev/tty
+La mise à jour est terminée, vous êtes maintenant en V${numero_version}.\n\n\
+Après redémarrage :\n\
+- Veuillez bien mettre à jour vos BIOS en V${numero_version}.\n\
+- Mettez également à jour vos différents romsets MAME, FBNeo... en conséquence.\n\
+- Et mettez à jour les systèmes tels que Switch, 3Dnes.\n" 12 90 2>&1 >/dev/tty
 
   dialog --backtitle "$BACKTITLE" --title "Redémarrage nécessaire" --yesno "\nUn redémarrage de Batocera est nécessaire.\n\nVoulez-vous redémarrer maintenant ?" 9 50 2>&1 >/dev/tty
   reponse=$?
@@ -226,7 +226,7 @@ VERSION=$(batocera-es-swissknife --version | awk '{print $1}' | sed -E 's/^([0-9
 confirmer_version() {
   dialog --backtitle "$BACKTITLE" \
     --title "Confirmation" \
-    --yesno "\nVersion de Batocera actuelle : $VERSION\n\nVoulez-vous installer la version $numero_version ?" 10 60 2>&1 >/dev/tty
+    --yesno "\nVersion de Batocera actuelle : $VERSION\n\nVoulez-vous installer la version $numero_version ?" 9 60 2>&1 >/dev/tty
 
   if [ $? -ne 0 ]; then
     clear
