@@ -14,7 +14,7 @@ declare -A poids_versions=(
 # Message initial
 dialog --backtitle "$BACKTITLE" \
   --title "Mise à jour / Downgrade Batocera" \
-  --yesno "\nScript de mise à jour ou Downgrade de Batocera.\n\nPermet de monter ou descendre la version de votre Batocera facilement si votre version actuelle ne vous convient pas.\n\n!!!ATTENTION!!! Ne pas descendre de plus d'une version par rapport à\nvotre version actuelle, au risque de causer de grave problèmes de compatibilité voir même rendre le boot impossible!!!\n\nÊtes-vous sûr de vouloir continuer ?" 18 75 2>&1 >/dev/tty
+  --yesno "\nScript de mise à jour ou Downgrade de Batocera.\n\nPermet de monter ou descendre la version de votre Batocera facilement si votre version actuelle ne vous convient pas.\n\n!!!ATTENTION!!! Ne pas descendre de plus d'une version par rapport à\nvotre version actuelle, au risque de causer de grave problèmes de compatibilité voir même rendre le boot impossible!!!\n\n\n\nÊtes-vous sûr de vouloir continuer ?" 18 75 2>&1 >/dev/tty
 if [ $? -ne 0 ]; then clear; exit 0; fi
 
 # Fonction: vérifier connexion Internet
@@ -33,6 +33,12 @@ selectionner_version() {
     40 "->Version 40 (3.34 Go)" \
     41 "->Version 41 (3.40 Go)" \
     2>&1 >/dev/tty)
+
+  if [ $? -ne 0 ] || [ -z "$choix" ]; then
+    clear
+    exit 0
+  fi
+
   numero_version="$choix"
 }
 
@@ -229,6 +235,14 @@ confirmer_version() {
 # Main
 verifier_connexion
 selectionner_version
+if (( numero_version < VERSION - 1 )); then
+  dialog --backtitle "$BACKTITLE" --title "Downgrade non autorisé" --msgbox "\n\
+Vous avez sélectionné la version $numero_version alors que vous êtes actuellement en version $VERSION.\n\n\
+Il est interdit de rétrograder de plus d’une version pour éviter des problèmes de compatibilité ou de démarrage.\n\n\
+Veuillez choisir une version plus récente (maximum une version en dessous)." 12 70 2>&1 >/dev/tty
+  clear
+  exit 1
+fi
 confirmer_version
 verifier_espace_userdata
 telecharger_fichier
