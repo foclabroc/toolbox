@@ -222,8 +222,8 @@ VERSION=$(batocera-es-swissknife --version | awk '{print $1}' | sed -E 's/^([0-9
 
 # Confirmation après sélection de version
 confirmer_version() {
-  dialog --backtitle "$BACKTITLE" --title "Confirmation" --yesno "\n\
-Voulez-vous installer la version $numero_version ?" 8 50 2>&1 >/dev/tty
+  dialog --backtitle "$BACKTITLE" --title "Confirmation" --yesno "\nVersion de Batocera actuelle : $VERSION\n\
+Voulez-vous installer la version $numero_version ?" 9 60 2>&1 >/dev/tty
 
   if [ $? -ne 0 ]; then
     return 1
