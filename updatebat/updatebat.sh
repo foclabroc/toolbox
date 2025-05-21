@@ -14,7 +14,7 @@ declare -A poids_versions=(
 # Message initial
 dialog --backtitle "$BACKTITLE" \
   --title "Mise à jour / Downgrade Batocera" \
-  --yesno "\nScript de mise à jour ou Downgrade de Batocera.\n\nPermet de monter ou descendre la version de votre Batocera facilement si votre version actuelle ne vous convient pas.\n\nÊtes-vous sûr de vouloir continuer ?" 13 70 2>&1 >/dev/tty
+  --yesno "\nScript de mise à jour ou Downgrade de Batocera.\n\nPermet de monter ou descendre la version de votre Batocera facilement si votre version actuelle ne vous convient pas.\n\n!!!ATTENTION!!! Ne pas descendre de plus d'une version par rapport à \nvotre version actuelle, au risque de causer de grave problèmes de compatibilité\nvoir même le boot impossible!!!\n\nÊtes-vous sûr de vouloir continuer ?" 16 70 2>&1 >/dev/tty
 if [ $? -ne 0 ]; then clear; exit 0; fi
 
 # Fonction: vérifier connexion Internet
