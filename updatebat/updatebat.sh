@@ -5,8 +5,6 @@ UPGRADE_DIR="/userdata/system/upgrade"
 DEST_FILE="$UPGRADE_DIR/boot.tar.xz"
 
 declare -A poids_versions=(
-    [36]=2730
-    [37]=2900
     [38]=3020
     [39]=3160
     [40]=3340
@@ -30,8 +28,6 @@ verifier_connexion() {
 # Fonction: sélectionner version
 selectionner_version() {
   choix=$(dialog --backtitle "$BACKTITLE" --title "Choisir une version" --menu "\nVersion actuelle : $VERSION\n\nSélectionnez une version à télécharger :\n " 20 55 8 \
-    36 "->Version 36 (2.73 Go)" \
-    37 "->Version 37 (2.90 Go)" \
     38 "->Version 38 (3.02 Go)" \
     39 "->Version 39 (3.16 Go)" \
     40 "->Version 40 (3.34 Go)" \
