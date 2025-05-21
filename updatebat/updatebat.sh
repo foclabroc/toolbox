@@ -234,16 +234,18 @@ confirmer_version() {
 
 # Main
 verifier_connexion
-selectionner_version
-if (( numero_version < VERSION - 1 )); then
-  dialog --backtitle "$BACKTITLE" --title "Downgrade non autorisé" --msgbox "\n\
+while true; do
+  selectionner_version
+  if (( numero_version < VERSION - 1 )); then
+    dialog --backtitle "$BACKTITLE" --title "Downgrade non autorisé" --msgbox "\n\
 Vous avez sélectionné la version $numero_version alors que vous êtes actuellement en version $VERSION.\n\n\
-Il est interdit de rétrograder de plus d’une version pour éviter des problèmes de compatibilité ou de démarrage.\n\n\
-Veuillez choisir une version plus récente (maximum une version en dessous)." 12 70 2>&1 >/dev/tty
-  clear
-  exit 1
-fi
-confirmer_version
+Il est déconseiller de rétrograder de plus d’une version pour éviter des problèmes de compatibilité ou de démarrage.\n\n\
+Veuillez choisir une version plus récente (maximum une version en dessous)." 14 70 2>&1 >/dev/tty
+    continue
+  fi
+  confirmer_version
+  break
+done
 verifier_espace_userdata
 telecharger_fichier
 extraire_et_mettre_a_jour
