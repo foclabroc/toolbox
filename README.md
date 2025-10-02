@@ -7,7 +7,7 @@ Elle permet d’installer facilement des applications, émulateurs, packs multim
 
 ## 🚀 Installation
 
-Depuis Batocera (ou une distribution Linux compatible), lancez simplement :
+Depuis Batocera (F1 -> applications -> Xterm) ou à distance (SSH) via putty, lancez simplement :
 
 ```bash
 curl -L foclabroc.short.gy/toolbox | bash
