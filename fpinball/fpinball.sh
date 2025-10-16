@@ -150,9 +150,9 @@ SIZE_MB=$(du -m "$ARCHIVE" | cut -f1)
   TAR_PID=$!
 
   # Simulation de la progression basée sur la taille
-  TOTAL_TIME=$((SIZE_MB / 2))   # 0.5 seconde par Mo (à ajuster)
-  [ "$TOTAL_TIME" -lt 8 ] && TOTAL_TIME=8
-  [ "$TOTAL_TIME" -gt 90 ] && TOTAL_TIME=90  # limite max à 1 min 30
+  TOTAL_TIME=$((SIZE_MB / 8))
+  [ "$TOTAL_TIME" -lt 4 ] && TOTAL_TIME=8
+  [ "$TOTAL_TIME" -gt 45 ] && TOTAL_TIME=90
 
   STEPS=100
   for i in $(seq 1 $STEPS); do
