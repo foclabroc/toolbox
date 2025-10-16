@@ -35,14 +35,9 @@ rm -rf /userdata/system/pro/fpinball
 
 # Lancement du téléchargement
 (
-  echo 10
-  wget -q --show-progress -O "$DESTINATION$ARCHIVE_NAME" "$ARCHIVE_URL" 2>&1 | \
-  stdbuf -oL tr '\r' '\n' | awk '/%/ {gsub(/\%/,""); print 10 + $1 * 0.7}'
-  echo 80
-  sleep 1
-  echo 100
+  curl -L --progress-bar -o "$DESTINATION$ARCHIVE_NAME" "$ARCHIVE_URL" 2>&1 | \
+  stdbuf -oL tr '\r' '\n' | awk '/%/ {gsub(/%/,""); print $1}'
 ) | dialog --gauge "Téléchargement de l'archive Future Pinball en cours..." 7 60 0 2>&1 >/dev/tty
-
 # Vérifier si le téléchargement a réussi
 if [ $? -ne 0 ] || [ ! -f "$DESTINATION$ARCHIVE_NAME" ]; then
     dialog --backtitle "Foclabroc Toolbox" \
@@ -145,13 +140,16 @@ fi
 # === Suppression ancien dossier ===
 rm -rf "$FINAL_DIR"
 
-# === Extraction avec jauge de progression (toutes les 50 lignes) ===
+# === Extraction avec jauge de progression (toutes les 50 fichiers extraits) ===
 TOTAL_FILES=$(tar -tf ge-customv40.tar | wc -l)
 COUNT=0
 
 (
-  tar -xf ge-customv40.tar -C "$EXTRACT_DIR" --checkpoint=1 --checkpoint-action=exec='echo $((COUNT++))' 2>/dev/null | while read -r; do
+  tar -tf ge-customv40.tar | while read -r file; do
       COUNT=$((COUNT + 1))
+      # Extraire le fichier courant
+      tar -xf ge-customv40.tar -C "$EXTRACT_DIR" "$file"
+      # Mettre à jour la jauge toutes les 50 extractions
       if (( COUNT % 50 == 0 )); then
           PERCENT=$((COUNT * 100 / TOTAL_FILES))
           echo "$PERCENT"
