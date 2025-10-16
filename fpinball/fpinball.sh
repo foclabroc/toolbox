@@ -87,9 +87,9 @@ if [[ -d "$FINAL_DIR" ]]; then
     --infobox "\nWine GE-Custom est déjà installé.\nAucune action nécessaire." 6 60 2>&1 >/dev/tty
     sleep 2
 
-    # === Message final ===
-    dialog --backtitle "Foclabroc Toolbox" --title "Future Pinball" \
-    --msgbox "Installation de Future Pinball terminée avec succès.\n\nAu premier lancement, patientez 30 secondes à 1 minute\npour l'installation automatique des Winetricks." 10 70 2>&1 >/dev/tty
+	# === Message final ===
+	dialog --backtitle "Foclabroc Toolbox" --title "Future Pinball" \
+	--msgbox "Installation de Future Pinball terminée avec succès.\n\nAjoutez vos ROMs dans /roms/fpinball et vérifiez que le système 'Future Pinball' est bien coché dans les paramètres de Collections → Systèmes affichés.\n\nAu premier lancement, patientez 30 secondes à 1 minute pour l'installation automatique des Winetricks." 13 70 2>&1 >/dev/tty
 
     # === Rafraîchissement des jeux ===
     curl -s http://127.0.0.1:1234/reloadgames > /dev/null
@@ -181,7 +181,7 @@ rm -rf "$DOWNLOAD_DIR"
 
 # === Message final ===
 dialog --backtitle "Foclabroc Toolbox" --title "Future Pinball" \
---msgbox "Installation de Future Pinball terminée avec succès.\n\nAu premier lancement, patientez 30 secondes à 1 minute\npour l'installation automatique des Winetricks." 10 70 2>&1 >/dev/tty
+--msgbox "Installation de Future Pinball terminée avec succès.\n\nAjoutez vos ROMs dans /roms/fpinball et vérifiez que le système 'Future Pinball' est bien coché dans les paramètres de Collections → Systèmes affichés.\n\nAu premier lancement, patientez 30 secondes à 1 minute pour l'installation automatique des Winetricks." 13 70 2>&1 >/dev/tty
 chmod a+x "/userdata/system/pro/fpinball/batocera-config-fpinball"
 # === Rafraîchissement des jeux ===
 curl -s http://127.0.0.1:1234/reloadgames > /dev/null
