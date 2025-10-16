@@ -140,25 +140,32 @@ fi
 # === Suppression ancien dossier ===
 rm -rf "$FINAL_DIR"
 
-# === Extraction avec jauge de progression (toutes les 50 fichiers extraits) ===
-TOTAL_FILES=$(tar -tf ge-customv40.tar | wc -l)
-COUNT=0
+# === Simulation + extraction réelle ===
+ARCHIVE="$DOWNLOAD_DIR/ge-customv40.tar"
+SIZE_MB=$(du -m "$ARCHIVE" | cut -f1)
 
 (
-  tar -tf ge-customv40.tar | while read -r file; do
-      COUNT=$((COUNT + 1))
-      # Extraire le fichier courant
-      tar -xf ge-customv40.tar -C "$EXTRACT_DIR" "$file"
-      # Mettre à jour la jauge toutes les 50 extractions
-      if (( COUNT % 50 == 0 )); then
-          PERCENT=$((COUNT * 100 / TOTAL_FILES))
-          echo "$PERCENT"
-      fi
+  # Lance l'extraction réelle en tâche de fond
+  tar -xf "$ARCHIVE" -C "$EXTRACT_DIR" &
+  TAR_PID=$!
+
+  # Simulation de la progression basée sur la taille
+  TOTAL_TIME=$((SIZE_MB / 2))   # 0.5 seconde par Mo (à ajuster)
+  [ "$TOTAL_TIME" -lt 8 ] && TOTAL_TIME=8
+  [ "$TOTAL_TIME" -gt 90 ] && TOTAL_TIME=90  # limite max à 1 min 30
+
+  STEPS=100
+  for i in $(seq 1 $STEPS); do
+      echo "$i"
+      sleep $(awk "BEGIN {print $TOTAL_TIME/$STEPS}")
   done
-) | dialog --gauge "Extraction de Wine GE-Custom..." 7 55 0 2>&1 >/dev/tty
+
+  # Attend la fin réelle de l’extraction
+  wait $TAR_PID 2>/dev/null
+) | dialog --gauge "Extraction de Wine GE-Custom (~${SIZE_MB} Mo)..." 7 60 0 2>&1 >/dev/tty
 
 # === Vérification de l'installation ===
-if [[ $? -eq 0 && -d "$FINAL_DIR" ]]; then
+if [[ -d "$FINAL_DIR" ]]; then
     dialog --backtitle "Foclabroc Toolbox" \
     --infobox "\nInstallation de Wine GE-Custom pour Future Pinball terminée avec succès !" 6 60 2>&1 >/dev/tty
     sleep 3
@@ -180,4 +187,5 @@ dialog --backtitle "Foclabroc Toolbox" --title "Future Pinball" \
 curl -s http://127.0.0.1:1234/reloadgames > /dev/null
 
 exit 0
+
 
