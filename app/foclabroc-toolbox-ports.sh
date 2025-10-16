@@ -225,21 +225,22 @@ main_menu() {
     while true; do
         main_menu=$(dialog --clear --backtitle "Foclabroc Toolbox" \
             --title "Menu Principal" \
-            --menu "\nSélectionnez une option :\n " 24 100 14 \
+            --menu "\nSélectionnez une option :\n " 24 100 15 \
             1 "[Nintendo Switch]  -> Installer l'émulation Switch sur Batocera" \
             2 "[Rgsx]             -> Installer RGSX l'outils de telechargement de jeux pour Batocera" \
-            3 "[Youtube TV]       -> Installer Youtube TV" \
-            4 "[Gparted]          -> Installer Gparted" \
-            5 "[Pack Kodi]        -> Installer le pack streaming/iptv kodi" \
-            6 "[Pack Nes3D]       -> Installer le pack Nintendo Nes 3D" \
-            7 "[Pack OpenLara]    -> Installer le pack OpenLara" \
-            8 "[Pack Music]       -> Installer le pack Music pour ES" \
-            9 "[Jeux Pc]          -> Téléchargement de Jeux Windows..." \
-            10 "[Wine Toolbox]     -> Téléchargement de Runner Wine et outils wsquash..." \
-            11 "[Update/Downgrade] -> Mise à jour et Downgrade de Batocera..." \
-            12 "[Tools]            -> Outils pour Batocera version light. (Plus d'options dispo via ssh)" \
-            13 "[Underground]      -> !!!Mot de passe nécessaire !!!" \
-            14 "[Exit]             -> Quitter le script" \
+            3 "[Fpinball]         -> Installer le launcher Future Pinball pour V42 et +" \
+            4 "[Youtube TV]       -> Installer Youtube TV" \
+            5 "[Gparted]          -> Installer Gparted" \
+            6 "[Pack Kodi]        -> Installer le pack streaming/iptv kodi" \
+            7 "[Pack Nes3D]       -> Installer le pack Nintendo Nes 3D" \
+            8 "[Pack OpenLara]    -> Installer le pack OpenLara" \
+            9 "[Pack Music]       -> Installer le pack Music pour ES" \
+            10 "[Jeux Pc]          -> Téléchargement de Jeux Windows..." \
+            11 "[Wine Toolbox]     -> Téléchargement de Runner Wine et outils wsquash..." \
+            12 "[Update/Downgrade] -> Mise à jour et Downgrade de Batocera..." \
+            13 "[Tools]            -> Outils pour Batocera version light. (Plus d'options dispo via ssh)" \
+            14 "[Underground]      -> !!!Mot de passe nécessaire !!!" \
+            15 "[Exit]             -> Quitter le script" \
             2>&1 >/dev/tty)
         clear
 
@@ -255,54 +256,59 @@ main_menu() {
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -L bit.ly/rgsx-install | sh" 
                 ;;
             3)
+                confirm_install "Fpinball" || continue
+                clear
+                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/fpinball/fpinball.sh | bash" 
+                ;;
+            4)
                 confirm_install "Youtube TV" || continue
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/youtubetv/youtubetv.sh | bash" 
                 ;;
-            4)
+            5)
                 confirm_install "Gparted" || continue
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/gparted/gparted.sh | bash" 
                 ;;
-            5)
+            6)
                 confirm_install "Pack Kodi" || continue
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/kodi/pack_kodi.sh | bash"
                 ;;
-            6)
+            7)
                 confirm_install "Pack Nes 3D" || continue
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/3d/pack_3d.sh | bash"
                 ;;
-            7)  #Pack openlara
+            8)  #Pack openlara
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/openlara/pack_lara.sh | bash"
                 ;;
-            8)  #Pack Music
+            9)  #Pack Music
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/music/music.sh | bash"
                 ;;
-            9)  #Jeux windows et linux
+            10)  #Jeux windows et linux
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/_win-game.sh | bash"
                 ;;
-            10)  #wine tools
+            11)  #wine tools
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash"
                 ;;
-            11)  #update tools
+            12)  #update tools
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/updatebat/updatebat.sh | bash"
                 ;;
-            12)  #record tools
+            13)  #record tools
                 clear
                 tools_options
                 ;;
-            13)  #Underground
+            14)  #Underground
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/underground.sh | bash"
                 ;;
-            14)# Afficher un message de remerciement
+            15)# Afficher un message de remerciement
                 dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --textbox "$tmpfile1" 20 78 2>&1 >/dev/tty
                 killall -9 xterm
                 clear
