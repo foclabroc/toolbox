@@ -250,7 +250,7 @@ main_menu() {
             5 "[Gparted]             -> Installer Gparted" \
             6 "[Pack Kodi]           -> Installer le pack streaming/iptv kodi" \
             7 "[Pack Nes3D]          -> Installer le pack Nintendo Nes 3D" \
-            8 "[Pack OpenLara]       -> Installer le pack OpenLara" \
+            8 "[Pack OpenLara]       -> Installer le pack OpenLara Batocera V38 à V41 seulement" \
             9 "[Pack Music]          -> Installer le pack Music pour ES" \
             10 "[Jeux Pc]             -> Téléchargement de Jeux Windows..." \
             11 "[Wine Toolbox]        -> Téléchargement de Runner Wine et outils wsquash..." \
