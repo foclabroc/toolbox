@@ -79,8 +79,10 @@ LA BISE." 30 70 2>&1 >/dev/tty
 
 # Vérification de la connexion Internet
 check_internet() {
-    if ! ping -c 1 -W 2 8.8.8.8 &>/dev/null; then
-        dialog --backtitle "Foclabroc Toolbox" --title "Erreur" --msgbox "\nPas de connexion Internet !" 6 40 2>&1 >/dev/tty
+    if ! curl -s --head --connect-timeout 3 https://www.google.com >/dev/null; then
+        dialog --backtitle "Foclabroc Toolbox" \
+               --title "Erreur" \
+               --msgbox "\nPas de connexion Internet détectée !" 6 40 2>&1 >/dev/tty
         exit 1
     fi
 }
