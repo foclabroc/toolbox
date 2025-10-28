@@ -354,5 +354,5 @@ main_menu() {
 show_intro
 show_info
 arch_check
-check_internet
+#check_internet
 main_menu
