@@ -1,6 +1,6 @@
 /* Replace Logo with streamberry logo, this should be the last line in CSS */
 :root {
-    --logo: url("\\Freebox_Server\soft et doc tv\logo.png");
+    --logo: url("https://github.com/foclabroc/toolbox/blob/main/jelly/logo.png?raw=true");
 }
 
 .pageTitleWithDefaultLogo {
