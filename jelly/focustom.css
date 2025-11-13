@@ -42,33 +42,44 @@ button.detailButton.btnPlay.play-button:hover {
 /* === Media Bar : bouton ▶ LIRE (fond accent + texte noir) === */
 
 
-/* Remplace le texte "Play" par "▶ LIRE" sur les boutons de lecture */
-.layout-desktop .mainDetailButtons .btnPlay::after,
-.layout-mobile .mainDetailButtons .btnPlay::after,
-.layout-tv .mainDetailButtons .btnPlay::after {
+/* Remplace le texte "Play" par "▶ LIRE" sur les boutons de lecture (Jellyfin) */
+button.btnPlay.detailButton.emby-button::after {
     content: "▶ LIRE" !important;
-    font-weight: 700 !important; /* gras plus marqué */
+    font-weight: 700 !important; /* texte plus marqué */
     text-transform: none;
     display: inline-block;
     text-align: center;
     width: 100%;
     font-size: 1em;
     line-height: 1.4em;
+    color: #000 !important;
 }
-/* Masque le texte original "Play" */
-.layout-desktop .mainDetailButtons .btnPlay span,
-.layout-mobile .mainDetailButtons .btnPlay span,
-.layout-tv .mainDetailButtons .btnPlay span {
+
+/* Masque le contenu original (icône et texte Play) */
+button.btnPlay.detailButton.emby-button .detailButton-content,
+button.btnPlay.detailButton.emby-button span {
     display: none !important;
 }
+
 /* Centrage et espacement équilibré du bouton */
-.layout-desktop .mainDetailButtons .btnPlay,
-.layout-mobile .mainDetailButtons .btnPlay,
-.layout-tv .mainDetailButtons .btnPlay {
+button.btnPlay.detailButton.emby-button {
     padding-left: 1em !important;
     padding-right: 1em !important;
+    background: var(--primary-accent-color) !important; /* fond du thème */
+    border: none !important;
+    border-radius: var(--rounded-cards, 10px) !important;
+    color: #000 !important;
+    font-weight: 700 !important;
+    transition: transform 0.15s ease, filter 0.15s ease;
 }
-/* Remplace le texte "Play" par "▶ LIRE" sur les boutons de lecture */
+
+/* Effet au survol */
+button.btnPlay.detailButton.emby-button:hover {
+    filter: brightness(1.1);
+    transform: scale(1.03);
+    cursor: pointer;
+}
+/* Remplace le texte "Play" par "▶ LIRE" sur les boutons de lecture (Jellyfin) */
 
 
 /* Replace Logo with focflix logo, this should be the last line in CSS */
