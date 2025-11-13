@@ -2300,35 +2300,6 @@ h3.tagline {
     background: var(--secondary-background-transparent) !important;
   }
 }
-/* Remplace le texte "Play" par "▶ LIRE" sur les boutons de lecture */
-.layout-desktop .mainDetailButtons .btnPlay::after,
-.layout-mobile .mainDetailButtons .btnPlay::after,
-.layout-tv .mainDetailButtons .btnPlay::after {
-    content: "▶ LIRE" !important;
-    font-weight: 700 !important; /* gras plus marqué */
-    text-transform: none;
-    display: inline-block;
-    text-align: center;
-    width: 100%;
-    font-size: 1em;
-    line-height: 1.4em;
-}
-
-/* Masque le texte original "Play" */
-.layout-desktop .mainDetailButtons .btnPlay span,
-.layout-mobile .mainDetailButtons .btnPlay span,
-.layout-tv .mainDetailButtons .btnPlay span {
-    display: none !important;
-}
-
-/* Centrage et espacement équilibré du bouton */
-.layout-desktop .mainDetailButtons .btnPlay,
-.layout-mobile .mainDetailButtons .btnPlay,
-.layout-tv .mainDetailButtons .btnPlay {
-    padding-left: 1em !important;
-    padding-right: 1em !important;
-}
-
 /*
 ================================================================================
 |                         JELLYFIN 10.11 FIXES                                  |
@@ -2993,3 +2964,31 @@ span.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-si
   background-size: 100% !important;
 }
 /* Replace Logo with focflix logo, this should be the last line in CSS */
+/* Remplace le texte "Play" par "▶ LIRE" sur les boutons de lecture */
+.layout-desktop .mainDetailButtons .btnPlay::after,
+.layout-mobile .mainDetailButtons .btnPlay::after,
+.layout-tv .mainDetailButtons .btnPlay::after {
+    content: "▶ LIRE" !important;
+    font-weight: 700 !important; /* gras plus marqué */
+    text-transform: none;
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+    font-size: 1em;
+    line-height: 1.4em;
+}
+
+/* Masque le texte original "Play" */
+.layout-desktop .mainDetailButtons .btnPlay span,
+.layout-mobile .mainDetailButtons .btnPlay span,
+.layout-tv .mainDetailButtons .btnPlay span {
+    display: none !important;
+}
+
+/* Centrage et espacement équilibré du bouton */
+.layout-desktop .mainDetailButtons .btnPlay,
+.layout-mobile .mainDetailButtons .btnPlay,
+.layout-tv .mainDetailButtons .btnPlay {
+    padding-left: 1em !important;
+    padding-right: 1em !important;
+}
