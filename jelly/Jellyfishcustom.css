@@ -219,3 +219,41 @@ button.btnPlay.detailButton.emby-button:hover {
     display: inline-flex !important;
 }
 /* Masque complètement le bouton "Watchlist" */
+
+
+/* Bouton ▶ Play (état normal — fond noir forcé) */
+.cardOverlayButton[data-action="resume"] {
+    background: #000 !important; /* fond noir au repos */
+    border-radius: 50% !important;
+    width: 2.8em !important;
+    height: 2.8em !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 8px rgba(0,0,0,0.4);
+    transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease;
+}
+
+/* Icône ▶ blanche */
+.cardOverlayButton[data-action="resume"] .material-icons.play_arrow {
+    color: #fff !important;
+    font-size: 1.6em !important;
+    transition: color 0.25s ease;
+}
+
+/* Survol : fond accent + triangle noir */
+.cardOverlayButton[data-action="resume"]:hover {
+    background: var(--primary-accent-color, #ffcc00) !important; /* couleur du thème */
+    transform: scale(1.07);
+    filter: brightness(1.05);
+}
+
+.cardOverlayButton[data-action="resume"]:hover .material-icons.play_arrow {
+    color: #000 !important;
+}
+
+/* Neutralise les éventuels styles internes Jellyfin */
+.emby-button.cardOverlayButton[data-action="resume"] {
+    background: #000 !important;
+}
+/* Bouton ▶ Play (état normal — fond noir forcé) */
