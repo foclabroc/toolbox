@@ -205,3 +205,17 @@ button.btnPlay.detailButton.emby-button:hover {
   filter: brightness(1.8) contrast(1.4) saturate(1.8);
 }
 /* Texte personnalisé message de connexion */
+
+
+/* Masque complètement le bouton "Watchlist" */
+.watchlist-button,
+.cardOverlayButton .watchlist,
+.cardOverlayButtonIcon.watchlist {
+    display: none !important;
+}
+
+/* Annule la règle du thème qui cachait "Vu" et "Favori" */
+.cardOverlayButtonIcon:is(.playstatebutton-icon-unplayed, .playstatebutton-icon-played, .favorite) {
+    display: inline-flex !important;
+}
+/* Masque complètement le bouton "Watchlist" */
