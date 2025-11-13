@@ -1,4 +1,2949 @@
-/* Replace Logo with streamberry logo, this should be the last line in CSS */
+/*
+================================================================================
+|                                                                              |
+|                         JELLYFIN CUSTOM THEME                                |
+|                         Main Stylesheet (theme.css)                          |
+|                                                                              |
+================================================================================
+*/
+
+/* ~~~~~~~~~~~~~~~~~~~~ EXTERNAL IMPORTS ~~~~~~~~~~~~~~~~~~~~ */
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap'); /* Quicksand Font from Google Fonts */
+@import url("https://cdn.jsdelivr.net/gh/Druidblack/jellyfin-icon-metadata/public-icon.css"); /* Metadata icons by Druidblack */
+@import url("https://cdn.jsdelivr.net/gh/n00bcodr/Jellyfish/fonts/materialSymbolsRounded.css");
+@import url("https://cdn.jsdelivr.net/gh/n00bcodr/Jellyfish/loginpage.css");
+@import url("https://cdn.jsdelivr.net/gh/n00bcodr/Jellyfish/colors/jellyblue.css");
+
+/* ~~~~~~~~~~~~~~~~~~~~ GLOBAL CSS VARIABLES ~~~~~~~~~~~~~~~~~~~~ */
+/* Defines core variables used throughout the theme for consistency. */
+:root {
+    --theme-updated-on: "06 November 2025 - 12:11 P.M."; /* Date of last theme update */
+    --theme-name: 'Jellyfish';
+    --rounded-cards: 15px; /* Standard border-radius */
+    --blur: 15px;           /* Default blur intensity */
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~ GLOBAL FONT ~~~~~~~~~~~~~~~~~~~~ */
+/* Sets the font for the theme. */
+body, h1, h2, h3, h4, h5, h6, p {
+    font-family: 'Quicksand', sans-serif !important;
+}
+
+/* hide scrollbars */
+* {
+  scrollbar-color : transparent transparent !important;
+  scrollbar-width: none !important;
+}
+
+.emby-button.block, .dashboardDocument .material-icons.check:before, .displayPreferencesPage .material-icons.check:before {
+    color: var(--text-color) !important;
+    background-color: var(--secondary-accent-color);
+}
+
+/* Show theme date in dashboard */
+.dashboardActionsContainer::before {
+    content: "Theme last updated on " var(--theme-updated-on, "..........");
+    display: block;
+    background-color: var(--alt-accent-color);
+    color: #ddd;
+    border-radius: var(--rounded-cards);
+    padding: 15px 15px;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: bold;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    margin-bottom: 1em;
+    margin-left: 2px;
+}
+/* ~~~~~~~~~~~~~~~~~~~~ ACCENT COLOR APPLICATION ~~~~~~~~~~~~~~~~~~~~ */
+/* Styles that apply the theme's accent colors to various UI elements. */
+
+/* == Primary Accent Backgrounds == */
+/* Applied to main interactive element backgrounds indicating a primary action or state. */
+.emby-checkbox:checked+span+.checkboxOutline, /* Checked checkboxes outline */
+.selectionCommandsPanel,                      /* Toolbar for selected items */
+.countIndicator,                              /* Unwatched count on cards */
+.MuiButton-root.MuiButton-containedSizeMedium, /* Material UI medium contained buttons */
+.MuiChip-root.MuiChip-colorInfo:not(.MuiChip-root.MuiChip-colorError), /* Info Chips (excluding error state) */
+progress[aria-valuenow]:before,               /* Progress bar fill (pseudo-element for some browsers) */
+.button-submit,                               /* General submit buttons */
+.layout-desktop .dashboardDocument div[data-role="controlgroup"] a.ui-btn-active, /* Active tabs in dashboard control groups (Desktop) */
+.layout-desktop #editItemMetadataPage .btnHeaderSave, /* Save button in metadata editor header (Desktop) */
+.layout-desktop .mainDetailButtons .btnPlay,    /* Play button on details page (Desktop) */
+.layout-mobile .mainDetailButtons .btnPlay,     /* Play button on details page (Mobile) */
+.layout-tv .mainDetailButtons .btnPlay,     /* Play button on details page (TV) */
+.playbackProgress>div,                        /* Inner bar of playback progress sliders */
+.iconOsdProgressInner                         /* Inner part of OSD circular progress indicators */
+{
+    background: var(--primary-accent-color) !important;
+}
+
+/* == Secondary Accent Backgrounds == */
+/* Applied to elements that need a less prominent accent background. */
+.MuiAlert-root.MuiAlert-standardInfo,          /* Info type Material UI alerts */
+.navMenuOption-selected,                        /* Selected items in the main navigation menu */
+.MuiListItemButton-root.Mui-selected,           /* Selected Material UI list item buttons */
+.jstree-default .jstree-wholerow-clicked        /* Clicked rows in jsTree (e.g., metadata editor folder tree) */ {
+    background: var(--secondary-accent-color) !important;
+}
+
+.MuiMenu-paper {
+    background: var(--secondary-background-transparent) !important;
+    backdrop-filter: blur(var(--blur)) !important;
+}
+
+.formDialogHeader,
+.formDialogFooter {
+    background: var(--secondary-accent-color) !important;
+    backdrop-filter: blur(25px) !important;
+}
+.formDialogHeader h3 {
+    font-weight: 800;
+}
+
+.formDialogContent {
+    background: var(--secondary-background-transparent) !important;
+    height: -webkit-fill-available !important;
+}
+
+.formDialog:has(.formDialogHeader-clear) .formDialogContent {
+    background: none !important;
+}
+
+.formDialog .formDialogFooter-clear {
+    margin-top: 1em !important;
+    margin-bottom: 0px !important;
+    padding: 1em;
+}
+
+.layout-mobile .dialog-fullscreen-lowres .formDialogHeader-clear {
+	border-radius: var(--rounded-cards) !important;
+	margin-left: 0em !important;
+}
+
+.layout-mobile .dialog-fullscreen-lowres .formDialogFooter-clear {
+    background: none !important;
+}
+
+.formDialogHeader.formDialogHeader-clear.justify-content-center {
+    width: 100%;
+	margin-bottom: 1em !important;
+}
+
+.formDialogHeader.formDialogHeader-clear .formDialogHeaderTitle {
+	margin-left: 0em !important;
+}
+.iconOsdProgressOuter   /* Outer ring of OSD circular progress indicators */
+{
+    background: #ffffffc0 !important;
+}
+
+.listItemIcon:not(.listItemIcon-transparent, .notification_important) /* Icons in list items (excluding transparent/important notifications) */
+{
+    color: #ffffff !important;
+    background-color: var(--secondary-accent-color) !important;
+}
+
+/* == Accent Color for Progress Bars == */
+/* Styles progress bar elements with the primary accent color. */
+progress::-webkit-progress-value,             /* Progress bar fill for WebKit browsers */
+.itemProgressBarForeground,                   /* Foreground of item progress bars (e.g., watched progress on cards) */
+.mdl-slider-background-lower                  /* Lower part of Material Design Lite sliders (used in player progress) */
+{
+    background: var(--primary-accent-color) !important;
+}
+
+/* Background for the track of item progress bars, using primary accent with transparency. */
+.itemProgressBar {
+    background: rgba(var(--primary-r), var(--primary-g), var(--primary-b), 0.2) !important;
+}
+
+/* == Accent Color for Borders == */
+/* Applies primary accent color to borders of interactive or focused elements. */
+.emby-checkbox:checked+span+.checkboxOutline, /* Outline of checked checkboxes */
+.emby-checkbox:focus:not(:checked)+span+.checkboxOutline, /* Outline of focused (but not checked) checkboxes */
+.emby-input:focus,                            /* Focused text input fields */
+.emby-textarea:focus,                         /* Focused textarea fields */
+.emby-select-withcolor:focus,                 /* Focused select dropdowns with color indication */
+.mdl-spinner__layer-1,                        /* Layers of Material Design Lite spinners */
+.mdl-spinner__layer-2,
+.mdl-spinner__layer-3,
+.mdl-spinner__layer-4,
+.progressring-spiner                          /* Spinner for progress rings */
+{
+    border-color: var(--primary-accent-color) !important;
+}
+
+/* == Accent Color for Text & Icons == */
+/* Applies primary accent color to text and icons for emphasis or active states. */
+.button-link:not(.itemDetailPage .button-link), /* Link-styled buttons (excluding those on item detail pages) */
+.selectLabelFocused,                          /* Labels for focused select dropdowns */
+.textareaLabelFocused,                        /* Labels for focused textareas */
+.inputLabelFocused,                           /* Labels for focused input fields */
+.metadataSidebarIcon,                         /* Icons in the metadata editor sidebar */
+.upNextDialog-countdownText,                  /* Countdown text in the "Up Next" dialog */
+.MuiSvgIcon-root.MuiSvgIcon-fontSizeInherit,  /* Material UI SVG icons inheriting font size */
+.listItemImageButton:hover,                   /* Hovered image buttons within list items */
+.button-flat:hover,                           /* Hovered flat buttons */
+#divRunningTasks span,                        /* Text within the running tasks indicator */
+.username,                                    /* Usernames (e.g., on profile pages) */
+.headerUsername,                              /* Username in the header */
+.sectionTitle,                                /* Titles of sections */
+.navMenuOption:hover:not(.navMenuOption-selected) /* Hovered main navigation items (not selected) */
+{
+    color: var(--primary-accent-color) !important;
+}
+
+.MuiListItemButton-root.Mui-selected .MuiListItemIcon-root, /* Icons within selected Material UI list items */
+.MuiListItemButton-root.Mui-selected          /* Selected Material UI list items (text) */
+{
+    color: #ffffff !important;
+}
+
+
+/* == Accent Color for Hover Effects (Fine Pointer Devices) == */
+/* Applies accent color on hover for icon buttons, specifically for mouse users. */
+@media (hover: hover) and (pointer: fine) {
+    .paper-icon-button-light:hover:not(:disabled) { /* Exclude disabled buttons */
+        color: var(--primary-accent-color) !important;
+        background-color: transparent !important;
+    }
+}
+
+.paper-icon-button-light:active:not(:disabled) { /* Active state for icon buttons */
+    color: var(--primary-accent-color) !important;
+    background-color: transparent !important;
+}
+
+/* == Accent Color for Dashboard Headings == */
+.dashboardSection h3 {
+ color: var(--primary-accent-color);
+ font-weight: bold !important;
+}
+
+.dashboardSection span.material-icons.chevron_right {
+    display: none;
+}
+/* == Hover Color for Movie Card Overlays == */
+/* Sets a semi-transparent background on movie card hover. */
+.card-hoverable:hover .cardOverlayContainer {
+    background: var(--secondary-background-transparent);
+}
+
+.cardOverlayContainer > .cardOverlayFab-primary {
+    background-color: transparent !important;
+    color: var(--primary-accent-color) !important;
+}
+
+/* Hide watched and favorite buttons on card hover */
+.cardOverlayButtonIcon:is(.playstatebutton-icon-unplayed, .playstatebutton-icon-played, .favorite) {
+    display: none !important;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~ SPECIFIC ELEMENT BACKGROUNDS (NON-ACCENT) ~~~~~~~~~~~~~~~~~~~~ */
+/* Defines specific background colors for particular buttons or elements, not tied to the theme accent. */
+
+/* Red background for delete image button. */
+#btnDeleteImage {
+    background: #942626c2 !important;
+}
+/* Red background for shutdown server button. */
+#btnShutdown {
+    background: #AE3739 !important;
+}
+/* Green background for restart server button and Save Metadata button */
+#btnRestartServer {
+    background: forestgreen !important;
+}
+/* Violet background for refresh button and reset metadata button */
+button.raised.btnRefresh.emby-button, .button-reset {
+    background: blueviolet !important;
+}
+/* Dark, semi-transparent background for the Intro Skipper button. */
+#skipIntro .emby-button {
+    background: rgba(30, 30, 30, 0.7) !important;
+}
+/* Red background for cancel and reset password buttons. */
+#btnCancel, #btnResetPassword, .button-cancel {
+    background: rgb(180 96 96) !important;
+}
+
+
+/* ~~~~~~~~~~~~~~~~~~~~ GENERAL BACKGROUND COLORS ~~~~~~~~~~~~~~~~~~~~ */
+/* Sets base background colors for main layout areas and components. */
+
+/* Primary background for the entire page and containers without backdrops. */
+html
+{
+    background-color: var(--primary-background-color) !important;
+}
+
+.backgroundContainer:not(.withBackdrop):not(.backgroundContainer-transparent), /* Main page background, excluding when a backdrop is shown */
+.noBackdropTransparency .detailPageSecondaryContainer /* Secondary container on detail pages when backdrop transparency is off */
+{
+    background-color: var(--secondary-background-transparent) !important;
+}
+
+.libraryDocument.withSectionTabs .backgroundContainer {
+    backdrop-filter: blur(var(--blur)) brightness(.1) !important;
+    background-color: var(--secondary-background-transparent);
+}
+
+/* Hide backdrop image on homepage to work well with media bar */
+.libraryDocument.withSectionTabs .backdropImage {
+    display: none;
+}
+
+/* Secondary, often slightly transparent, backgrounds for elements like drawers, dialogs, and content sections. */
+.layout-desktop .mainDrawer,                  /* Main navigation drawer (Desktop) */
+.layout-mobile .mainDrawer,                   /* Main navigation drawer (Mobile) */
+.MuiPaper-root.MuiDrawer-paperAnchorDockedLeft, /* Material UI drawer paper */
+.dialog,                                      /* Dialog boxes */
+.programCell-active,                          /* Active program cells in the TV guide */
+.channelsContainer,                           /* Container for TV channels */
+.layout-desktop .detailSectionContent,        /* Content area within detail sections (Desktop) - Consider backdrop transparency rules */
+.layout-mobile .detailSectionContent,         /* Content area within detail sections (Mobile) */
+.layout-tv .detailSectionContent,         /* Content area within detail sections (tv) */
+.trackSelections,                            /* Audio/Subtitle track selection area */
+.MuiPaper-root.MuiPopover-paper
+{
+    background: var(--secondary-background-transparent) !important;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~ DYNAMIC BACKGROUNDS (ACTIVE DEVICES) ~~~~~~~~~~~~~~~~~~~~ */
+/* Provides a set of alternate background colors, often used for cards in the "Active Devices" section. */
+.defaultCardBackground1 { background-color: var(--primary-alt1) !important; }
+.defaultCardBackground2 { background-color: var(--primary-alt2) !important; }
+.defaultCardBackground3 { background-color: var(--primary-alt3) !important; }
+.defaultCardBackground4 { background-color: var(--primary-alt4) !important; }
+.defaultCardBackground5 { background-color: var(--primary-alt5) !important; }
+
+/* ~~~~~~~~~~~~~~~~~~~~ LAYOUT - GENERAL ~~~~~~~~~~~~~~~~~~~~ */
+
+/* == Poster Card Size Reduction (Landscape) == */
+/* Reduces the width of portrait-oriented cards on wider screens in landscape. */
+@media (min-width: 50em) and (orientation: landscape) {
+    .overflowPortraitCard { /* used for "More like this" sections */
+        width: 15% !important;
+    }
+}
+
+/* == Rounded Progress Bars == */
+/* Applies rounding to all progress elements and their WebKit-specific parts. */
+progress,
+progress::-webkit-progress-bar, /* Track of the progress bar (WebKit) */
+progress::-webkit-progress-value  /* Filled part of the progress bar (WebKit) */
+{
+    border-radius: var(--rounded-cards) !important;
+    overflow: hidden; /* Ensures inner parts respect the rounding */
+}
+
+/* == Default Logo Styling == */
+/* Styles for the Jellyfin logo when a custom one isn't set by the user. */
+.pageTitleWithDefaultLogo {
+    background-image: var(--logo) !important; /* Uses the --logo variable, ensure it's defined in your color scheme files */
+    background-size: 100% !important; /* Make logo responsive within its container */
+}
+/* Desktop logo dimensions and positioning. */
+.layout-tv .pageTitleWithLogo, .layout-desktop .pageTitleWithLogo {
+    margin-left: 25px !important;
+    height: 60px !important;
+    width: 140px !important;
+}
+/* Mobile logo dimensions and positioning. */
+.layout-mobile .pageTitleWithLogo {
+    height: 30px !important;
+    width: 100px !important;
+    margin: 0 1em 0 .5em !important;
+    padding: 10px !important;
+}
+/* General page title margin (when logo is not present or text only). */
+[dir="ltr"] .pageTitle {
+    margin: 0 1em 0 .5em !important;
+}
+/* Fix for empty page titles that might otherwise take up space due to margin. */
+[dir="ltr"] .pageTitle:not(.pageTitleWithLogo):empty {
+    margin: 0 !important;
+}
+
+/* == Dialog Styling == */
+/* Basic styling for dialog boxes. */
+.dialog {
+    background-color: var(--secondary-background-color) !important; /* Re-affirm background, could be inherited */
+    border-radius: var(--rounded-cards) !important;
+    border: 1px solid var(--alt-accent-color);
+}
+/* Margin for titles within action sheets (a type of dialog). */
+.actionSheetTitle {
+    margin: 10px 20px !important;
+}
+
+.actionSheetMenuItem.emby-button:hover, .listItem:hover {
+    background-color: var(--secondary-accent-color) !important; /* Accent color on hover */
+    border-radius: var(--rounded-cards) !important;
+}
+
+.actionSheetContent {
+    background: var(--secondary-background-transparent) !important;
+    backdrop-filter: var(--blur) !important;
+    border-radius: var(--rounded-cards) !important;
+}
+
+/* == Mobile Cast & Crew Card Size == */
+/* Adjusts the size of cast and crew portrait cards on mobile devices. */
+/* Small mobile devices */
+@media (min-width: 25em) {
+    .layout-mobile #castContent .card.overflowPortraitCard,
+    .layout-mobile #guestCastContent .card.overflowPortraitCard {
+        width: 30% !important;
+        font-size: 90% !important;
+    }
+}
+/* iPads in portrait */
+@media (min-width: 50em) and (orientation: portrait) {
+    .layout-mobile #castContent .card.overflowPortraitCard,
+    .layout-mobile #guestCastContent .card.overflowPortraitCard  {
+        width: 18% !important;
+        font-size: 90% !important;
+    }
+}
+/* iPads/tablets in landscape */
+@media (min-width: 50em) and (orientation: landscape) {
+    .layout-mobile #castContent .card.overflowPortraitCard,
+    .layout-mobile #guestCastContent .card.overflowPortraitCard {
+      width: 12% !important;
+      font-size: 90% !important;
+    }
+}
+/* Desktop cast and crew card size. */
+.layout-desktop #castContent .card.overflowPortraitCard,
+.layout-desktop #guestCastContent .card.overflowPortraitCard {
+    width: 10em !important; /* Fixed width for desktop */
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~ LAYOUT - HEADER ~~~~~~~~~~~~~~~~~~~~ */
+
+/* == Header Base Styling == */
+/* Basic transparency and padding for the main header. */
+.skinHeader, .skinHeader-withBackground.osdHeader {
+    background-color: transparent !important;
+    background: transparent !important;
+}
+.layout-desktop .skinHeader,
+.layout-tv .skinHeader {
+    padding-top: 1.5em !important; /* Top padding for desktop and TV layouts */
+}
+.layout-tv .skinHeader {
+    padding-bottom: 10px !important; /* Specific bottom padding for TV layout */
+}
+
+/* == ZestyTheme-Inspired Header Tabs & Right Section == */
+/* Styles for header tabs and the right-aligned header items, creating a pill-shaped, blurred effect. */
+.headerTabs,       /* Container for navigation tabs within the header */
+.headerRight       /* Container for icons/buttons on the right of the header */
+{
+    background: var(--header-background-color) !important; /* Use a variable for background, ensure it's defined (e.g., semi-transparent white) */
+    border-radius: 100px !important; /* Creates the pill shape */
+    color: var(--secondary-background-color) !important; /* Text color, assuming a light header background means dark text */
+    backdrop-filter: blur(50px) !important; /* Strong blur effect */
+    box-shadow: 0px 0px 10px 10px rgba(0,0,0,0.25) !important;
+}
+
+/* == Header Button Hover & Focus (Right Section) == */
+/* Accent color for icon buttons in the right header section on hover/focus. */
+.headerRight .paper-icon-button-light:hover,
+.headerRight .paper-icon-button-light:hover:not(:disabled),
+.headerRight .paper-icon-button-light:focus,
+.headerRight .paper-icon-button-light:focus:not(:disabled)
+{
+    color: var(--primary-accent-color) !important;
+}
+
+/* == Header Text Color & Positioning == */
+/* Styling for text elements within the header tabs/buttons. */
+.homeLibraryText,       /* Text for the "Home" or library buttons */
+.emby-button-foreground /* General foreground (text/icon) for Emby buttons */
+{
+	color: var(--secondary-background-color) !important; /* Dark text, assuming light header background */
+    transition: color 0.2s ease; /* Smooth color transition on hover/state change */
+    top: unset !important;       /* Resets any default vertical positioning */
+    position: relative;          /* Ensures proper behavior within flex containers */
+}
+
+/* == Header Tab Button Styling == */
+/* Styling for individual tab buttons and the home/library button in the header. */
+#indexPage .homeLibraryButton, /* Home button specifically on the index page */
+.emby-tab-button               /* General tab buttons */
+{
+	background: transparent !important; /* Start with a transparent background */
+	min-width: 0 !important;            /* Allow shrinking */
+	max-width: 50vw !important;         /* Limit maximum width */
+    width: fit-content !important;      /* Fit width to content */
+    transition: background-color 0.2s ease; /* Smooth background transition */
+    border-radius: 100px !important;    /* Start with applied Border Radius */
+}
+/* Desktop-specific margin for tab/home buttons. */
+.layout-desktop .homeLibraryButton,
+.layout-desktop .emby-tab-button {
+	margin: .5em !important;
+}
+
+/* == Header Tab Button Hover/Focus Effects == */
+/* Defines hover and focus appearance for header tabs, using primary accent. */
+.raised:hover .homeLibraryText,
+.emby-tab-button:hover .emby-button-foreground {
+	color: var(--text-color) !important; /* Text color on hover (e.g., white for contrast with accent background) */
+	transition: color 0.2s ease;
+}
+#indexPage .homeLibraryButton:hover,
+.emby-tab-button:hover {
+	border-radius: 100px !important; /* Maintain pill shape on hover */
+	background-color: var(--primary-accent-color) !important; /* Use primary accent for background on hover */
+}
+/* Remove default outline/shadow on focus for a cleaner look. */
+.raised.homeLibraryButton.emby-button:hover,
+.emby-tab-button:hover,
+.homeLibraryButton:focus {
+	outline: none !important;
+	box-shadow: none !important;
+}
+/* Remove default underline/after-element effect on tab hover. */
+.emby-tab-button:hover::after {
+    background: unset !important;
+}
+
+/* == Active Header Tab Styling == */
+/* Styles for the currently active header tab. */
+.emby-tab-button-active {
+  background-color: var(--primary-accent-color) !important;
+  border-radius: 100px !important; /* Pill shape */
+  color: var(--text-color) !important; /* Text color for active tab (e.g., white) */
+}
+.emby-tab-button-active > .emby-button-foreground {
+  color: var(--text-color) !important; /* Ensure foreground text also matches active state color */
+}
+
+/* == Header Tabs & Right Section Positioning (Desktop) == */
+/* Fine-tunes positioning and sizing for desktop header elements. */
+.layout-tv .headerTabs, .layout-desktop .headerTabs {
+    margin-bottom: 2vh !important;
+    margin-left: 60px !important;
+    margin-top: -58px !important; /* Negative margin to pull it up relative to other header elements */
+    font-size: 12px !important;   /* Custom font size for tabs */
+}
+.layout-tv .headerRight, .layout-desktop .headerRight {
+    height: 45px !important;
+    padding: 2px 5px !important;
+    position: absolute !important; /* Absolute positioning for precise placement */
+    right: 12px !important;
+}
+.layout-tv .emby-tab-button {
+    height: 40px !important;
+	font-size: 15px;
+}
+/* Ensures tab buttons align content correctly and have appropriate padding. */
+.emby-tab-button {
+    height: 30px !important;     /* Match a consistent height */
+    display: inline-flex !important; /* For proper alignment of content */
+    align-items: center !important;    /* Vertical centering */
+    justify-content: center !important;/* Horizontal centering */
+    padding: 0 15px !important;  /* Horizontal padding within tabs */
+}
+/* --- End of Zesty Header Styles Integration --- */
+
+/* == Header Left Section Styling (Desktop) == */
+/* Styling for the left part of the header, typically containing back/menu buttons. */
+.layout-desktop .headerLeft:not(.libraryDocument:has(.videoPlayerContainer) .headerLeft) { /* Exclude when video player is active */
+    padding: 2px !important;
+    top: -3px !important; /* Slight upward adjustment */
+    border-radius: 5px !important;
+    flex-grow: 0 !important; /* Prevent growing to fill space */
+    -webkit-flex-grow: 0 !important;
+}
+/* Fallback for browsers not supporting :has() selector (e.g., older Jellyfin Media Player versions). */
+@supports not selector(:has(*)) {
+    .layout-desktop .headerLeft {
+        padding: 2px !important;
+        top: -3px !important;
+        background-color: var(--primary-background-transparent) !important; /* Fallback background */
+        border-radius: 50px !important; /* Different rounding for fallback */
+    }
+}
+
+/* == Header Button Icon Alignment == */
+/* Adjusts vertical alignment of icons within header buttons for Mobile. */
+
+.layout-mobile .emby-button-foreground {
+    text-shadow: -2px 2px 12px #000000eb !important; /* Text shadow for mobile header icons for readability */
+}
+
+
+/* ~~~~~~~~~~~~~~~~~~~~ LAYOUT - MAIN DRAWER (SIDEBAR) ~~~~~~~~~~~~~~~~~~~~ */
+
+/* == Sidebar Dynamic Styling (Desktop - Default Behavior) == */
+/* Styles for the main navigation drawer (sidebar) to make it appear dynamically (slides in/out). */
+.layout-desktop .mainDrawer:not(.dashboardDocument) {
+    left: -320px !important; /* Initially positioned off-screen to the left */
+    z-index: 1099 !important; /* High z-index to appear above other content */
+    border-top-right-radius : 30px !important;
+    border-bottom-right-radius : 30px !important;
+    backdrop-filter: blur(30px) !important;
+    width: 275px !important;
+    transition: transform .24s ease-out,left .26s ease-out,-webkit-transform .24s ease-out !important; /* Smooth transition for sliding */
+}
+/* Shows the hamburger menu button when the drawer is dynamic. */
+.layout-desktop .mainDrawerButton:not(.dashboardDocument) {
+    display: inline-flex !important;
+}
+/* Resets content margin when the drawer is dynamic (no longer permanently shifted). */
+.layout-desktop .libraryPage:not(#editItemMetadataPage),
+.quickConnectSettingsContainer,
+.layout-desktop .appfooter {
+    margin-left: 0px !important;
+}
+
+/* == Sidebar Styling (Mobile) == */
+/* Basic styling for the mobile sidebar. */
+.layout-mobile .mainDrawer {
+    width: 250px !important;
+    backdrop-filter: blur(50px) !important;
+	border-top-right-radius : 30px !important;
+    border-bottom-right-radius : 30px !important;
+}
+.layout-mobile .mainDrawer-scrollContainer {
+    margin-top: 15px !important; /* Top margin for scrollable content */
+}
+
+/* == Sidebar Scroll Container & Button Positioning == */
+/* Adjusts padding/margin for the scrollable area within the sidebar. */
+.layout-desktop .mainDrawer-scrollContainer { /* Applies to the dynamic desktop drawer now */
+    margin-top: 15px !important;
+    margin-left: 10px !important;
+}
+/* Specific padding for the dashboard's static sidebar. */
+.layout-desktop .dashboardDocument .mainDrawer-scrollContainer {
+    padding-top: 75px !important; /* Accounts for header height */
+    margin-left: 10px !important;
+    background: var(--secondary-background-color) !important;
+}
+
+/* == Dashboard Top Bar Styling (MUI Override) == */
+/* Removes background and shadow from a Material UI AppBar element likely used in the dashboard top. */
+.css-fknfom { /* This is a generated MUI class name, may be fragile if Jellyfin updates MUI versions/styling */
+        background: none !important;
+        box-shadow: none !important;
+}
+
+/* == Sidebar Navigation Buttons == */
+/* Styling for individual navigation options within the sidebar. */
+.navMenuOption,
+.navMenuOption:hover,
+.navMenuOption-selected {
+    width: 85% !important;          /* Relative width */
+    margin: auto !important;        /* Centering */
+    text-align: center !important;
+    height: 45px !important;        /* Fixed height */
+    margin-top: 3px !important;
+    margin-bottom: 3px !important;
+    border-radius: 10px !important; /* Rounded corners */
+    transition: .2s !important;     /* Smooth transitions for hover effects */
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
+}
+/* Hover effect for non-selected sidebar buttons. */
+.navMenuOption:hover:not(.navMenuOption-selected) {
+    background: var(--primary-background-transparent) !important; /* Dark semi-transparent background */
+    color: var(--primary-accent-color) !important; /* Text color changes to accent on hover */
+    transform: scale(1.05) !important;       /* Slight scaling effect */
+}
+/* Styling for selected sidebar buttons. */
+.navMenuOption-selected {
+    background: var(--secondary-accent-color) !important; /* Uses secondary accent for background */
+    color: var(--primary-accent-color) !important;    /* Uses primary accent for text */
+}
+
+/* == Sidebar Button Icons & Text Alignment == */
+/* Adjusts the position of icons and text within sidebar navigation buttons. */
+.navMenuOptionIcon,
+.navMenuOptionText {
+    position: inherit !important; /* Resets to default positioning behavior */
+    right: 10% !important;        /* Shifts content slightly to the right (may need review based on desired layout) */
+    margin-top: 0 !important;
+}
+
+/* == Sidebar Fixes for Specific Pages/States == */
+/* Ensures the dynamic sidebar is hidden on pages where it's not needed (e.g., video player, login page). */
+.layout-desktop .hide-scroll .mainDrawer,
+.layout-desktop .hideMainDrawer .mainDrawer {
+    left: -320px !important; /* Keep it off-screen */
+}
+/* Static sidebar behavior specifically for the dashboard. */
+.layout-desktop .dashboardDocument .mainDrawer {
+    top: 0px !important;
+    left: 0px !important;     /* Positioned on-screen */
+    width: 300px !important;  /* Slightly wider for dashboard view */
+    z-index: 998 !important;  /* Below header but above page content */
+    background: var(--secondary-background-color) !important; /* Solid background */
+    border-radius: 0 !important; /* No rounding for static full-height sidebar */
+    transition: none !important;   /* No transition needed for static element */
+}
+/* Adjusts the main page content on the dashboard to accommodate the static sidebar. */
+.layout-desktop .dashboardDocument .mainAnimatedPage {
+    left: 280px !important;
+}
+
+.layout-desktop div#dashboardPage {
+    left: 260px !important;
+}
+
+.localUsers .cardText-secondary {
+    height: 4em !important;
+    font-size: 10px;
+}
+
+/* Make device cards and media library cards smaller for compact layout */
+#devicesPage .cardScalable, #mediaLibraryPage .cardScalable {
+  height: 10vh;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~ LAYOUT - MOBILE HEADER ~~~~~~~~~~~~~~~~~~~~ */
+/* Styles specific to the mobile header behavior and appearance. */
+
+.layout-mobile .skinHeader {
+    transition: .5s !important; /* Short transition for header movements */
+}
+/* Default state for unpinned (scrolled down) header. */
+.layout-mobile .headroom--unpinned {
+    transform: none;
+}
+/* When tabs are visible in the mobile header and it's unpinned, hide the top part of the header. */
+.layout-mobile .headroom--unpinned:has(.headerTabs.sectionTabs:not(.hide)) {
+    transform: translateY(-50%);
+}
+/* When scrolled (not at the top), apply a blurred background to the mobile header. */
+.layout-mobile .headroom--not-top {
+    background: var(--secondary-background-transparent) !important; /* Blurred background using secondary accent */
+    backdrop-filter: blur(var(--blur)) !important;
+}
+/* Remove background from the right header section when scrolled (it inherits from headroom--not-top).
+.layout-mobile .headroom--not-top .headerRight {
+    background: none !important;
+} */
+
+/* Transparent header when at the very top of the page or when tabs are visible (overriding the scrolled style). */
+.layout-mobile .headroom--top,
+.layout-mobile .headroom--not-top:has(.headerTabs.sectionTabs:not(.hide)) {
+    background: transparent !important;
+    backdrop-filter: none !important;
+}
+/* Styles for the right header section when at the top (pill shape, blur). */
+.layout-mobile .headroom--top .headerRight {
+    background: var(--header-background-color) !important; /* Re-apply defined header background */
+    border-radius: 100px !important;
+    backdrop-filter: blur(50px) !important; /* Strong blur */
+    box-shadow: 1px 3px 6px rgba(var(--secondary-background-color),.5); /* Dark shadow */
+    color: var(--secondary-background-color) !important; /* Dark text */
+    height: 40px !important;
+    padding: 0 10px !important;
+}
+/* Styling for mobile header tabs (pill shape, light background, blur). */
+.layout-mobile .headerTabs {
+    height: 40px !important;
+    font-size: 12px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    width: auto !important;
+    max-width: 100% !important;
+    margin-bottom: 1em !important;
+}
+/* Ensure mobile tab buttons match the height of the tabs container. */
+.layout-mobile .emby-tab-button {
+    height: 40px !important;
+}
+
+/* == Mobile Header - Small Screen Adjustments (< 380px width) == */
+/* Adjusts header layout on very small mobile screens to prevent overlap. */
+@media (max-width: 380px) {
+    /* Center page title below other header elements if no logo is present. */
+    .layout-mobile .pageTitle:not(.pageTitleWithLogo):not(:empty) {
+        position: absolute !important;
+        margin-left: 50% !important;
+        transform: translate(-50%, 0) !important;
+        top: 60px !important;
+    }
+    /* Adjust alignment when the centered title is present. */
+    .layout-mobile .headerTop:has(.pageTitle:not(.pageTitleWithLogo):not(:empty)) {
+        -webkit-align-items: start !important;
+        align-items: start !important;
+    }
+    /* Increase header height to accommodate the moved title. */
+    .layout-mobile .skinHeader:has(.pageTitle:not(.pageTitleWithLogo):not(:empty)) {
+        height: 110px !important;
+    }
+    /* Further increase header height if tabs are also visible with the moved title. */
+    .layout-mobile .skinHeader:has(.pageTitle:not(.pageTitleWithLogo):not(:empty)):has(.sectionTabs:not(.hide)) {
+        height: 140px !important;
+    }
+    /* Add padding to library pages to prevent content from going under the taller header. */
+    .layout-mobile .libraryPage:not(.noSecondaryNavPage) {
+        padding-top: 9.5em !important;
+    }
+    /* Adjust unpinned header transformation when title and tabs are present. */
+    .layout-mobile .headroom--unpinned:has(.headerTabs.sectionTabs:not(.hide)):has(.pageTitle:not(.pageTitleWithLogo):not(:empty)) {
+        transform: translateY(-60%);
+    }
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~ LAYOUT - CONTENT AREA ~~~~~~~~~~~~~~~~~~~~ */
+
+/* == Horizontal Scroll Menu Fix == */
+/* Adjusts margin for horizontally scrolling sections (e.g., on home page) to prevent cutoff. */
+.emby-scroller {
+    margin-right: 3.3% !important; /* Consolidated from separate desktop/mobile rules */
+}
+
+/* == Collection Items Alignment Fix (Desktop) == */
+/* Corrects padding for items within a collection view. */
+.layout-desktop .collectionItems .collectionItemsContainer {
+    padding-left: 0% !important;
+}
+
+/* == Hide "Next Up" Section == */
+/* Completely hides the "Next Up" section from the home page or series pages. */
+/* div.nextUpSection {
+    display: none;
+} */
+
+/* == Hide "Upcoming on TV" Section == */
+/* Hides the "Upcoming" schedule list and section title for TV series. */
+#seriesScheduleList,
+#seriesScheduleSection {
+    display: none !important;
+}
+
+.separator-icon {
+    color: var(--primary-accent-color) !important;
+    font-size: 2vh !important;
+}
+
+
+/* ~~~~~~~~~~~~~~~~~~~~ CARDS & LIST ITEMS ~~~~~~~~~~~~~~~~~~~~ */
+
+/* == Universal Card Rounding == */
+/* Applies consistent rounding and overflow hiding to all card components and their inner parts. */
+.card,
+.cardBox,
+.cardScalable,
+.cardPadder,
+.cardImageContainer,
+.blurhash-canvas,     /* Canvas used for blurhash placeholders */
+.cardContent,
+.cardOverlayContainer
+ {
+    border-radius: var(--rounded-cards) !important;
+    overflow: hidden !important; /* Crucial for rounded corners on elements with backgrounds/images */
+}
+
+.cardOverlayButton {
+  border-radius: 10px !important;
+}
+
+.itemSelectionPanel {
+    border: none !important;
+    background-color: transparent !important;
+    border-radius: var(--rounded-cards) !important;
+}
+
+.checkboxOutline.multiSelectCheckboxOutline {
+    width: 100% !important;
+    height: 100% !important;
+}
+.checkboxOutline {
+    border-radius: var(--rounded-cards) !important;
+}
+.emby-checkbox:checked+span+.checkboxOutline.multiSelectCheckboxOutline {
+	background: rgba(var(--primary-r), var(--primary-g), var(--primary-b), 0.5) !important;
+    border: 5px solid var(--primary-accent-color) !important;
+    backdrop-filter: var(--blur) !important;
+}
+
+.itemSelectionPanel .material-icons.check:before {
+    content: 'check';
+    font-size: 5em !important;
+    color: white !important;
+    text-shadow: 0 0 15px rgba(0,0,0,0.7);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.cardText-secondary+.itemSelectionPanel>.checkboxContainer, .cardText.cardTextCentered:not(.cardText-secondary,.cardText-first)+.itemSelectionPanel>.checkboxContainer {
+    height: calc(100% - 3em);
+}
+
+.itemSelectionPanel .checkboxContainer {
+    height: calc(100% - 1.5em);
+}
+
+
+/* Removes default background from card padders to rely on cardBox or image. */
+.cardPadder {
+  background: none !important;
+}
+
+/* == General Card & List Item Styling == */
+/* Additional rounding for specific card and list elements. */
+.cardBox { /* Redundant if .card already covers this, but ensures specificity */
+    border-radius: var(--rounded-cards) !important;
+}
+.paperList { /* Container for lists, often in settings */
+    border-radius: var(--rounded-cards) !important;
+}
+/* Styling for list items in desktop and TV layouts, adding padding, transition, and rounding. */
+.layout-desktop .listItem,
+.layout-tv .listItem {
+    padding-inline: 15px !important; /* Horizontal padding */
+    transition: .2s !important;
+    border-radius: var(--rounded-cards) !important;
+}
+
+#childrenContent .listItem {
+    padding-left: 1em !important;
+    padding-right: 1em !important;
+    padding-top: 1em !important;
+    padding-bottom: 1em !important;
+    border-radius: 28px !important;
+}
+
+
+@media (orientation: portrait) {
+    .layout-mobile .listItemImage {
+        min-height: 5em !important;
+    }
+}
+
+.listItemImageButton:hover {
+    background: none !important;
+    translate: 0 -3px !important;
+}
+
+.listItemImageButton{
+    background: none !important;
+    color: white !important
+}
+
+.layout-mobile #childrenContent .listItem {
+    margin-right: 2em !important;
+}
+
+.listItem-content {
+    align-items: flex-start !important;
+}
+.playstatebutton-icon-played {
+    color: lawngreen !important; /* Accent color for watched state icon */
+}
+
+
+/* Hover effect for list items: background change and slight scaling. */
+.listItem {
+    transition: background 0.2s ease, box-shadow 0.2s ease, translate 0.2s ease !important;
+}
+
+.listItem:hover {
+    background: var(--alt-accent-color) !important;
+    translate: 0 -3px !important;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25) !important;
+}
+
+
+/* == Card Hover Effects (Outline & Dim) == */
+/* Adds an accent-colored border and a dimming overlay on hover for various card types. */
+
+.cardBox-bottompadded.cardBox > .cardScalable {
+    border: 2px solid transparent; /* Reserve space for hover border */
+}
+
+div.card-withuserdata.card-hoverable.card:hover > .cardBox-bottompadded.cardBox > .cardScalable,
+div.groupedCard.card-hoverable.overflowSquareCard.card:hover > .cardBox-bottompadded.cardBox > .cardScalable,
+div.card-hoverable.squareCard.card:hover > .cardBox-bottompadded.cardBox > .cardScalable {
+    border: 2px solid var(--primary-accent-color) !important;
+    box-shadow: 0 0 3px rgba(255, 255, 255, .5) !important; /* Subtle white shadow for emphasis */
+}
+/* The dimming overlay using a pseudo-element. */
+div.card-withuserdata.card-hoverable.card:hover > .cardBox-bottompadded.cardBox > .cardScalable::before,
+div.groupedCard.card-hoverable.overflowSquareCard.card:hover > .cardBox-bottompadded.cardBox > .cardScalable::before,
+div.card-hoverable.squareCard.card:hover > .cardBox-bottompadded.cardBox > .cardScalable::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(31, 31, 31, 0.4); /* Dark semi-transparent overlay */
+    z-index: -1; /* Position behind card content but above card background/image if any */
+    border-radius: var(--rounded-cards); /* Match card rounding */
+}
+/* Ensures cards are positioned relatively for the ::before pseudo-element to work correctly. */
+div.card-withuserdata.card-hoverable.card,
+div.groupedCard.card-hoverable.overflowSquareCard.card,
+div.card-hoverable.squareCard.card {
+    position: relative;
+}
+
+/* == Home Library Button Hover Effects == */
+/* Adds a border and dimming overlay to home library buttons on hover. */
+a.emby-button.homeLibraryButton.raised {
+    position: relative; /* For pseudo-element positioning */
+    box-sizing: border-box; /* Ensures padding and border are included in width/height */
+    border: 2px solid transparent; /* Transparent border by default to prevent layout shift on hover */
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+a.emby-button.homeLibraryButton.raised:hover {
+    border-color: var(--primary-accent-color) !important; /* Accent border on hover */
+    background-color: rgba(255, 255, 255, 0.1) !important; /* Slight white highlight */
+}
+/* Dimming overlay for home library buttons on hover. */
+a.emby-button.homeLibraryButton.raised:hover::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(31, 31, 31, 0.2); /* Dark semi-transparent overlay */
+    z-index: 1; /* Above the button's background but below its text/icon */
+    transition: background-color 0.1s ease;
+    border-radius: 18px;
+}
+
+/* == List Item Image Styling == */
+/* Ensures list item images (e.g., in search results) are contained and rounded. */
+.listItemImage {
+    background-size: cover !important; /* Image fits within bounds without cropping */
+    border-radius: var(--rounded-cards);
+    max-height: fit-content;
+    min-height: 10em !important;
+}
+
+/* == Indicators (Watched, Count, Media Source) == */
+/* General styling for various indicators on cards/list items. */
+.playedIndicator { /* "Watched" checkmark indicator */
+    background: #48b648 !important; /* Green background */
+    color: white
+}
+
+.countIndicator {
+    color: var(--text-color) !important; /* Text color for count indicators */
+}
+
+
+/* Desktop-specific indicator styling (squared look). */
+@media (min-width: 1200px) {
+    .playedIndicator, .indicator { /* General class for indicators */
+        border-radius: 10px !important; /* Custom rounding for desktop */
+        width: 30px;
+        height: 30px;
+    }
+    .mediaSourceIndicator { /* Indicator for media source (e.g., HD, 4K) */
+        background: var(--primary-accent-color) !important;
+        border-radius: 10px !important;
+        width: 30px;
+        height: 30px;
+        color: var(--secondary-background-color); /* Text color for contrast against accent */
+        display: flex; /* For centering text inside */
+        align-items: center;
+        justify-content: center;
+    }
+}
+/* Mobile/default indicator styling. */
+@media (max-width: 1199px) {
+    /* Jellyfin's default indicator styles usually apply here. */
+    .mediaSourceIndicator {
+        border-radius: 0 !important; /* Default square shape for mobile */
+        background: #00000085 !important; /* Default dark semi-transparent background */
+    }
+}
+/* ~~~~~~~~~~~~~~~~~~~~ SEARCH & FILTERING ~~~~~~~~~~~~~~~~~~~~ */
+
+
+/* Styles the buttons in the A-Z alpha picker */
+.alphaPickerButton {
+    color: #888 !important;
+    font-weight: 600;
+    transition: color 0.2s ease, transform 0.2s ease !important;
+}
+
+.alphaPickerButton:hover {
+    color: #fff !important;
+    transform: scale(1.1) !important;
+}
+
+.alphaPickerButton-selected {
+    color: var(--primary-accent-color) !important;
+    transform: scale(1.2) !important;
+}
+/* ~~~~~~~~~~~~~~~~~~~~ DETAILS PAGE (Restored Original Layout Focus) ~~~~~~~~~~~~~~~~~~~~ */
+/* Styles aimed at restoring or customizing the layout of the item details page. */
+
+/* == Detail Image Sizing and Positioning (Desktop) == */
+.layout-desktop .detailImageContainer .card { /* The main poster/image on the details page */
+    top: 9em !important;      /* Vertical positioning from the top */
+    width: 18.3vw !important; /* Width relative to viewport width */
+}
+
+/* == Detail Page Content Repositioning (Desktop) == */
+.layout-desktop .detailSection { /* Sections like Cast, Seasons, etc. */
+    margin-right: 0 !important; /* Remove any default right margin */
+}
+.layout-desktop .detailPageContent { /* Main content container for details */
+    padding-left: 3.3% !important; /* Original/desired left padding */
+}
+
+/* == Detail Page Logo Positioning and Styling == */
+/* Styles for the series/movie logo image displayed on the details page. */
+.layout-desktop .detailLogo,
+.layout-tv .detailLogo {
+    right: 0 !important;     /* Align to right edge (or reset if previously centered) */
+    left: 4% !important;     /* Position from left */
+    top: 10% !important;     /* Position from top */
+    position: absolute !important; /* Absolute positioning for precise placement */
+    width: auto !important;  /* Allow natural width based on height or max-width */
+    max-width: 30%;          /* Maximum width relative to parent */
+    max-height: 30%;         /* Maximum height relative to parent - adjust for logo size */
+    height: 800px !important;/* Fixed height, likely overridden by max-height. Review if this is intended or if max-height is sufficient. */
+    z-index: 3;              /* Ensure logo is above backdrop but potentially below some OSD elements */
+    animation: slideInLogo 0.8s ease-out; /* Apply slide-in animation */
+}
+
+/* == Transparent Detail Ribbon == */
+/* Makes the ribbon bar (often containing item title/info) transparent. */
+.detailRibbon {
+    background: transparent !important;
+}
+
+/* == Tagline Spacing == */
+/* Adds top margin to the tagline for better separation. */
+h3.tagline {
+    margin-top: 1.5em !important;
+    border-left: 0.25em solid white;
+    padding: 0 0.5em;
+}
+
+.itemTags.focuscontainer-x {
+    display: none; /* Hide tags section*/
+}
+
+/* == Card Styling for Top-Right Buttons (Details Page) == */
+/* Wraps the main action buttons (Play, Watched, Favorite) in a blurred card-like container. */
+.mainDetailButtons {
+    margin-top: 1.5em;          /* Spacing above the buttons */
+    flex-wrap: wrap;
+}
+
+/* == Card Styling for "Groups" Section (Desktop) == */
+/* Styles the container for grouped information (e.g., ratings, genres, runtime). */
+.layout-tv .detailsGroupItem, .layout-desktop .detailsGroupItem {
+    padding: 5px 15px !important;
+    width: fit-content !important; /* Fit to content width */
+    max-width: max-content !important;
+    display: flex;                /* Use flex for layout of items within */
+    gap: 1em;                     /* Spacing between items in the group */
+}
+
+/* == Label Fix for Group Section & Track Selection == */
+/* Standardizes label widths and flex behavior within detail groups and track selection. */
+.detailsGroupItem .label,
+.trackSelections .selectContainer .selectLabel {
+    min-width: 75px;   /* Minimum width for labels */
+    flex-basis: unset; /* Reset flex basis */
+    margin: unset;     /* Reset margin */
+}
+
+.detailsGroupItem .content {
+    padding: 0 10px;
+    margin-left: 10px !important;
+}
+
+/* Apply styles only if all children with class 'hide' are not hidden */
+.itemDetailsGroup:has(.detailsGroupItem:not(.hide)) {
+    background: var(--secondary-background-transparent) !important;
+    padding: 10px 0px 0px 0px !important;
+    border-radius: var(--rounded-cards) !important;
+    max-width: 100% !important;
+    backdrop-filter: blur(var(--blur)) !important;
+}
+
+.layout-mobile .itemDetailsGroup:has(.detailsGroupItem:not(.hide)) {
+    padding: 10px 20px 1px !important;
+}
+
+
+/* == Card Styling for Description Area == */
+/* Wraps the item description/overview in a styled container. */
+
+.layout-tv .detailSectionContent{
+    background: var(--secondary-background-transparent) !important;
+    border-radius: var(--rounded-cards) !important;
+    padding: 10px 20px 10px 20px !important;
+}
+
+.layout-desktop .detailSectionContent {
+    background: var(--secondary-background-transparent) !important;
+    border-radius: var(--rounded-cards) !important;
+    padding: 40px 20px 0px 20px !important;
+    margin-top: 40px !important;
+}
+.layout-mobile .detailSectionContent {
+    background: var(--secondary-background-transparent) !important;
+    border-radius: var(--rounded-cards) !important;
+    padding: 10px 20px !important;
+}
+
+/* == Card Styling for Track Selection Area == */
+/* Wraps the audio/subtitle track selection controls. */
+.trackSelections {
+    border-radius: var(--rounded-cards) !important;
+    padding: 10px 20px !important;
+    margin-top: 20px !important;
+    max-width: 100% !important;
+}
+
+/* == Fix for Track Select Dropdowns == */
+/* Adjusts padding and margin for dropdowns within track selection. */
+.trackSelections .selectContainer .detailTrackSelect {
+    padding: 0 10px;
+    margin-left: 10px !important;
+    border: none !important;
+    max-width: 70em !important; /* Ensures dropdowns fit within the track selection area */
+    width: 70em !important; /* Matches the width of the track selection area */
+}
+
+/* hide the dropdown arrow in track selections */
+.detailSection .trackSelections .selectArrowContainer {
+    display: none;
+}
+
+/* Fixes for mobile and smaller screens to make containers fit trackselections */
+.trackSelections>.selectContainer {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.trackSelections>.selectContainer:hover {
+    overflow: auto;
+    white-space: normal;
+    text-overflow: initial;
+}
+
+/* == Title Positioning (Desktop) == */
+/* Repositions the main title and related info on the details page. */
+.layout-desktop .infoWrapper { /* Container for title, year, ratings etc. */
+    margin-top: 245px !important;
+    margin-left: 20.8vw !important; /* Offset from left, relative to viewport width */
+}
+.layout-desktop .detailPagePrimaryContainer { /* Primary container for the top section of details page */
+    padding-left: 3.3% !important; /* Re-affirm padding */
+}
+.layout-desktop .nameContainer { /* Container for the item name/title */
+    position: absolute !important;
+    margin-top: -48px !important; /* Negative margin to pull it upwards */
+    display: flex;
+    flex-direction: column; /* Stack title elements vertically */
+    align-items: flex-start;
+}
+.layout-desktop .itemMiscInfo { /* Miscellaneous info like year, runtime, rating */
+    position: absolute !important;
+    margin-left: 12px !important;
+    margin-top: 10px !important;
+}
+
+/* == Description Box Positioning (Desktop) == */
+/* Moves the primary content (description, etc.) to align with the repositioned title. */
+.layout-desktop .detailPagePrimaryContent {
+    padding-left: 20.4vw !important; /* Offset from left */
+}
+
+/* == Minimum Height for Primary Content Based on Poster Aspect Ratio (Desktop) == */
+/* Adjusts the minimum height of the primary content area to prevent overlap or awkward spacing with different poster image aspect ratios. */
+.layout-desktop .detailPageWrapperContainer:has(.detailImageContainer .portraitCard) .detailPagePrimaryContent {
+    min-height: 29vw !important; /* For portrait posters (e.g., 2:3) */
+}
+.layout-desktop .detailPageWrapperContainer:has(.detailImageContainer .squareCard) .detailPagePrimaryContent {
+    min-height: 20vw !important; /* For square posters (e.g., 1:1) */
+}
+.layout-desktop .detailPageWrapperContainer:has(.detailImageContainer .backdropCard) .detailPagePrimaryContent {
+    min-height: 12vw !important; /* For backdrop/landscape posters (e.g., 16:9) */
+}
+/* Fallback for browsers not supporting :has() (e.g., JMP). */
+@supports not selector(:has(*)) {
+    .layout-desktop .detailPageWrapperContainer .detailPagePrimaryContent {
+        min-height: 29vw !important; /* Default to a common height */
+    }
+}
+
+/* == If Rating is not present, move details up == */
+.layout-mobile #itemDetailPage:has(div.detailImageContainer .cardImageIcon.person) .detailPageWrapperContainer:has(.itemMiscInfo.itemMiscInfo-primary.hide) p.overview.detail-clamp-text {
+    margin-top: 0%;
+}
+
+.detailPageWrapperContainer:has(.itemMiscInfo.itemMiscInfo-primary.hide) p.overview.detail-clamp-text {
+    margin-top: -3%;
+}
+
+
+/* == Reordering Detail Page Sections == */
+/* Uses flexbox to reorder elements within the detail section (e.g., description, track selection, groups). */
+.detailSection {
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+}
+.detailSection .detailSectionContent { order: 1; } /* Description first */
+.detailSection .recordingFields    { order: 2; } /* Recording fields (for Live TV) */
+.detailSection .trackSelections    { order: 3; } /* Audio/Subtitle selection */
+.detailSection .itemDetailsGroup   { order: 4; } /* Other details like genres, ratings */
+
+/* == Reordering Episode Title Elements (Desktop) == */
+/* Adjusts the order of parent name (Show Title) and item name (Episode Title) within the name container. */
+.layout-desktop .nameContainer .parentName { order: 1; } /* Show title */
+.layout-desktop .nameContainer .itemName   { order: 2; } /* Episode title */
+
+/* == Episode Name Position Modification (Desktop) == */
+.layout-desktop .nameContainer .itemName.infoText.subtitle {
+    margin: .8em 12px !important; /* Consistent margin for original titles or subtitles */
+    padding: 0px !important;     /* Remove default padding if any */
+}
+
+/* Hide original title (titles in original language) */
+.nameContainer .itemName.originalTitle {
+    display: none;
+}
+
+.itemDetailsGroup:has(.detailsGroupItem:not(.hide)) {
+    padding: 10px 40px 0px 0px !important;
+}
+
+.layout-desktop .nameContainer {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    align-items: baseline;
+}
+
+.nameContainer:has(.itemName.subtitle) .parentName {
+    display: block !important;
+    padding-right: 10px;
+}
+
+.nameContainer a.button-link.itemAction.emby-button:hover {
+    transform: scale(1) !important;
+}
+
+.nameContainer:has(.itemName.subtitle) .parentName::after {
+    content: " -";
+}
+
+
+.layout-desktop .nameContainer .itemName.infoText.subtitle {
+    margin: 5px 0px !important;
+    padding: 0px !important;
+    font-weight: bolder;
+    font-size: x-large;
+}
+
+
+/* == Play Button Modification == */
+/* Customizes the text and appearance of the main Play button on the details page. */
+.layout-desktop .mainDetailButtons .btnPlay::after,
+.layout-tv .mainDetailButtons .btnPlay::after,
+.layout-mobile .mainDetailButtons .btnPlay::after {
+    content: "Play" !important; /* Custom text for the play button */
+}
+/* Desktop Play Button Styling. */
+.layout-tv .mainDetailButtons .btnPlay, .layout-desktop .mainDetailButtons .btnPlay {
+    /* Primary accent background is applied globally, this ensures other properties */
+    padding-right: 20px !important; /* Padding for the custom text */
+    margin-right: 0 !important;     /* Reset any conflicting margins */
+    right: 0 !important;            /* Reset any conflicting offsets */
+    color: var(--text-color) !important;/* Text color for contrast against accent bg */
+    border-radius: var(--rounded-cards) !important;
+}
+/* Mobile Play Button Styling. */
+.layout-mobile .mainDetailButtons .btnPlay {
+    /* Primary accent background is applied globally */
+    position: relative !important; /* Ensure proper positioning */
+    padding-right: auto !important; /* Auto padding, or adjust as needed */
+    right: auto !important;
+    color: var(--secondary-background-color) !important;
+    padding-top: 10px !important; /* Specific top padding for mobile */
+    border-radius: var(--rounded-cards) !important;
+}
+/* Hover effect for Play button (brightness increase). */
+.mainDetailButtons .btnPlay:hover  {
+    filter: brightness(120%);
+    box-shadow: 0px 0px 15px 2px rgba(255, 255, 255, .5) !important;
+}
+/* Ensures detail buttons use row direction for flex layout (icon beside text). */
+.mainDetailButtons .detailButton{
+    -webkit-flex-direction: row !important;
+    flex-direction: row !important;
+}
+
+/* == Live TV Recording Fields Styling == */
+.recordingFields { /* Container for recording schedule options */
+    margin: 5px 0 -7px 0 !important; /* Fine-tuned margin */
+}
+.recordingButton { /* Button to record */
+    height: 40px !important;
+}
+.recordingIcon { /* Icon within the recording button */
+    color: red !important; /* Distinct red color for recording icon */
+}
+/* Fix for overlapping miscellaneous info when recording fields are present. */
+.itemMiscInfo.itemMiscInfo-secondary {
+    margin-left: 65px !important;
+}
+
+/* == Animations for Details Page == */
+/* Logo slide-in animation. */
+.detailLogo {
+    animation: slideInLogo 0.8s ease-out;
+}
+@keyframes slideInLogo {
+    0% { transform: translateY(-50px); opacity: 0; }
+    60% { transform: translateY(10px); opacity: 1; }
+    100% { transform: translateY(0); }
+}
+/* Primary container fade and slide-in animation. */
+.detailPagePrimaryContainer {
+    animation: fadeSlideIn 1.5s ease-in-out;
+}
+@keyframes fadeSlideIn {
+    0% { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+/* Hover scale animation for flat/link buttons. */
+.button-flat:hover, .button-link:hover {
+    transform: scale(1.1); /* Slightly larger scale than default theming might provide */
+    transition: transform 0.2s ease-in-out;
+}
+/* Star rating spin animation on hover. */
+.starRatingContainer:hover .starIcon {
+    animation: spin 1s ease-in-out;
+}
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Rotten Tomato rating hover effect. */
+.mediaInfoItem.mediaInfoCriticRating:hover {
+    transform: scale(1.1) rotate(-5deg);
+    transition: transform 0.2s ease-in-out;
+}
+
+
+/* ~~~~~~~~~~~~~~~~~~~~ PLAYER & UP NEXT DIALOG ~~~~~~~~~~~~~~~~~~~~ */
+
+/* == Player OSD Element Styling == */
+/* Applies blur and rounding to Up Next container, Toasts, and Slider Bubbles. */
+.upNextContainer:not(#skipIntro), /* "Up Next" dialog, excluding the Intro Skipper variant */
+.sliderBubble                     /* Bubble showing time/chapter when scrubbing progress bar */
+{
+    backdrop-filter: blur(var(--blur)) !important;
+    border-radius: var(--rounded-cards) !important;
+}
+/* Specific background and margin for the "Up Next" dialog. */
+.upNextContainer:not(#skipIntro) {
+    background-color: rgba(0, 0, 0, 0.6) !important; /* Dark semi-transparent background */
+    margin: 4% !important; /* Margin around the dialog */
+}
+/* Specific styling for toasts. */
+.toastVisible {
+    background-color: var(--primary-background-transparent) !important;
+    backdrop-filter: blur(25px) !important;
+    border-radius: 18px !important;
+    text-shadow: 2px 2px black;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+}
+/* Specific background for slider bubbles. */
+.sliderBubble {
+    background-color: var(--secondary-background-transparent) !important;
+}
+/* Special styling for Jellyscrub chapter preview bubbles (transparent background, no blur). */
+.sliderBubble:not(.osdVolumeSliderContainer .sliderBubble):has(.chapterThumbContainer) {
+    background-color: #ffffff00 !important; /* Fully transparent */
+    top: 25px !important; /* Adjusted vertical position */
+    backdrop-filter: unset !important; /* Remove blur */
+}
+
+/* == Hide Menu Buttons in Player OSD Header == */
+/* Hides most buttons in the player's top OSD bar, keeping only essential ones. */
+.osdHeader .headerButton:not(.headerBackButton):not(.headerCastButton):not(.headerSyncButton) {
+    display: none !important;
+}
+
+/* == Player Progress Bar Styling (MDL Slider) == */
+/* Customizes the appearance of the Material Design Lite slider used for player progress. */
+.mdl-slider-background-flex { /* The track container for the slider */
+    height: 10px !important;
+    margin-top: -5px !important; /* Vertical centering adjustment */
+    border-radius: 100px !important; /* Pill shape */
+    background: hsla(0, 0%, 100%, .2) !important; /* Light, semi-transparent track */
+}
+.mdl-slider-background-lower { /* The filled (played) part of the track */
+    border-radius: 100px !important; /* Pill shape */
+    background-color: var(--primary-accent-color) !important; /* Uses primary accent color */
+}
+.mdl-slider-background-upper { /* The unfilled (remaining) part of the track */
+    border-top-right-radius: 100px !important;
+    border-radius: 100px !important; /* Pill shape */
+    border-bottom-right-radius: 100px !important;
+    background: hsla(0, 0%, 100%, .2) !important; /* Matches track background */
+    transform: translateX(-3px) !important; /* Slight adjustment for visual alignment */
+}
+
+/* == Player Progress Bar Thumb Styling - Invisible Thumb == */
+/* WebKit/Chrome/Safari */
+.mdl-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent !important;
+    height: 0px !important;
+    width: 0px !important;
+    border-radius: 0px !important;
+    border: none;
+    cursor: pointer;
+    margin-top: 0px;
+}
+
+/* Firefox */
+.mdl-slider::-moz-range-thumb {
+    background: transparent !important;
+    height: 0px !important;
+    width: 0px !important;
+    border-radius: 0px !important;
+    border: none;
+    cursor: pointer;
+}
+
+/* Internet Explorer */
+
+.mdl-slider::-ms-thumb {
+    background: transparent !important;
+    height: 0px !important;
+    width: 0px !important;
+    border-radius: 0px !important;
+    border: none;
+    cursor: pointer;
+    margin-top: 0px;
+}
+
+/* Hover effect for the thumb */
+.mdl-slider-hoverthumb:hover::-webkit-slider-thumb {
+    background: transparent !important;
+}
+
+.mdl-slider-hoverthumb:hover::-moz-range-thumb {
+    background: transparent !important;
+}
+
+/* == "Up Next" Dialog Button Hover Effect == */
+.upNextDialog-buttons .upNextDialog-button {
+    transition: .2s !important;
+}
+.upNextDialog-buttons .upNextDialog-button:hover {
+    transform: scale(1.1); /* Scale effect on hover */
+}
+
+/* == Player Button Icon Override == */
+/* Changes default player icons for rewind/forward to different Material Icons. */
+.material-icons.fast_rewind::before { content: "\e059"; }  /* Changes to 'skip_previous' icon */
+.material-icons.fast_forward::before { content: "\e057"; } /* Changes to 'skip_next' icon */
+
+.btnPip {
+    display: none !important; /* Hides the Picture-in-Picture button */
+}
+
+.osdControls .btnUserRating {
+    display: none !important;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~ PLUGIN SUPPORT ~~~~~~~~~~~~~~~~~~~~ */
+/* Styles for enhancing or fixing compatibility with various Jellyfin plugins. */
+
+/* == Jellyscrub Plugin == */
+/* Customizes the appearance of chapter thumbnail previews from Jellyscrub. */
+.chapterThumbContainer { /* Container for the thumbnail image and text */
+    background: none !important;
+    border-radius: var(--rounded-cards) !important;
+    box-shadow: unset !important; /* Remove default shadow */
+}
+.chapterThumb { /* The thumbnail image itself */
+    border-radius: var(--rounded-cards) !important;
+    margin-bottom: 47px !important; /* Adjust spacing */
+    box-shadow: 0 0 1.9vh #000 !important; /* Custom shadow */
+}
+.chapterThumbTextContainer { /* Container for the chapter name text */
+    background: none !important;
+}
+.chapterThumbText { /* Chapter name text */
+    text-align: center !important;
+}
+.chapterThumbText-dim { /* Dimmed part of chapter text (e.g., duration) */
+    display: none !important; /* Hide dimmed text */
+}
+
+/* == IntroSkipper Plugin == */
+/* General styling for the skip button provided by IntroSkipper. */
+.skip-button {
+    background: var(--primary-accent-color) !important;
+    color: var(--text-color) !important;
+    margin-right: 5% !important;
+    border-radius: var(--rounded-cards) !important;
+}
+
+.skip-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(var(--primary-r), var(--primary-g), var(--primary-b), 0.8)!important; /* Accent-colored shadow */
+}
+
+/* Mobile-specific styling for the skip button. */
+ .layout-mobile .skip-button {
+    box-shadow: 0 0 30px rgba(var(--primary-r), var(--primary-g), var(--primary-b), 0.7)!important;
+    padding: 10px 10px !important;
+}
+
+/* Styling for the newer IntroSkipper button (often within an #skipIntro container). */
+#skipIntro .btnSkipIntro { /* The main skip intro button */
+    transition: 0.2s;
+    border-radius: 100px !important; /* Pill shape */
+    backdrop-filter: blur(var(--blur)) !important; /* Apply theme blur */
+    background: rgba(30, 30, 30, 0.7) !important; /* Use predefined dark semi-transparent background */
+}
+#skipIntro .btnSkipIntro:hover {
+    transform: scale(1.05);
+    background: var(--primary-accent-color) !important; /* Accent color on hover */
+    box-shadow: 0 0 8px rgba(var(--primary-r), var(--primary-g), var(--primary-b), 0.6) !important; /* Accent-colored shadow */
+}
+/* Ensure text/icon within the skip button is white on hover for contrast. */
+#skipIntro .paper-icon-button-light:hover:not(:disabled) {
+    color: #FFF !important;
+}
+/* Remove padding from the "Up Next" container when it's specifically for IntroSkipper. */
+#skipIntro .upNextContainer {
+    padding: 0px !important;
+}
+/* Remove focus shadow from IntroSkipper button for a cleaner look. */
+#skipIntro .emby-button:focus {
+    background: rgba(30, 30, 30, 0.7) !important; /* Maintain base background on focus */
+    box-shadow: unset !important;
+}
+
+/* == Intro Skipper Markers on Progress Bar == */
+/* Controls visibility and appearance of intro/credit markers on the player progress bar. */
+/* Hide markers when progress bar thumb is not hovered. */
+.sliderContainer:has(.mdl-slider-hoverthumb:not(:hover)) .sliderMarker {
+    opacity: 0 !important;
+    transition: 0.2s !important;
+}
+/* Show markers when progress bar thumb is hovered. */
+.sliderContainer:has(.mdl-slider-hoverthumb:hover) .sliderMarker {
+    opacity: 1 !important;
+    transition: 0.2s !important;
+    height: 10px !important; /* Make markers taller */
+    transform: translate3d(0, 40%, 0) !important; /* Adjust vertical position */
+    -webkit-transform: translate3d(0, 40%, 0) !important;
+    z-index: 10 !important; /* Ensure visibility above other elements */
+}
+/* Style for "watched" or passed markers (e.g., intro already skipped). */
+.sliderMarker.watched {
+    background-color: #FFFFFF90 !important; /* Semi-transparent white */
+}
+
+
+.btnStartNow {
+    background: var(--primary-accent-color) !important;
+    color: var(--text-color) !important;
+}
+
+/* == InPlayerEpisodePreview Plugin (Desktop) == */
+/* Adjusts layout and font sizes for the InPlayerEpisodePreview popup on desktop. */
+.layout-desktop #popupFocusContainer {
+    padding: 10px !important;
+    background: var(--secondary-background-transparent) !important;
+    backdrop-filter: blur(var(--blur)) !important;
+}
+.layout-desktop #popupTitleContainer { margin: 0px !important; padding: 10px 0px !important; }
+.layout-desktop #popupContentContainer .previewEpisodeDetails { position: unset !important; margin: 0px 0px 6px 10px !important; font-size: 13.5px !important; }
+.layout-desktop #popupContentContainer .previewEpisodeTitle { font-size: 16.5px !important; }
+.layout-desktop #popupContentContainer .listItem { padding: .25em .5em !important; }
+
+
+/* ~~~~~~~~~~~~~~~~~~~~ SETTINGS & DASHBOARD ~~~~~~~~~~~~~~~~~~~~ */
+
+/* == Input Fields, Lists, and Buttons Styling == */
+/* Applies consistent rounding to various form elements and lists in settings/dashboard. */
+.emby-input,
+.emby-textarea,
+.emby-select,
+.paperList,           /* General list container */
+.subtitleappearance-preview /* Preview area in subtitle settings */
+{
+    border-radius: var(--rounded-cards) !important;
+}
+
+.emby-input, .emby-textarea, .emby-select-withcolor {
+    border: 0.1em solid var(--alt-accent-color) !important;
+}
+
+.emby-input, .emby-textarea, .paperList, .fab, .emby-select-withcolor, .visualCardBox, .emby-button.raised.button-alt  {
+    background: var(--alt-accent-color) !important;
+}
+
+.fab, .raised {
+  box-shadow: 0 4px 12px rgba(var(--primary-r), var(--primary-g), var(--primary-b), 0.1) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+.fab:hover, .raised:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(var(--primary-r), var(--primary-g), var(--primary-b), 0.4) !important;
+}
+
+
+/* Change colors for options dropdown */
+.emby-select option {
+  background-color: rgba(var(--primary-r), var(--primary-g), var(--primary-b), 0.2);
+  color: var(--text-color);
+}
+
+/* Selected option */
+.emby-select option:checked {
+  background-color: rgb(var(--primary-r), var(--primary-g), var(--primary-b));
+}
+
+/* Background for dashboard menu on mobile */
+.MuiPaper-root.MuiPaper-elevation.MuiPaper-elevation16.MuiDrawer-paper.MuiDrawer-paperAnchorLeft {
+    background: var(--secondary-background-color) !important;
+    border-top-right-radius: 30px !important;
+    border-bottom-right-radius: 30px !important;
+}
+
+/* The panel when clicked on the profile in dashboard page */
+.css-1ilo2kq {
+    backdrop-filter: blur(var(--blur));
+    border-radius: var(--rounded-cards);
+}
+
+/* Applies a smaller, consistent rounding to buttons and select elements. */
+.button-submit,
+.emby-select,
+.btnRefresh,
+#btnShutdown,
+.raised, /* General raised buttons */
+.MuiToggleButton-root.MuiToggleButtonGroup-groupedHorizontal /* Material UI Toggle Buttons (Jellyfin 10.9+) */
+{
+    border-radius: var(--rounded-cards) !important;
+    background: var(--alt-accent-color);
+}
+
+/* == Profile Page Styling == */
+/* Fixes alignment issues and applies accent color to usernames/titles on the user profile page. */
+.layout-desktop #userProfilePage .readOnlyContent div:not([class]), div[class=""] { /* Targets specific divs that might lack classes */
+    align-items: initial !important;
+}
+.username { /* Already styled in accent colors, this re-affirms or adjusts margin */
+    margin: 0px 0px 10px 10px !important;
+    color: var(--primary-accent-color) !important;
+}
+.headerUsername, .sectionTitle { /* Accent color for username in header and section titles */
+    color: var(--primary-accent-color) !important;
+    text-shadow: -1px 1px 15px #000000;
+    font-weight: bold;
+}
+ /* remove chevron in section titles */
+.sectionTitleTextButton>.material-icons {
+    display: none;
+}
+
+/* == General Dashboard Styling == */
+/* Removes borders under list items for a cleaner look. */
+.listItem-border {
+    border: 0 !important;
+}
+
+.taskProgressInner { /* Inner progress bar for tasks */
+    background: var(--primary-accent-color);
+}
+
+/* Styles fieldsets in the dashboard with rounding, custom border, and padding. */
+.layout-desktop fieldset.verticalSection-extrabottompadding,
+.layout-tv fieldset.verticalSection-extrabottompadding {
+    border-radius: var(--rounded-cards) !important;
+    border-color: var(--secondary-background-transparent) !important;
+    padding: 10px 35px 20px 35px !important;
+}
+
+.layout-mobile fieldset.verticalSection-extrabottompadding {
+    border-radius: var(--rounded-cards) !important;
+    border-color: var(--secondary-background-transparent) !important;
+}
+
+#itemDetailPage .verticalSection .itemsContainer.padded-right {
+    padding-right: 0 !important;
+}
+
+/* Styles tab navigation within the dashboard (e.g., in server settings sections). */
+.localnav {
+    border-radius: 50px;
+    background: var(--alt-accent-color) !important;
+    width: fit-content !important;
+}
+/* Removes default background from buttons within dashboard tab navigation. */
+.dashboardDocument a[data-role="button"] {
+    background: none !important;
+}
+/* Styles the active tab in dashboard navigation with accent color and pill shape. */
+.dashboardDocument div[data-role="controlgroup"] a.ui-btn-active {
+    background: var(--primary-accent-color) !important;
+    border-radius: 100px !important; /* Pill shape */
+}
+
+/* Styles the subheader in lists (e.g., in settings or dashboard) with custom font and padding. */
+.MuiListSubheader-root {
+    font-weight: bolder;
+    font-variant: petite-caps;
+    font-size: large;
+    font-family: 'Quicksand';
+    padding-left: 2px;
+}
+
+/* Background for plugin change log and plugin author details */
+.css-10dubda, .css-1xnox0e {
+    background: var(--secondary-background-transparent) !important;
+}
+ /* Plugin page success message */
+.css-1s2cwil {
+    background: #228b2296 !important;
+}
+/* Failure or warning in plugin page */
+.css-1fl3wau {
+    background-color: #8b0000d9;
+}
+
+/* == Specific Dashboard Page Adjustments == */
+/* Adds top margin to specific dashboard pages for better layout. */
+#libraryDisplayPage,
+#metadataImagesConfigurationPage,
+#metadataNfoPage {
+    margin-top: 40px !important;
+}
+#mediaLibraryPage {
+    margin-top: 10px !important;
+}
+/* Re-aligns the "Active Devices" container. */
+.activeDevices.itemsContainer {
+    margin: 0px !important;
+}
+
+/* == Dashboard Table Styling == */
+.detailTableBodyRow-shaded:nth-child(even) {
+    background: var(--primary-background-transparent) !important;
+}
+
+/* == Revoke Button Styling (API page)== */
+.btnRevoke {
+    background: #ff000069;
+}
+
+/* == IntroSkipper Settings Details (Within Dashboard) == */
+/* Styles for <summary> elements (used for collapsible sections) in IntroSkipper settings. */
+.layout-desktop summary {
+    border-radius: 100px !important; /* Pill shape */
+}
+/* Adds padding to specific sections within IntroSkipper settings. */
+#intro_reqs, #edl, #silence, #support {
+    padding-bottom: 10px !important;
+}
+
+/* == Dashboard Fixes for Jellyfin 10.9.x == */
+/* Adjusts layout for specific pages due to changes in Jellyfin 10.9.x. */
+
+.MuiAlert-message { color: #fff !important; } /* Ensure Material UI alert messages are white */
+.MuiDataGrid-root.MuiDataGrid-withBorderColor { border-radius: var(--rounded-cards) !important; } /* Rounding for DataGrid */
+.infoBanner { border-radius: var(--rounded-cards) !important; } /* Rounding for info banners */
+.MuiToggleButton-root.MuiToggleButtonGroup-groupedHorizontal { padding-inline: 15px !important; } /* Padding for MUI toggle buttons */
+
+/* == Jellyfin 10.9+ Dashboard Sidebar (Material UI List) == */
+/* Styles for the newer MUI-based sidebar in the dashboard. */
+.MuiPaper-root.MuiDrawer-paperAnchorDockedLeft { /* The drawer paper itself */
+    border-right: none !important; /* Remove default right border */
+    width: 260px !important;
+    border-top-right-radius: var(--rounded-cards) !important;
+    border-bottom-right-radius: var(--rounded-cards)  !important;
+}
+/* Smaller sidebar width for mobile dashboard. */
+.layout-mobile .MuiPaper-root.MuiDrawer-paperAnchorDockedLeft {
+    background: var(--secondary-background-transparent) !important; /* Transparent background on mobile */
+    width: 240px !important;
+}
+/* Styling for the list container within the MUI sidebar. */
+.MuiList-root.MuiList-subheader {
+    padding-left: 10px !important;
+}
+/* Styling for list items within the subheader section of the MUI sidebar. */
+.MuiList-subheader .MuiListItem-root.MuiListItem-gutters {
+    /* width: 85% !important;          Relative width */
+    margin-inline: auto !important; /* Centering */
+}
+/* Styling for list item buttons within the MUI sidebar. */
+.MuiList-subheader .MuiListItemButton-root.MuiListItemButton-gutters {
+    border-radius: 18px !important;
+    margin: 2px 0px !important;
+    transition: .2s !important;
+    height: 45px !important;
+}
+/* Default color for non-selected MUI sidebar list item buttons and their icons. */
+.MuiList-subheader .MuiListItemButton-root.MuiListItemButton-gutters:not(.Mui-selected) .MuiListItemIcon-root,
+.MuiList-subheader .MuiListItemButton-root.MuiListItemButton-gutters:not(.Mui-selected) {
+    color: #D1D1D1; /* Light gray for default text/icons */
+}
+/* Hover effect for non-selected MUI sidebar list item buttons. */
+.MuiList-subheader .MuiListItemButton-root.MuiListItemButton-gutters:hover:not(.Mui-selected) {
+    translate: 0 -3px !important;
+    background: var(--secondary-background-transparent) !important; /* Dark semi-transparent background on hover */
+}
+/* Ensures MUI icons inherit color correctly. */
+.MuiListItemIcon-root.MuiSvgIcon-fontSizeMedium {
+    color: inherit !important;
+}
+/* Padding for MUI list item buttons that are NOT part of the main sidebar (e.g., other lists in dashboard pages). */
+.MuiList-root:not(.MuiList-subheader) .MuiListItemButton-root.MuiListItemButton-gutters {
+    padding: 20px 38px 10px 38px !important;
+}
+/* Styling for MUI collapsed list item buttons (e.g., in nested navigation). */
+.MuiCollapse-root.MuiCollapse-vertical .MuiListItemButton-root.MuiListItemButton-gutters {
+    width: 85% !important;
+    margin-inline: auto !important;
+    padding: 8px 16px !important;
+    border-radius: 18px !important;
+}
+
+
+/* ~~~~~~~~~~~~~~~~~~~~ METADATA EDITOR ~~~~~~~~~~~~~~~~~~~~ */
+/* Styles specific to the metadata editor interface. */
+
+/* Adjusts widths for the sidebar and content area in the desktop metadata editor. */
+.layout-desktop .editPageSidebar { width: 25vw !important; } /* Sidebar takes 25% of viewport width */
+.layout-desktop .editPageInnerContent { width: 74vw !important; } /* Inner content takes most of the remaining width */
+
+/* Styling for the jsTree component used for folder navigation in the metadata editor. */
+.jstree-default-large .jstree-node { line-height: 35px !important; } /* Adjust line height for tree nodes */
+.jstree-wholerow-hovered { background: var(--primary-background-transparent) !important; } /* Background for hovered tree rows */
+/* Negative margin to adjust alignment of child nodes in the tree. */
+.jstree-children { margin-left: -10px !important; }
+
+/* Styling for the "Save" button in the metadata editor header. */
+#editItemMetadataPage .btnHeaderSave {
+    /* Accent background is applied globally */
+    height: 40px !important;
+    color: white !important; /* Ensure text is white for contrast */
+}
+
+
+/* ~~~~~~~~~~~~~~~~~~~~ MUSIC PLAYER & NOW PLAYING BAR ~~~~~~~~~~~~~~~~~~~~ */
+/* Styles related to the music player interface and the "Now Playing" bar at the bottom. */
+
+/* Margin adjustment for the info container in the desktop Now Playing bar. */
+.layout-desktop .appfooter .nowPlayingBarInfoContainer { margin-left: 20px !important; }
+
+/* Styling for the volume OSD (On-Screen Display) in the desktop layout. */
+.volumeOsd {
+    border-radius: var(--rounded-cards) !important;
+    background: var(--secondary-background-transparent) !important; /* Use theme's transparent background */
+}
+
+/* Margin adjustments for parent name (Album/Artist) in the music player's name container (Desktop). */
+.layout-desktop .nameContainer .musicParentName {
+    margin-right: 20px !important;
+    font-size: 1.8em;
+    color: var(--primary-accent-color);
+}
+
+.layout-desktop .nameContainer .musicParentName::after {
+    content: " -" !important;
+}
+
+/* Margin adjustments for the Now Playing bar itself and its position container (Desktop). */
+.layout-desktop .appfooter .nowPlayingBar { margin-top: 20px !important; }
+.layout-desktop .appfooter .nowPlayingBar .nowPlayingBarPositionContainer { top: -15px !important; } /* Slight upward shift */
+
+#childrenContent:has(.listItem[data-type="Audio"]) {
+    border: 1px solid var(--alt-accent-color);
+    border-radius: var(--rounded-cards);
+    padding: .5em;
+    background-color: var(--secondary-background-transparent);
+}
+
+.listItem[data-type="Audio"]:has(.playlistIndexIndicatorImage):not(:hover) {
+    background: var(--secondary-background-transparent);
+}
+
+
+/* ~~~~~~~~~~~~~~~~~~~~ LIVE TV ~~~~~~~~~~~~~~~~~~~~ */
+/* Styles specific to the Live TV guide and related elements. */
+
+/* Enhancements for TV Guide channel images and program names. */
+.lazy-image-fadein-fast.non-blurhashable.lazy.guideChannelImage { /* Channel logos in the guide */
+    transition: filter 0.1s ease;
+    z-index: 1; /* Ensure it's above other static elements if needed */
+}
+.lazy-image-fadein-fast.non-blurhashable.lazy.guideChannelImage:hover {
+    filter: drop-shadow(0 0 6px #676767); /* Gray drop shadow on hover */
+}
+/* Text shadow effect for program names in the guide on hover. */
+.programCell-active.itemAction.programCell:hover .guideProgramName > .guideProgramNameText {
+    transition: text-shadow 0.2s ease;
+    text-shadow: 0 0 2px var(--primary-accent-color); /* Accent color text shadow */
+}
+/* Accent background for hovered or selected channel headers in the guide. */
+.channelsContainer button.itemAction.guide-channelHeaderCell:hover,
+.channelsContainer button.itemAction.guide-channelHeaderCell.selected {
+    background-color: var(--primary-accent-color) !important;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~ BACKDROP SUPPORT ~~~~~~~~~~~~~~~~~~~~ */
+/* Styles that apply when item backdrops (background images) are enabled and visible. */
+
+/* == Translucent Cards on Item Detail Page  == */
+/* Makes various sections on the item detail page translucent */
+.layout-desktop #itemDetailPage .detailSectionContent,
+.layout-desktop #itemDetailPage .trackSelections {
+    background: var(--secondary-background-transparent) !important; /* Use theme's transparent background */
+    backdrop-filter: blur(var(--blur)) !important; /* Apply theme blur */
+}
+
+/* == Transparent/Gradient Drawer  == */
+.backgroundContainer.withBackdrop + div .mainDrawer
+{
+    background: var(--secondary-background-transparent) !important; /* Darker gradient */
+    backdrop-filter: blur(50px) !important;
+    border-top-right-radius: 30px !important; /* Rounded corners for the drawer */
+    border-bottom-right-radius: 30px !important; /* Rounded corners for the drawer */
+}
+
+/* Fallback for browsers not supporting :has() (e.g., JMP). */
+@supports not selector(:has(*)) {
+    /* Simpler transparent background with blur for desktop JMP. */
+    .layout-desktop .backgroundContainer.withBackdrop + div .mainDrawer {
+        background: transparent !important;
+        backdrop-filter: blur(50px) !important;
+        border-top-right-radius: 30px !important; /* Rounded corners for the drawer */
+        border-bottom-right-radius: 30px !important; /* Rounded corners for the drawer */
+    }
+    /* Creates a pseudo-element to simulate a solid background behind the static drawer area on JMP when backdrop transparency is off. */
+    .layout-desktop #itemDetailPage.noBackdropTransparency::after {
+        position: fixed; content: ""; top: 0; left: 0; height: 100%;
+        width: 250px; /* Assumed width of the static drawer */
+        background: var(--secondary-background-color);
+        z-index: 997; /* Position below the main drawer but above page content */
+    }
+}
+
+/* == Blurred Sidebar Buttons (with Backdrop) == */
+/* Applies blur to sidebar navigation buttons when a backdrop is visible. */
+.layout-desktop:has(.backgroundContainer.withBackdrop) .navMenuOption-selected,
+.layout-mobile:has(.backgroundContainer.withBackdrop) .navMenuOption-selected,
+.layout-desktop:has(.backgroundContainer.withBackdrop) .navMenuOption:hover:not(.navMenuOption-selected),
+.layout-mobile:has(.backgroundContainer.withBackdrop) .navMenuOption:hover:not(.navMenuOption-selected) {
+    background: var(--primary-background-transparent) !important; /* Use theme's transparent background on hover */
+    color: var(--primary-accent-color) !important;
+    backdrop-filter: blur(var(--blur)) !important;
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
+}
+
+/* == Mobile Backdrop Image Adjustments == */
+/* Fine-tunes the appearance and behavior of backdrop images on mobile devices. */
+.layout-mobile .backdropImage {
+    background-position: 50% !important; /* Center the image */
+    background-repeat: no-repeat !important;
+    background-size: cover !important;   /* Cover the area */
+    bottom: 0 !important;
+    contain: layout style !important; /* Performance optimization hint */
+    left: 0 !important;
+    position: absolute !important;
+    right: 0 !important;
+    top: 0 !important;
+    opacity: .3 !important;         /* Reduced opacity for subtlety */
+    margin-top: 0rem !important;    /* Reset any default margin */
+    background-attachment: scroll !important; /* Ensure it scrolls with content if needed, or 'fixed' */
+}
+/* Fade-in animation for mobile backdrop images. */
+.layout-mobile .backdropImageFadeIn {
+    -webkit-animation: backdrop-fadein .8s ease-in normal both !important;
+    animation: backdrop-fadein .8s ease-in normal both !important
+}
+@keyframes backdrop-fadein {
+    from { opacity: 0; } to { opacity: 1; } /* Simple fade-in from 0 to current opacity (which is .3) */
+}
+
+/* == Hides Backdrop in People Detail page and other adjustments == */
+
+@media (orientation: portrait) {
+.layout-mobile #itemDetailPage:has(div.detailImageContainer .cardImageIcon.person) > .itemBackdrop {
+    height: 20% !important;
+}
+
+.layout-mobile #itemDetailPage:has(.cardImageIcon.person) .mainDetailButtons {
+    justify-content: flex-end !important;
+}
+}
+
+.layout-desktop #itemDetailPage:has(div.detailImageContainer .cardImageIcon.person) > .itemBackdrop {
+    height: 15% !important;
+}
+
+.layout-desktop #itemDetailPage:has(div.detailImageContainer .cardImageIcon.person) .mainDetailButtons {
+    position: absolute !important;
+    right: 6em !important;
+    top: 6em !important;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~ RESPONSIVENESS & FIXES ~~~~~~~~~~~~~~~~~~~~ */
+
+/* == Scaling Fixes for Header Elements == */
+/* Adjusts header tab and right section margins on screens narrower than 1600px. */
+@media (max-width: 1599px) {
+    .layout-desktop .headerTabs {
+        margin-top: -65px !important; /* Further adjust top margin */
+    }
+    .layout-desktop .headerRight {
+        margin-right: 15px !important; /* Adjust right margin */
+    }
+    /* Ensures section tabs (within header) align to center and fit content on these screen sizes. */
+    .layout-desktop .sectionTabs {
+        width: auto !important;
+        align-self: center !important;
+    }
+}
+
+/* == Fixes for TV Layout Header == */
+.layout-tv .sectionTabs { width: auto !important; } /* Ensure tabs fit content */
+.layout-tv .headerLeft { padding: 5px !important; } /* Adjust padding for left header on TV */
+
+/* == Font and Overlap Fixes for Media Bar Area == */
+/* Addresses issues with the first content section overlapping the media bar (Now Playing bar) and standardizes fonts in that area. */
+
+.homeSectionsContainer {
+    top: 69vh !important;
+}
+
+/* Standardizes font family for various text elements often found near or related to the media bar. */
+.genre, .plot, .rating-value, .rating-value span, .date, .age-rating span, .runTime, .featured-content, .button-container button, .play-text {
+    font-family: inherit !important;
+}
+
+
+/* ~~~~~~~~~~~~~~~~~~~~ MOBILE SPECIFIC FIXES AND CHANGES ~~~~~~~~~~~~~~~~~~~~ */
+
+/* == Vertical Stacking on Detail Page (Mobile) == */
+/* Adjusts top padding for the main wrapper on mobile detail pages. */
+.layout-mobile .detailPageWrapperContainer {
+    padding-top: 1em !important;
+}
+
+/* Remove play button from card overlay on mobile detail pages. */
+.layout-mobile .cardOverlayButton-br {
+    display: none;
+}
+
+
+/* == Mobile Poster/Backdrop Styling == */
+/* Uses the item backdrop as the main image on mobile detail pages, with opacity and a gradient mask. */
+.layout-mobile .itemBackdrop {
+    margin: 0 !important;
+    opacity: .5 !important; /* Match opacity from backdrop support section */
+    height: 50vh !important;
+    mask-image: linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 15%); /* Fades out the bottom of the backdrop */
+}
+
+/* == Mobile Logo Positioning (Details Page) == */
+/* Styles and positions the series/movie logo on mobile detail pages. */
+.layout-mobile .detailLogo {
+    display: block !important;      /* Ensure it's visible */
+    position: inherit !important;   /* Reset to default flow positioning relative to backdrop */
+    width: 70% !important;          /* Relative width */
+    max-height: 15vh;               /* Max height relative to viewport height */
+    margin: -8vh auto 1em auto;     /* Negative top margin to pull it up over backdrop, auto horizontal for centering, bottom margin */
+    left: 15% !important;           /* Adjust if centering with margin: auto isn't perfect */
+    top: 15% !important;            /* Adjust based on desired overlap with backdrop */
+    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.7)); /* Add a shadow for better visibility */
+}
+
+/* == Bigger Logo in Landscape (Mobile) == */
+@media (orientation: landscape) {
+    .layout-mobile .detailLogo {
+        width: 80% !important; /* Larger width in landscape */
+        left: 20% !important;  /* Re-adjust left if needed for centering */
+    }
+}
+
+/* == Content Alignment (Mobile Details Page) == */
+/* Centers main detail buttons and adjusts padding for the content area. */
+.layout-mobile .mainDetailButtons {
+    justify-content: center; /* Center buttons within their container */
+    padding-top: 10px !important;
+}
+.layout-mobile .detailPageContent {
+    padding-right: 0 !important; /* Remove right padding if any */
+}
+
+
+/* ~~~~~~~~~~~~~~~~~~~~ Book SPECIFIC FIXES AND CHANGES ~~~~~~~~~~~~~~~~~~~~ */
+
+.mainDetailButtons:has(button.btnPlaystate[data-type="Book"]) button.btnPlay::after {
+    content: "Read" !important;
+    margin-top: 4px;
+    margin-left: 4px;
+    font-weight: bold;
+}
+
+.mainDetailButtons:has(button.btnPlaystate[data-type="Book"]) .material-icons.play_arrow:before{
+    display:  none !important;
+}
+
+.mainDetailButtons:has(button.btnPlaystate[data-type="Book"]) .material-icons.play_arrow:after {
+    content: "\1F56E" !important;
+    margin-left: -8px;
+}
+
+.layout-desktop #itemDetailPage:has(button.btnPlaystate[data-type="Book"]) .itemBackdrop, .layout-mobile #itemDetailPage:has(button.btnPlaystate[data-type="Book"]) .itemBackdrop {
+    height: 15%;
+}
+
+ .layout-desktop #itemDetailPage:has(button.btnPlaystate[data-type="Book"])  .mainDetailButtons {
+    backdrop-filter: none !important;
+    margin-top: 9% !important;
+}
+
+.layout-desktop #itemDetailPage:has(button.btnPlaystate[data-type="Book"]) .itemMiscInfo {
+    margin-left: 11px !important;
+    margin-top: 11px !important;
+}
+
+/* Cornered card indicators */
+.cardIndicators, .listItemIndicators {
+  right: -1px !important;
+  top: -1px !important;
+}
+.innerCardFooter {
+  border-radius: 0px 8px !important;
+  box-shadow: -2px 1px 4px 0 rgb(0 0 0 / .8) !important;
+}
+.countIndicator, .playedIndicator {
+  border-radius: 0px 10px !important;
+  box-shadow: -2px 1px 4px 0 rgb(0 0 0 / .8), inset 0 1px 3px rgba(255,255,255,0.2) !important;
+  border: 1px solid rgba(0,0,0,0.2);
+}
+
+.playedIndicator {
+    background: linear-gradient(to bottom, #5fe35f, #48b648) !important;
+}
+
+.mediaSourceIndicator {
+  left: 0 !important;
+  top: 0 !important;
+  border-radius: 8px 0px !important;
+  box-shadow: -2px 1px 4px 0 rgb(0 0 0 / .8);
+  background: -2px 1px 4px 0 rgb(0 0 0 / .8)
+}
+
+.layout-mobile .playedIndicator, .layout-mobile .countIndicator {
+    font-size: 95%;
+}
+
+/*New progress bar*/
+#indexPage .innerCardFooterClear,
+.libraryPage .innerCardFooterClear,
+#itemDetailPage .innerCardFooterClear {
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+#indexPage .itemProgressBarForeground,
+.libraryPage .itemProgressBarForeground,
+#itemDetailPage .itemProgressBarForeground,
+#indexPage .itemProgressBar,
+.libraryPage .itemProgressBar,
+#itemDetailPage .itemProgressBar {
+    border-radius: var(--rounded-cards);
+}
+#indexPage .itemProgressBarForeground,
+.libraryPage .itemProgressBarForeground,
+#itemDetailPage .itemProgressBarForeground  {
+    background-color: var(--primary-accent-color) !important;
+}
+#indexPage .itemProgressBar,
+.libraryPage .itemProgressBar,
+#itemDetailPage .itemProgressBar {
+    height: 8px;
+    background: var(--secondary-background-transparent) !important;
+    margin: .5em .8em;
+}
+/*Accommodate play button on mobile*/
+/* @media all and (max-width: 100em){
+  #indexPage .itemProgressBar,
+  .libraryPage .itemProgressBar,
+  #itemDetailPage .itemProgressBar {
+    margin-right: 3.2em;
+  }
+} */
+
+@supports (backdrop-filter: blur(15px)) {
+  #indexPage .itemProgressBar,
+  .libraryPage .itemProgressBar,
+  #itemDetailPage .itemProgressBar{
+    backdrop-filter: blur(4px);
+    background: var(--secondary-background-transparent) !important;
+  }
+}
+/*
+================================================================================
+|                         JELLYFIN 10.11 FIXES                                  |
+================================================================================
+*/
+
+.layout-desktop .itemMiscInfo {
+    margin-left: -46vw !important;
+}
+
+.layout-desktop .nameContainer {
+    margin-left: -46.5vw !important;
+}
+
+.detailImageContainer {
+    margin-left: -4vw !important;
+    margin-top: -8vw !important;
+}
+
+.nextUpSection  {
+    order: 5 !important;
+}
+div#listChildrenCollapsible {
+    order: 6 !important;
+}
+.detailSectionContent {
+    order: 0 !important;
+}
+
+.itemDetailsGroup {
+    order: 3 !important;
+}
+
+.collectionItems {
+    order: 6 !important;
+}
+
+.collectionItems .sectionTitleContainer-cards {
+    padding-left: 0 !important;
+}
+
+.mainDetailButtons {
+    margin-left: -5em;
+}
+
+.layout-desktop .itemBackdrop,
+.layout-tv .itemBackdrop {
+    height: 45vh !important;
+}
+
+.layout-tv .sectionTabs {
+	width: fit-content;
+	margin-inline: auto !important;
+}
+
+
+/*
+================================================================================
+|                        Dashboard Styles
+|            These do not work natively, need to be injected
+================================================================================
+*/
+
+
+/* Server */
+.css-1787okl, .css-znfy44 {
+  border-radius: 20px !important;
+  background: var(--secondary-background-transparent) !important;
+}
+
+/* Media chips */
+.css-1yr4dn5, .css-lh4h8w, .css-nqwc7a, .css-hkers1, .css-11qg7pw, .css-q0e3wl, .css-wnfue5, .css-46ocr5 {
+  border-radius: 20px !important;
+  background: var(--secondary-background-transparent) !important;
+}
+
+/* Activity, Alerts and Paths */
+.css-1m91j26, .css-1ypqulw {
+  border-radius: 20px !important;
+  padding: 0px !important;
+  background: var(--alt-accent-color) !important;
+}
+
+/* Devices, Plugins Footer */
+.css-4beb5o, .css-sxfj10, .css-1brmtja, .css-1yd4q9n {
+  background: var(--secondary-background-transparent) !important;
+}
+
+/* Devices Card */
+.css-1yd4q9n {
+  border-radius: 20px !important;
+}
+
+/* Header */
+header.MuiPaper-root.MuiPaper-elevation.MuiPaper-elevation4.MuiAppBar-root.MuiAppBar-colorDefault.MuiAppBar-positionFixed.mui-fixed.css-jz1vtw {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+
+/* Bigger and centered server buttons */
+.MuiStack-root.css-11r6nok {
+    height: 3em;
+    display: flex;
+    justify-content: center;
+}
+
+/* Server Buttons */
+.MuiStack-root.css-11r6nok button:nth-child(1) {
+  background: rebeccapurple !important;
+  color: white !important;
+}
+
+.css-jqp64h {
+  background: rebeccapurple !important;
+  color: white !important;
+  border: none !important;
+}
+
+.MuiStack-root.css-11r6nok button:nth-child(2) {
+  background: #ff9800 !important;
+  color: white !important;
+}
+.MuiStack-root.css-11r6nok button:nth-child(3) {
+  background: #f44336 !important;
+  color: white !important;
+}
+
+/* Activity list items */
+.MuiList-root:not(.MuiList-subheader) .MuiListItemButton-root.MuiListItemButton-gutters {
+    padding: 10px 30px 10px 30px !important;
+}
+
+/* Links */
+.css-c4z1po {
+    color: var(--primary-accent-color) !important;
+    --Link-underlineColor: var(--primary-accent-color) !important;
+}
+
+/* save button and help button*/
+.css-ybuz3k, .fab, .raised {
+    color: var(--text-color) !important;
+    background: var(--primary-accent-color) !important;
+}
+
+/* Switches */
+
+.css-1fmeo47.Mui-checked {
+    color: var(--primary-accent-color);
+}
+.css-1fmeo47.Mui-checked + .MuiSwitch-track {
+    background-color:  var(--secondary-accent-color);
+}
+
+/* Branding buttons */
+.css-1vcmsp6, .css-nu23t2 {
+    border-radius: 15px;
+    font-weight: 600;
+}
+
+
+/* Devices Table */
+.css-mq8hip, tr, tr.MuiTableRow-root.css-vag9oz, .css-j5zxs1, tr.MuiTableRow-root.css-1cksag5  {
+    background-color: transparent !important;
+}
+
+/* Table Headers */
+.css-wsew38 {
+    justify-content: flex-end;
+}
+
+input.PrivateSwitchBase-input.css-j8yymo, .css-5191sg.Mui-focused {
+    color: var(--primary-accent-color) !important;
+}
+
+.css-1y99tin::after, .css-g193a2::after {
+  border-bottom: 1px solid var(--primary-accent-color);
+}
+
+/* Checkboxes */
+span.MuiButtonBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.PrivateSwitchBase-root.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.Mui-checked.MuiCheckbox-root.MuiCheckbox-colorPrimary.MuiCheckbox-sizeMedium.css-1a194ku {
+    color: var(--primary-accent-color);
+}
+
+/* Buttons in plugin page */
+.css-1ejoxfo, .css-1ejoxfo:hover, .css-1ejoxfo.Mui-focusVisible {
+    background-color: var(--primary-accent-color);
+}
+/* manage repository button */
+.css-cr7oyo {
+    background-color: var(--secondary-accent-color);
+    color: var(--text-color);
+    border-radius: 20px;
+    font-weight: 500;
+    border: 0;
+}
+
+/* Progress % for scheduled tasks */
+.MuiBox-root.css-lmbv6g {
+    color: var(--primary-accent-color);
+}
+
+/* Dashboard Theme Update Date */
+.css-1787okl::after {
+    content: "Theme last updated on " var(--theme-updated-on, "..........");
+    display: block;
+    background-color: var(--alt-accent-color);
+    border-radius: var(--rounded-cards);
+    padding: 1em;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: bold;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    margin: 10px 0px;
+}
+
+
+/* Progress track */
+.MuiLinearProgress-root {
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--secondary-background-transparent) !important;
+}
+.MuiLinearProgress-bar {
+  background: var(--primary-accent-color) !important;
+  border-radius: inherit;
+}
+.css-lmbv6g .MuiTypography-root {
+  font-weight: 600;
+}
+/*
+ * ===================================================================
+ * Custom CSS for International Media Ratings
+ * ===================================================================
+ * This comprehensive stylesheet applies a color-coded system to media ratings
+ * from multiple countries and organizations for easy identification of content suitability.
+ *
+ * This CSS works in conjunction with the rating.js script that adds
+ * 'rating' attributes to .mediaInfoOfficialRating elements.
+ *
+ * Color Scheme Philosophy:
+ * - Green Shades: General/All Audiences (G, U, etc.)
+ * - Yellow/Amber: Parental Guidance (PG, 12, etc.)
+ * - Orange: Parental Caution (PG-13, 15, etc.)
+ * - Red Shades: Restricted/Adults (R, 18, etc.)
+ * - Purple: Special Categories (S, X, etc.)
+ * - Blue: Educational/Exempt content
+ * - Grey: Unrated/Unknown
+ *
+ * Countries/Systems Covered:
+ * - United States (MPAA, TV Ratings)
+ * - United Kingdom (BBFC)
+ * - Canada (CHVRS)
+ * - Australia (ACMA, OFLC)
+ * - Germany (FSK, USK)
+ * - France (CSA)
+ * - Japan (Eirin, CERO)
+ * - South Korea (KMRB, GRB)
+ * - India (CBFC)
+ * - Brazil (ClassInd)
+ * - Netherlands (NICAM)
+ * - Sweden (Statens biografbyrå)
+ * - And many more...
+ * ===================================================================
+ Included more countries for anyone to use it. Completely generated by AI based on the previous version. Would have been impossible to write manually :)
+ */
+
+
+/* --- Base Style for All Ratings --- */
+.mediaInfoOfficialRating {
+    background-color: #607D8B !important; /* Blue Grey - default fallback */
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 4px !important;
+    color: #FFFFFF !important;
+    display: inline-block !important;
+    font-size: 0.85em !important;
+    font-weight: bold !important;
+    line-height: 1.2 !important;
+    min-width: 20px !important;
+    padding: 2px 6px !important;
+    text-align: center !important;
+    text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.8) !important;
+    text-transform: uppercase !important;
+    transition: all 0.2s ease !important;
+}
+
+.mediaInfoOfficialRating:hover {
+    transform: scale(1.05) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+
+/*
+ * ===================================================================
+ * Color-Coded Rating Groups
+ * ===================================================================
+*/
+
+/* === GREEN: General / All Audiences === */
+.mediaInfoOfficialRating[rating='G'],                     /* US / Canada / Australia / Ireland etc. */
+.mediaInfoOfficialRating[rating='TV-G'],                   /* US */
+.mediaInfoOfficialRating[rating='TV-Y'],                   /* US */
+.mediaInfoOfficialRating[rating='U'],                      /* UK / India */
+.mediaInfoOfficialRating[rating='UK-U'],                   /* UK */
+.mediaInfoOfficialRating[rating='GB-U'],                   /* UK */
+.mediaInfoOfficialRating[rating='IN-U'],                   /* India */
+.mediaInfoOfficialRating[rating='C'],                      /* Canada / Australia */
+.mediaInfoOfficialRating[rating='CA-C'],                   /* Canada */
+.mediaInfoOfficialRating[rating='CA-G'],                   /* Canada (Quebec) */
+.mediaInfoOfficialRating[rating='P'],                      /* Australia */
+.mediaInfoOfficialRating[rating='AU-P'],                   /* Australia */
+.mediaInfoOfficialRating[rating='AU-G'],                   /* Australia */
+.mediaInfoOfficialRating[rating='FSK-0'],                   /* Germany */
+.mediaInfoOfficialRating[rating='DE-0'],                   /* Germany */
+.mediaInfoOfficialRating[rating='FR-U'],                   /* France */
+.mediaInfoOfficialRating[rating='JP-G'],                   /* Japan */
+.mediaInfoOfficialRating[rating='KR-ALL'],                 /* South Korea */
+.mediaInfoOfficialRating[rating='BR-L'],                   /* Brazil */
+.mediaInfoOfficialRating[rating='NL-AL'],                  /* Netherlands */
+.mediaInfoOfficialRating[rating='SE-BTL'],                 /* Sweden */
+.mediaInfoOfficialRating[rating='IT-T'],                   /* Italy */
+.mediaInfoOfficialRating[rating='ES-APTA'],                /* Spain */
+.mediaInfoOfficialRating[rating='RU-0+'],                  /* Russia */
+.mediaInfoOfficialRating[rating='CN-G'],                   /* China */
+.mediaInfoOfficialRating[rating='MX-AA'],                  /* Mexico */
+.mediaInfoOfficialRating[rating='AR-ATP'],                 /* Argentina */
+.mediaInfoOfficialRating[rating='NO-A'],                   /* Norway */
+.mediaInfoOfficialRating[rating='DK-A'],                   /* Denmark */
+.mediaInfoOfficialRating[rating='FI-S'],                   /* Finland */
+.mediaInfoOfficialRating[rating='BE-KT'],                  /* Belgium */
+.mediaInfoOfficialRating[rating='CH-0'],                   /* Switzerland */
+.mediaInfoOfficialRating[rating='AT-0'],                   /* Austria */
+.mediaInfoOfficialRating[rating='PL-B/O'],                 /* Poland */
+.mediaInfoOfficialRating[rating='CZ-U'],                   /* Czech Republic */
+.mediaInfoOfficialRating[rating='HU-KN'],                  /* Hungary */
+.mediaInfoOfficialRating[rating='PT-M/4'],                 /* Portugal */
+.mediaInfoOfficialRating[rating='GR-K'],                   /* Greece */
+.mediaInfoOfficialRating[rating='TR-G'],                   /* Turkey */
+.mediaInfoOfficialRating[rating='IL-G'],                   /* Israel */
+.mediaInfoOfficialRating[rating='ZA-A'],                   /* South Africa */
+.mediaInfoOfficialRating[rating='SG-G'],                   /* Singapore */
+.mediaInfoOfficialRating[rating='MY-U'],                   /* Malaysia */
+.mediaInfoOfficialRating[rating='TH-G'],                   /* Thailand */
+.mediaInfoOfficialRating[rating='PH-G'],                   /* Philippines */
+.mediaInfoOfficialRating[rating='ID-SU'],                  /* Indonesia */
+.mediaInfoOfficialRating[rating='VN-P'],                   /* Vietnam */
+.mediaInfoOfficialRating[rating='NZ-G'],                   /* New Zealand */
+.mediaInfoOfficialRating[rating='IE-G'],                   /* Ireland */
+.mediaInfoOfficialRating[rating='APPROVED'],               /* US (Legacy) */
+.mediaInfoOfficialRating[rating='PASSED'],                 /* US (Legacy) */
+.mediaInfoOfficialRating[rating='TV-Y7'],                  /* US */
+.mediaInfoOfficialRating[rating='C8'],                     /* Canada */
+.mediaInfoOfficialRating[rating='CA-C8'],                  /* Canada */
+.mediaInfoOfficialRating[rating='AU-C'] {                  /* Australia */
+    background-color: #2E7D32 !important; /* Dark Green */
+    border-color: #4CAF50 !important;
+}
+
+
+
+/* === YELLOW: Parental Guidance Suggested === */
+.mediaInfoOfficialRating[rating='PG'],                     /* US / UK / Canada / Australia / Ireland etc. */
+.mediaInfoOfficialRating[rating='TV-PG'],                  /* US */
+.mediaInfoOfficialRating[rating='GP'],                    /* US (Legacy) */
+.mediaInfoOfficialRating[rating='10'],                   /* From some shows */
+.mediaInfoOfficialRating[rating='UK-PG'],                  /* UK */
+.mediaInfoOfficialRating[rating='GB-PG'],                   /* UK */
+.mediaInfoOfficialRating[rating='IE-PG'],                  /* Ireland */
+.mediaInfoOfficialRating[rating='12'],                     /* UK */
+.mediaInfoOfficialRating[rating='12A'],                    /* UK / Ireland */
+.mediaInfoOfficialRating[rating='UK-12'],                  /* UK */
+.mediaInfoOfficialRating[rating='GB-12'],                   /* UK */
+.mediaInfoOfficialRating[rating='UK-12A'],                 /* UK */
+.mediaInfoOfficialRating[rating='GB-12A'],                 /* UK */
+.mediaInfoOfficialRating[rating='IE-12A'],                 /* Ireland */
+.mediaInfoOfficialRating[rating='CA-PG'],                  /* Canada */
+.mediaInfoOfficialRating[rating='AU-PG'],                  /* Australia */
+.mediaInfoOfficialRating[rating='FSK-6'],                   /* Germany */
+.mediaInfoOfficialRating[rating='DE-6'],                   /* Germany */
+.mediaInfoOfficialRating[rating='FR-10'],                  /* France */
+.mediaInfoOfficialRating[rating='FR--10'],                 /* France */
+.mediaInfoOfficialRating[rating='JP-PG12'],                /* Japan */
+.mediaInfoOfficialRating[rating='KR-12'],                  /* South Korea */
+.mediaInfoOfficialRating[rating='IN-UA'],                  /* India */
+.mediaInfoOfficialRating[rating='IN-UA-7'],                /* India */
+.mediaInfoOfficialRating[rating='IN-U/A 7+'],              /* India */
+.mediaInfoOfficialRating[rating='IN-UA-13'],               /* India */
+.mediaInfoOfficialRating[rating='IN-U/A 13+'],             /* India */
+.mediaInfoOfficialRating[rating='IN-UA-16'],               /* India */
+.mediaInfoOfficialRating[rating='IN-U/A 16+'],             /* India */
+.mediaInfoOfficialRating[rating='BR-12'],                  /* Brazil */
+.mediaInfoOfficialRating[rating='NL-6'],                   /* Netherlands */
+.mediaInfoOfficialRating[rating='SE-7'],                   /* Sweden */
+.mediaInfoOfficialRating[rating='IT-VM6'],                 /* Italy */
+.mediaInfoOfficialRating[rating='ES-7'],                   /* Spain */
+.mediaInfoOfficialRating[rating='RU-6+'],                  /* Russia */
+.mediaInfoOfficialRating[rating='MX-A'],                   /* Mexico */
+.mediaInfoOfficialRating[rating='AR-13'],                  /* Argentina */
+.mediaInfoOfficialRating[rating='NO-6'],                   /* Norway */
+.mediaInfoOfficialRating[rating='DK-7'],                   /* Denmark */
+.mediaInfoOfficialRating[rating='FI-K-7'],                 /* Finland */
+.mediaInfoOfficialRating[rating='BE-6'],                   /* Belgium */
+.mediaInfoOfficialRating[rating='CH-6'],                   /* Switzerland */
+.mediaInfoOfficialRating[rating='AT-6'],                   /* Austria */
+.mediaInfoOfficialRating[rating='PL-7'],                   /* Poland */
+.mediaInfoOfficialRating[rating='CZ-12'],                  /* Czech Republic */
+.mediaInfoOfficialRating[rating='HU-6'],                   /* Hungary */
+.mediaInfoOfficialRating[rating='PT-M/6'],                 /* Portugal */
+.mediaInfoOfficialRating[rating='GR-K-12'],                /* Greece */
+.mediaInfoOfficialRating[rating='TR-PG'],                  /* Turkey */
+.mediaInfoOfficialRating[rating='IL-PG'],                  /* Israel */
+.mediaInfoOfficialRating[rating='ZA-PG'],                  /* South Africa */
+.mediaInfoOfficialRating[rating='SG-PG'],                  /* Singapore */
+.mediaInfoOfficialRating[rating='MY-P13'],                 /* Malaysia */
+.mediaInfoOfficialRating[rating='TH-PG13'],                /* Thailand */
+.mediaInfoOfficialRating[rating='PH-PG'],                  /* Philippines */
+.mediaInfoOfficialRating[rating='ID-BO'],                  /* Indonesia */
+.mediaInfoOfficialRating[rating='VN-K'],                   /* Vietnam */
+.mediaInfoOfficialRating[rating='NZ-PG'],                  /* New Zealand */
+.mediaInfoOfficialRating[rating='GP'] {                    /* US (Legacy) */
+    background-color: #daa520 !important; /* Dark Yellow */
+    border-color: #FFC107 !important;
+}
+
+
+/* === ORANGE: Parents Strongly Cautioned === */
+.mediaInfoOfficialRating[rating='PG-13'],                  /* US */
+.mediaInfoOfficialRating[rating='TV-14'],                  /* US */
+.mediaInfoOfficialRating[rating='15'],                     /* UK */
+.mediaInfoOfficialRating[rating='UK-15'],                  /* UK */
+.mediaInfoOfficialRating[rating='GB-15'],                  /* UK */
+.mediaInfoOfficialRating[rating='15A'],                    /* Ireland */
+.mediaInfoOfficialRating[rating='IE-15A'],                 /* Ireland */
+.mediaInfoOfficialRating[rating='14+'],                    /* Canada */
+.mediaInfoOfficialRating[rating='CA-14+'],                 /* Canada */
+.mediaInfoOfficialRating[rating='CA-13+'],                 /* Canada (Quebec) */
+.mediaInfoOfficialRating[rating='M'],                      /* Australia / US (Legacy) */
+.mediaInfoOfficialRating[rating='AU-M'],                   /* Australia */
+.mediaInfoOfficialRating[rating='FSK-12'],                  /* Germany */
+.mediaInfoOfficialRating[rating='DE-12'],                  /* Germany */
+.mediaInfoOfficialRating[rating='FR-12'],                  /* France */
+.mediaInfoOfficialRating[rating='FR--12'],                 /* France */
+.mediaInfoOfficialRating[rating='JP-R15+'],                /* Japan */
+.mediaInfoOfficialRating[rating='KR-15'],                  /* South Korea */
+.mediaInfoOfficialRating[rating='BR-14'],                  /* Brazil */
+.mediaInfoOfficialRating[rating='NL-9'],                   /* Netherlands */
+.mediaInfoOfficialRating[rating='SE-11'],                  /* Sweden */
+.mediaInfoOfficialRating[rating='IT-VM14'],                /* Italy */
+.mediaInfoOfficialRating[rating='ES-12'],                  /* Spain */
+.mediaInfoOfficialRating[rating='RU-12+'],                 /* Russia */
+.mediaInfoOfficialRating[rating='CN-PG-13'],               /* China */
+.mediaInfoOfficialRating[rating='MX-B'],                   /* Mexico */
+.mediaInfoOfficialRating[rating='AR-16'],                  /* Argentina */
+.mediaInfoOfficialRating[rating='NO-9'],                   /* Norway */
+.mediaInfoOfficialRating[rating='DK-11'],                  /* Denmark */
+.mediaInfoOfficialRating[rating='FI-K-12'],                /* Finland */
+.mediaInfoOfficialRating[rating='BE-9'],                   /* Belgium */
+.mediaInfoOfficialRating[rating='CH-10'],                  /* Switzerland */
+.mediaInfoOfficialRating[rating='AT-10'],                  /* Austria */
+.mediaInfoOfficialRating[rating='PL-12'],                  /* Poland */
+.mediaInfoOfficialRating[rating='CZ-15'],                  /* Czech Republic */
+.mediaInfoOfficialRating[rating='HU-12'],                  /* Hungary */
+.mediaInfoOfficialRating[rating='PT-M/12'],                /* Portugal */
+.mediaInfoOfficialRating[rating='GR-K-15'],                /* Greece */
+.mediaInfoOfficialRating[rating='TR-12'],                  /* Turkey */
+.mediaInfoOfficialRating[rating='IL-14'],                  /* Israel */
+.mediaInfoOfficialRating[rating='ZA-10-12PG'],             /* South Africa */
+.mediaInfoOfficialRating[rating='SG-PG13'],                /* Singapore */
+.mediaInfoOfficialRating[rating='TH-15'],                  /* Thailand */
+.mediaInfoOfficialRating[rating='PH-PG-13'],               /* Philippines */
+.mediaInfoOfficialRating[rating='ID-13+'],                 /* Indonesia */
+.mediaInfoOfficialRating[rating='VN-T13'],                 /* Vietnam */
+.mediaInfoOfficialRating[rating='NZ-M'],                   /* New Zealand */
+.mediaInfoOfficialRating[rating='-12'] {                   /* For some shows */
+    background-color: #E65100 !important; /* Dark Orange */
+    border-color: #FF9800 !important;
+}
+
+
+/* === RED-ORANGE: Mature / Restricted === */
+.mediaInfoOfficialRating[rating='16+'],                    /* Generic 16+ */
+.mediaInfoOfficialRating[rating='MA15+'],                  /* Australia */
+.mediaInfoOfficialRating[rating='AU-MA15+'],               /* Australia */
+.mediaInfoOfficialRating[rating='FSK-16'],                  /* Germany */
+.mediaInfoOfficialRating[rating='DE-16'],                  /* Germany */
+.mediaInfoOfficialRating[rating='FR-16'],                  /* France */
+.mediaInfoOfficialRating[rating='FR--16'],                 /* France */
+.mediaInfoOfficialRating[rating='BR-16'],                  /* Brazil */
+.mediaInfoOfficialRating[rating='NL-12'],                  /* Netherlands */
+.mediaInfoOfficialRating[rating='SE-15'],                  /* Sweden */
+.mediaInfoOfficialRating[rating='ES-16'],                  /* Spain */
+.mediaInfoOfficialRating[rating='RU-16+'],                 /* Russia */
+.mediaInfoOfficialRating[rating='MX-B15'],                 /* Mexico */
+.mediaInfoOfficialRating[rating='NO-12'],                  /* Norway */
+.mediaInfoOfficialRating[rating='FI-K-16'],                /* Finland */
+.mediaInfoOfficialRating[rating='BE-12'],                  /* Belgium */
+.mediaInfoOfficialRating[rating='CH-14'],                  /* Switzerland */
+.mediaInfoOfficialRating[rating='AT-14'],                  /* Austria */
+.mediaInfoOfficialRating[rating='PL-15'],                  /* Poland */
+.mediaInfoOfficialRating[rating='HU-16'],                  /* Hungary */
+.mediaInfoOfficialRating[rating='PT-M/16'],                /* Portugal */
+.mediaInfoOfficialRating[rating='TR-15'],                  /* Turkey */
+.mediaInfoOfficialRating[rating='IL-16'],                  /* Israel */
+.mediaInfoOfficialRating[rating='ZA-13'],                  /* South Africa */
+.mediaInfoOfficialRating[rating='SG-NC16'],                /* Singapore */
+.mediaInfoOfficialRating[rating='PH-R-16'],                /* Philippines */
+.mediaInfoOfficialRating[rating='ID-17+'],                 /* Indonesia */
+.mediaInfoOfficialRating[rating='VN-T16'],                 /* Vietnam */
+.mediaInfoOfficialRating[rating='NZ-R13'],                 /* New Zealand */
+.mediaInfoOfficialRating[rating='IE-16'],                  /* Ireland */
+.mediaInfoOfficialRating[rating='CA-16+'],                /* Canada (Quebec) */
+.mediaInfoOfficialRating[rating='MA 15+'],                /* For some shows */
+.mediaInfoOfficialRating[rating='-16'],                   /* For some shows */
+.mediaInfoOfficialRating[rating='16'],                    /* For some shows */
+.mediaInfoOfficialRating[rating='M16'] {                   /* For some shows */
+    background-color: red !important; /* Red Orange */
+    border-color: #FF5722 !important;
+}
+
+
+/* === RED: Restricted / Adults Only === */
+.mediaInfoOfficialRating[rating='R'],                      /* US */
+.mediaInfoOfficialRating[rating='TV-MA'],                  /* US */
+.mediaInfoOfficialRating[rating='18'],                     /* UK / Ireland */
+.mediaInfoOfficialRating[rating='UK-18'],                  /* UK */
+.mediaInfoOfficialRating[rating='GB-18'],                   /* UK */
+.mediaInfoOfficialRating[rating='IE-18'],                  /* Ireland */
+.mediaInfoOfficialRating[rating='18+'],                    /* Canada */
+.mediaInfoOfficialRating[rating='CA-18+'],                 /* Canada (and Quebec) */
+.mediaInfoOfficialRating[rating='R18+'],                   /* Australia */
+.mediaInfoOfficialRating[rating='AU-R18+'],                /* Australia */
+.mediaInfoOfficialRating[rating='FSK-18'],                  /* Germany */
+.mediaInfoOfficialRating[rating='DE-18'],                  /* Germany */
+.mediaInfoOfficialRating[rating='FR-18'],                  /* France */
+.mediaInfoOfficialRating[rating='FR--18'],                 /* France */
+.mediaInfoOfficialRating[rating='JP-R18+'],                /* Japan */
+.mediaInfoOfficialRating[rating='KR-18'],                  /* South Korea */
+.mediaInfoOfficialRating[rating='KR-R'],                   /* South Korea */
+.mediaInfoOfficialRating[rating='IN-A'],                   /* India */
+.mediaInfoOfficialRating[rating='BR-18'],                  /* Brazil */
+.mediaInfoOfficialRating[rating='NL-16'],                  /* Netherlands */
+.mediaInfoOfficialRating[rating='IT-VM18'],                /* Italy */
+.mediaInfoOfficialRating[rating='ES-18'],                  /* Spain */
+.mediaInfoOfficialRating[rating='RU-18+'],                 /* Russia */
+.mediaInfoOfficialRating[rating='CN-R'],                   /* China */
+.mediaInfoOfficialRating[rating='MX-C'],                   /* Mexico */
+.mediaInfoOfficialRating[rating='AR-18'],                  /* Argentina */
+.mediaInfoOfficialRating[rating='NO-15'],                  /* Norway */
+.mediaInfoOfficialRating[rating='DK-15'],                  /* Denmark */
+.mediaInfoOfficialRating[rating='FI-K-18'],                /* Finland */
+.mediaInfoOfficialRating[rating='BE-16'],                  /* Belgium */
+.mediaInfoOfficialRating[rating='CH-16'],                  /* Switzerland */
+.mediaInfoOfficialRating[rating='AT-16'],                  /* Austria */
+.mediaInfoOfficialRating[rating='PL-18'],                  /* Poland */
+.mediaInfoOfficialRating[rating='CZ-18'],                  /* Czech Republic */
+.mediaInfoOfficialRating[rating='HU-18'],                  /* Hungary */
+.mediaInfoOfficialRating[rating='PT-M/18'],                /* Portugal */
+.mediaInfoOfficialRating[rating='GR-K-17'],                /* Greece */
+.mediaInfoOfficialRating[rating='TR-18'],                  /* Turkey */
+.mediaInfoOfficialRating[rating='IL-18'],                  /* Israel */
+.mediaInfoOfficialRating[rating='ZA-16'],                  /* South Africa */
+.mediaInfoOfficialRating[rating='SG-M18'],                 /* Singapore */
+.mediaInfoOfficialRating[rating='MY-18'],                  /* Malaysia */
+.mediaInfoOfficialRating[rating='TH-18'],                  /* Thailand */
+.mediaInfoOfficialRating[rating='PH-R-18'],                /* Philippines */
+.mediaInfoOfficialRating[rating='ID-21+'],                 /* Indonesia */
+.mediaInfoOfficialRating[rating='VN-T18'],                 /* Vietnam */
+.mediaInfoOfficialRating[rating='NZ-R15'],                 /* New Zealand */
+.mediaInfoOfficialRating[rating='NZ-R16'] {                /* New Zealand */
+    background-color: #800000 !important; /* Dark Red */
+    border-color: #cc2222 !important;
+}
+
+
+/* === PINK: Adults Only  === */
+.mediaInfoOfficialRating[rating='NC-17'],                  /* US */
+.mediaInfoOfficialRating[rating='R18'],                    /* UK */
+.mediaInfoOfficialRating[rating='UK-R18'],                 /* UK */
+.mediaInfoOfficialRating[rating='GB-R18'],                 /* UK */
+.mediaInfoOfficialRating[rating='X18+'],                   /* Australia */
+.mediaInfoOfficialRating[rating='AU-X18+'],                /* Australia */
+.mediaInfoOfficialRating[rating='MX-D'],                   /* Mexico */
+.mediaInfoOfficialRating[rating='NO-18'],                  /* Norway */
+.mediaInfoOfficialRating[rating='CH-18'],                  /* Switzerland */
+.mediaInfoOfficialRating[rating='ZA-18'],                  /* South Africa */
+.mediaInfoOfficialRating[rating='SG-R21'],                 /* Singapore */
+.mediaInfoOfficialRating[rating='TH-20'],                  /* Thailand */
+.mediaInfoOfficialRating[rating='NZ-R18'],                 /* New Zealand */
+.mediaInfoOfficialRating[rating='X'] {                     /* US (Legacy) */
+    background-color: #880E4F !important; /* Very Dark Pink */
+    border-color: #C2185B !important;
+}
+
+
+/* === PURPLE: Special Categories === */
+
+.mediaInfoOfficialRating[rating='IN-S'] {                  /* India */
+    background-color: #6A1B9A !important; /* Purple */
+    border-color: #8953aa !important;
+}
+
+
+/* === BLUE: Special / Educational / Exempt === */
+.mediaInfoOfficialRating[rating='EXEMPT'],
+.mediaInfoOfficialRating[rating='EDUCATIONAL'],
+.mediaInfoOfficialRating[rating='INFORMATIONAL'] {
+    background-color: #1565C0 !important; /* Darker Blue */
+    border-color: #2196F3 !important;
+}
+
+
+/* === GREY: Unrated / Unknown === */
+.mediaInfoOfficialRating[rating='UNRATED'],
+.mediaInfoOfficialRating[rating='NOT RATED'],
+.mediaInfoOfficialRating[rating='NR'],
+.mediaInfoOfficialRating[rating='UR'],
+.mediaInfoOfficialRating[rating='NONE'] {
+    background-color: #616161 !important; /* Grey */
+    border-color: #9E9E9E !important;
+}
+
+
+/*
+ * ===================================================================
+ * Accessibility Improvements
+ * ===================================================================
+*/
+@media (prefers-reduced-motion: reduce) {
+    .mediaInfoOfficialRating {
+        transition: none !important;
+    }
+
+    .mediaInfoOfficialRating:hover {
+        transform: none !important;
+    }
+}
+
+@media (prefers-high-contrast: high) {
+    .mediaInfoOfficialRating {
+        border-width: 2px !important;
+        text-shadow: none !important;
+    }
+}
+/* Replace Logo with focflix logo, this should be the last line in CSS */
 :root {
     --logo: url("https://github.com/foclabroc/toolbox/blob/main/jelly/logo.png?raw=true");
 }
@@ -18,3 +2963,4 @@
 #loginPage .manualLoginForm:not(.hide) h1.sectionTitle::before {
   background-size: 100% !important;
 }
+/* Replace Logo with focflix logo, this should be the last line in CSS */
