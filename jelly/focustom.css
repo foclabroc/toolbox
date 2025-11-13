@@ -1,0 +1,196 @@
+@import url("https://cdn.jsdelivr.net/gh/n00bcodr/jellyfish@main/theme.css");
+@import url("https://cdn.jsdelivr.net/gh/n00bcodr/jellyfish@main/progress_bar.css");
+@import url("https://cdn.jsdelivr.net/gh/n00bcodr/jellyfish/10.11_fixes.css");
+@import url("https://cdn.jsdelivr.net/gh/n00bcodr/Jellyfish/ratings.css");
+@import url("https://cdn.jsdelivr.net/gh/n00bcodr/Jellyfish/slideshow.css");
+
+
+/* === Media Bar : bouton ▶ LIRE (fond accent + texte noir) === */
+button.detailButton.btnPlay.play-button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.45rem !important;
+    padding-left: 1em !important;
+    padding-right: 1em !important;
+    background: var(--primary-accent-color) !important; /* fond dans la couleur du thème */
+    color: #000 !important;                             /* texte et icône noirs */
+    border: none !important;
+    border-radius: var(--rounded-cards, 10px) !important; /* arrondi cohérent avec ton thème */
+    transition: transform 0.15s ease, filter 0.15s ease;
+}
+/* Masquer le texte original "Play" */
+button.detailButton.btnPlay.play-button .play-text {
+    display: none !important;
+}
+/* Ajouter le texte "LIRE" après l’icône */
+button.detailButton.btnPlay.play-button::after {
+    content: "LIRE" !important;
+    font-weight: 700 !important;
+    text-transform: none;
+    display: inline-block;
+    line-height: 1 !important;
+    pointer-events: none;
+    color: #000 !important; /* texte noir */
+}
+/* Effet au survol — léger agrandissement et ombrage */
+button.detailButton.btnPlay.play-button:hover {
+    filter: brightness(1.1);
+    transform: scale(1.03);
+    cursor: pointer;
+}
+/* === Media Bar : bouton ▶ LIRE (fond accent + texte noir) === */
+
+
+/* Remplace le texte "Play" par "▶ LIRE" sur les boutons de lecture */
+.layout-desktop .mainDetailButtons .btnPlay::after,
+.layout-mobile .mainDetailButtons .btnPlay::after,
+.layout-tv .mainDetailButtons .btnPlay::after {
+    content: "▶ LIRE" !important;
+    font-weight: 700 !important; /* gras plus marqué */
+    text-transform: none;
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+    font-size: 1em;
+    line-height: 1.4em;
+}
+/* Masque le texte original "Play" */
+.layout-desktop .mainDetailButtons .btnPlay span,
+.layout-mobile .mainDetailButtons .btnPlay span,
+.layout-tv .mainDetailButtons .btnPlay span {
+    display: none !important;
+}
+/* Centrage et espacement équilibré du bouton */
+.layout-desktop .mainDetailButtons .btnPlay,
+.layout-mobile .mainDetailButtons .btnPlay,
+.layout-tv .mainDetailButtons .btnPlay {
+    padding-left: 1em !important;
+    padding-right: 1em !important;
+}
+/* Remplace le texte "Play" par "▶ LIRE" sur les boutons de lecture */
+
+
+/* Replace Logo with focflix logo, this should be the last line in CSS */
+:root {
+    --logo: url("https://github.com/foclabroc/toolbox/blob/main/jelly/logo.png?raw=true");
+}
+.pageTitleWithDefaultLogo {
+    background-size: 100% !important;
+}
+.layout-mobile .pageTitleWithDefaultLogo {
+    width: 130px !important;
+}
+#loginPage .visualLoginForm:not(.hide) h1::before {
+  background-size: 50% !important;
+}
+#loginPage .manualLoginForm:not(.hide) h1.sectionTitle::before {
+  background-size: 100% !important;
+}
+/* Replace Logo with focflix logo, this should be the last line in CSS */
+
+
+/* Texte personnalisé ecran de connexion */
+#loginPage .checkboxLabel::after {
+  content: "Mémoriser mot de passe ! 📝";
+  font-size: 15px !important;
+  font-family: inherit;
+  color: #fff;
+}
+/* Style des champs de saisie du formulaire de connexion manuelle */
+#loginPage .emby-input {
+  color: var(--primary-accent-color);
+  transition: all 0.3s ease-in-out;
+  border-radius: 5px;
+  padding: 12px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+}
+/* Effet au survol pour la case "Se souvenir de moi" */
+#loginPage .checkboxContainer:hover {
+  color: var(--primary-accent-color) !important;
+}
+/* Texte et style personnalisés pour le bouton "Se connecter" */
+#loginPage button.emby-button[type="submit"] span::after {
+  content: "🎬🎬 Valider votre ticket de cinema 🍿🍿" !important;
+  font-size: 17px !important;
+  font-family: inherit;
+}
+#loginPage button.emby-button[type="submit"] {
+  background-color: #28a745a8 !important;
+  color: var(--text-color) !important;
+}
+#loginPage button.emby-button[type="submit"]:hover {
+  background-color: #28a745 !important;
+  color: white !important;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  transform: scale(1.05);
+}
+/* Texte et style personnalisés pour le bouton "Annuler" */
+#loginPage button.emby-button[type="button"].btnCancel span::after {
+  content: "Annuler la mission ! ☠️" !important;
+  font-size: 16px !important;
+  font-family: inherit;
+}
+#loginPage button.emby-button[type="button"].btnCancel {
+  background-color: #dc3545a8 !important;
+  color: var(--text-color) !important;
+}
+#loginPage button.emby-button[type="button"].btnCancel:hover {
+  background-color: #dc3545 !important;
+  color: white !important;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  transform: scale(1.05);
+}
+/* Texte et style personnalisés pour le bouton "Connexion rapide" */
+#loginPage button.emby-button[type="button"].btnQuick span::after {
+  content: "🔗 Connexion rapide 🔗" !important;
+  font-size: 17px !important;
+  font-family: inherit;
+  color: var(--text-color) !important;
+}
+#loginPage button.emby-button[type="button"].btnQuick {
+  background-color: var(--primary-accent-color) !important;
+}
+#loginPage button.emby-button[type="button"].btnQuick:hover {
+  background-color: var(--secondary-accent-color) !important;
+  color: white !important;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  transform: scale(1.05);
+}
+/* Texte personnalisé ecran de connexion */
+
+
+/* Texte personnalisé message de connexion */
+@keyframes neonFlash {
+  0%, 100% {
+    color: #00eaff; /* Bleu clair lumineux */
+    text-shadow:
+      0 0 1px #00eaff,
+      0 0 2px #00d0ff,
+      0 0 4px #00bfff;
+  }
+  50% {
+    color: #ff004c; /* Rouge vif */
+    text-shadow:
+      0 0 1px #ff004c,
+      0 0 2px #ff1a6b,
+      0 0 4px #ff3366;
+  }
+}
+#loginPage::after {
+  content: "🍿 Bienvenue Chez Foclabroc 🍿";
+  font-size: 30px !important;
+  font-family: 'Quicksand', sans-serif !important;
+  font-weight: 900;
+  text-align: center !important;
+  position: absolute !important;
+  bottom: 72px !important; /* ↓ légèrement plus bas */
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  letter-spacing: 1.5px;
+  animation: neonFlash 1.5s infinite ease-in-out;
+  z-index: 10 !important;
+  filter: brightness(1.8) contrast(1.4) saturate(1.8);
+}
+/* Texte personnalisé message de connexion */
