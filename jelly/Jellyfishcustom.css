@@ -172,41 +172,6 @@ button.btnPlay.detailButton.emby-button:hover {
 /* Texte personnalisé ecran de connexion */
 
 
-/* Texte personnalisé message de connexion */
-@keyframes neonFlash {
-  0%, 100% {
-    color: #00eaff; /* Bleu clair lumineux */
-    text-shadow:
-      0 0 1px #00eaff,
-      0 0 2px #00d0ff,
-      0 0 4px #00bfff;
-  }
-  50% {
-    color: #ff004c; /* Rouge vif */
-    text-shadow:
-      0 0 1px #ff004c,
-      0 0 2px #ff1a6b,
-      0 0 4px #ff3366;
-  }
-}
-#loginPage::after {
-  content: "🍿 Bienvenue Chez Foclabroc 🍿";
-  font-size: 30px !important;
-  font-family: 'Quicksand', sans-serif !important;
-  font-weight: 900;
-  text-align: center !important;
-  position: absolute !important;
-  bottom: 72px !important; /* ↓ légèrement plus bas */
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  letter-spacing: 1.5px;
-  animation: neonFlash 1.5s infinite ease-in-out;
-  z-index: 10 !important;
-  filter: brightness(1.8) contrast(1.4) saturate(1.8);
-}
-/* Texte personnalisé message de connexion */
-
-
 /* Masque complètement le bouton "Watchlist" */
 .watchlist-button,
 .cardOverlayButton .watchlist,
