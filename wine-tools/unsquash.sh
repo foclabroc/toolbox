@@ -2,7 +2,10 @@
 
 #Recherche de fichiers compressé (.wtgz et .wsquashfs) dans /userdata/roms/windows
 compressed_files=()
-for file in /userdata/roms/windows/*.wtgz /userdata/roms/windows/*.wsquashfs; do
+for file in /userdata/roms/windows/*.wtgz \
+            /userdata/roms/windows/*.WTGZ \
+            /userdata/roms/windows/*.wsquashfs \
+            /userdata/roms/windows/*.WSQUASHFS; do
   [ -f "$file" ] || continue
   compressed_files+=( "$file" "" )
 done
@@ -28,12 +31,14 @@ fi
 
 # Determiner l'extension du fichier
 extension="${selected_file##*.}"
+extension=$(echo "$extension" | tr '[:upper:]' '[:lower:]')
 
 #Decompression du fichier
 case "$extension" in
   wtgz)
     dialog --backtitle "Foclabroc Toolbox" --infobox "\nDécompression du fichier TGZ (wtgz)... Veuillez patienter." 6 50 2>&1 >/dev/tty
     base_name=$(basename "$selected_file" .wtgz)
+    base_name=$(basename "$base_name" .WTGZ)
     final_dir="/userdata/roms/windows/${base_name}.wine"
     rm -rf "$final_dir"
     mkdir -p "$final_dir"
@@ -48,6 +53,7 @@ case "$extension" in
   wsquashfs)
     dialog --backtitle "Foclabroc Toolbox" --infobox "\nDécompression du fichier SquashFS (wsquashfs)... Veuillez patienter." 6 50 2>&1 >/dev/tty
     base_name=$(basename "$selected_file" .wsquashfs)
+    base_name=$(basename "$base_name" .WSQUASHFS)
     final_dir="/userdata/roms/windows/${base_name}.wine"
     rm -rf "$final_dir"
     unsquashfs -d "$final_dir" "$selected_file" 2>&1 >/dev/tty
