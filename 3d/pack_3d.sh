@@ -4,7 +4,7 @@
 URL_40="https://github.com/foclabroc/toolbox/releases/download/Fichiers/3d.zip"
 URL_41="https://github.com/foclabroc/toolbox/releases/download/Fichiers/3d-41.zip"
 URL_42="https://github.com/foclabroc/toolbox/releases/download/Fichiers/3d-42.zip"
-
+URL_43="https://github.com/foclabroc/toolbox/releases/download/Fichiers/3d-43.zip"
 clear
 
 # Détecter la version de Batocera
@@ -17,8 +17,10 @@ if [ "$VERSION" -le 40 ]; then
     ARCHIVE_URL="$URL_40"
 elif [ "$VERSION" -eq 41 ]; then
     ARCHIVE_URL="$URL_41"
-elif [ "$VERSION" -ge 42 ]; then
+elif [ "$VERSION" -eq 42 ]; then
     ARCHIVE_URL="$URL_42"
+elif [ "$VERSION" -ge 43 ]; then
+    ARCHIVE_URL="$URL_43"
 else
     echo "Version non prise en charge."
     exit 1
@@ -52,7 +54,7 @@ if [ "$FREE_SPACE_MB" -lt "$REQUIRED_SPACE_MB" ]; then
 fi
 
 #Lancement telechargement
-echo "Téléchargement de l'archive..."
+echo "Téléchargement de l'archive pour version : $VERSION ..."
 wget -q --show-progress -O "$DESTINATION$ARCHIVE_NAME" "$ARCHIVE_URL"
 
 if [ $? -ne 0 ]; then
