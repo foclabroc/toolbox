@@ -9,6 +9,7 @@ declare -A poids_versions=(
     [39]=3160
     [40]=3340
     [41]=3400
+    [42]=3900
 )
 
 # Message initial
@@ -32,6 +33,7 @@ selectionner_version() {
     39 "->Version 39 (3.16 Go)" \
     40 "->Version 40 (3.34 Go)" \
     41 "->Version 41 (3.40 Go)" \
+    42 "->Version 42 (3.90 Go)" \
     2>&1 >/dev/tty)
 
   if [ $? -ne 0 ] || [ -z "$choix" ]; then
