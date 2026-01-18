@@ -441,6 +441,57 @@ install_new_pack() {
 	cp -r "$ROOT_DIR"/* /userdata/
 	shopt -u dotglob nullglob
 
+    gamelist_file="/userdata/roms/ports/gamelist.xml"
+
+    # Ensure the gamelist.xml exists
+    if [ ! -f "$gamelist_file" ]; then
+        echo '<?xml version="1.0" encoding="UTF-8"?><gameList></gameList>' > "$gamelist_file"
+    fi
+
+    # Installation de xmlstarlet si absent.
+    XMLSTARLET_DIR="/userdata/system/switch/extra"
+    XMLSTARLET_BIN="$XMLSTARLET_DIR/xmlstarlet"
+    XMLSTARLET_SYMLINK="/usr/bin/xmlstarlet"
+
+    if [ -f "$XMLSTARLET_BIN" ]; then
+        chmod +x "$XMLSTARLET_BIN"
+        ln -sf "$XMLSTARLET_BIN" "$XMLSTARLET_SYMLINK"
+    fi
+
+    # Ajouter Ryujinx Config
+    xmlstarlet ed -L \
+        -s "/gameList" -t elem -n "game" -v "" \
+        -s "/gameList/game[last()]" -t elem -n "path" -v "./ryujinx_config.sh" \
+        -s "/gameList/game[last()]" -t elem -n "name" -v "Ryujinx Config App" \
+        -s "/gameList/game[last()]" -t elem -n "desc" -v "Lancement de RYUJINX en mode application pour configuration manuelle." \
+        -s "/gameList/game[last()]" -t elem -n "developer" -v "Foclabroc DreamerCG Spirit" \
+        -s "/gameList/game[last()]" -t elem -n "publisher" -v "Foclabroc DreamerCG Spirit" \
+        -s "/gameList/game[last()]" -t elem -n "genre" -v "Switch" \
+        -s "/gameList/game[last()]" -t elem -n "rating" -v "1.00" \
+        -s "/gameList/game[last()]" -t elem -n "region" -v "eu" \
+        -s "/gameList/game[last()]" -t elem -n "lang" -v "fr" \
+        -s "/gameList/game[last()]" -t elem -n "image" -v "./images/ryujinx_config_screen.png" \
+        -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/ryujinx_config_logo.png" \
+        -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/ryujinx_config.png" \
+        "$gamelist_file"
+
+    # Ajouter Eden/Citron Config
+    xmlstarlet ed -L \
+        -s "/gameList" -t elem -n "game" -v "" \
+        -s "/gameList/game[last()]" -t elem -n "path" -v "./yuzu_config.sh" \
+        -s "/gameList/game[last()]" -t elem -n "name" -v "Eden Citron Config App" \
+        -s "/gameList/game[last()]" -t elem -n "desc" -v "Lancement de EDEN en mode application pour configuration manuelle Unifié de Citron et Eden." \
+        -s "/gameList/game[last()]" -t elem -n "developer" -v "Foclabroc DreamerCG Spirit" \
+        -s "/gameList/game[last()]" -t elem -n "publisher" -v "Foclabroc DreamerCG Spirit" \
+        -s "/gameList/game[last()]" -t elem -n "genre" -v "Switch" \
+        -s "/gameList/game[last()]" -t elem -n "rating" -v "1.00" \
+        -s "/gameList/game[last()]" -t elem -n "region" -v "eu" \
+        -s "/gameList/game[last()]" -t elem -n "lang" -v "fr" \
+        -s "/gameList/game[last()]" -t elem -n "image" -v "./images/yuzu_config_screen.png" \
+        -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/yuzu_config_logo.png" \
+        -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/yuzu_config.png" \
+        "$gamelist_file"
+
     mark_step_done "install"
 }
 
