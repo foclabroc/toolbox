@@ -100,7 +100,7 @@ case "$LANGUE:$1" in
 1:Estimated) echo "Estimated time remaining";;
 2:Estimated) echo "Temps restant estimé";;
 
-1:archive_created) echo "Archive created successfully";;
+1:archive_created) echo "Archive successfully created";;
 2:archive_created) echo "Archive cree avec succes";;
 
 1:size) echo "Size";;
@@ -118,14 +118,20 @@ case "$LANGUE:$1" in
 1:backupask) echo "Create a ZIP archive of your Switch saves and mods";;
 2:backupask) echo "Creer une archive ZIP de vos sauvegardes et mods Switch";;
 
-1:zip) echo "Ziping in progress";;
-2:zip) echo "Compression en cours";;
+1:backupask2) echo "ZIP archive of your Switch saves and mods";;
+2:backupask2) echo "ZIP de vos sauvegardes et mods Switch";;
+
+1:zip) echo "\nCompression in progress";;
+2:zip) echo "\nCompression en cours";;
 
 1:file) echo "Files";;
 2:file) echo "Fichiers";;
 
-1:zipF) echo "Ziping Done";;
+1:zipF) echo "Compression Done";;
 2:zipF) echo "Compression Termine";;
+
+1:finalizing) echo "\nFinalizing...\n\n[may take some time if you have large Mods like (CTGP-DX...)]";;
+2:finalizing) echo "\nFinalisation...\n\n[peut prendre du temps si vous avez de gros Mods comme (CTGP-DX...)]";;
 
 1:finished_full) cat <<EOF
 Switch installation completed
@@ -518,7 +524,7 @@ install_new_pack() {
         -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/yuzu_config_logo.png" \
         -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/yuzu_config.png" \
         "$gamelist_file"
-
+    rm -rf "/userdata/README.md"
     mark_step_done "install"
 }
 
@@ -571,29 +577,38 @@ zip_with_gauge() {
     ZIP_FILE="$2"
 
     BASE_DIR="/userdata"
-
     cd "$BASE_DIR" || exit 1
 
-    TOTAL=$(find "saves/switch" | wc -l)
+    TOTAL=$(find "saves/switch" -type f | wc -l)
     [ "$TOTAL" -eq 0 ] && TOTAL=1
 
     COUNT=0
+    FINALIZING="no"
 
     (
-        find "saves/switch" | while read -r entry; do
-            ((COUNT++))
-            PERCENT=$(( COUNT * 100 / TOTAL ))
-
-            echo "$PERCENT"
-            echo "XXX"
-            echo "────────────────────────────────────────"
-            echo "$(TXT zip)..."
-            echo ""
-            echo "$(TXT file) : $COUNT / $TOTAL"
-            echo "XXX"
-
-            echo "$entry"
-        done | zip -r "$ZIP_FILE" -@ >/dev/null
+        zip -r -0 -v "$ZIP_FILE" "saves/switch" 2>/dev/null | while read -r line; do
+            if [[ "$line" == adding:* ]]; then
+                ((COUNT++))
+                PERCENT=$(( COUNT * 100 / TOTAL ))
+                if [[ "$PERCENT" -ge 99 ]]; then
+                    PERCENT=99
+                    FINALIZING="yes"
+                fi
+                echo "$PERCENT"
+                echo "XXX"
+                echo "────────────────────────────────────────"
+                if [[ "$FINALIZING" == "yes" ]]; then
+                    echo "$(TXT finalizing)"
+                else
+                    echo "$(TXT zip)"
+                fi
+                echo ""
+                echo ""
+                echo "$PERCENT %"
+                echo "XXX"
+            fi
+        done
+        sync
 
         echo "100"
         echo "XXX"
@@ -601,21 +616,20 @@ zip_with_gauge() {
         echo "XXX"
 
     ) | dialog --backtitle "$BACKTITLE" \
-               --title "$(TXT backupT)" \
-               --gauge "$(TXT zip)..." 10 60 0
+               --title "$(TXT backupask2)" \
+               --gauge "$(TXT zip)" 14 60 0
 
-    # --- Affichage du résultat final ---
+
     if [[ -f "$ZIP_FILE" ]]; then
-        SIZE_BYTES=$(stat -c%s "$ZIP_FILE")
-        SIZE_MB=$(( SIZE_BYTES / 1024 / 1024 ))
+        SIZE_MB=$(( $(stat -c%s "$ZIP_FILE") / 1024 / 1024 ))
 
         dialog --backtitle "$BACKTITLE" \
-               --title "Backup terminé" \
+               --title "$(TXT zipF)" \
                --ok-label "$(TXT ok)" \
-               --msgbox "\n$(TXT archive_created) \n\n $(TXT size) : ${SIZE_MB} Mo\n\n $(TXT location) : $ZIP_FILE" 11 85
+               --msgbox "\n$(TXT archive_created)\n\n$(TXT size) : ${SIZE_MB} MB\n\n$(TXT location) : $ZIP_FILE" 12 80
     else
         dialog --backtitle "$BACKTITLE" \
-               --msgbox "\nErreur : $(TXT ziperror)." 6 40
+               --msgbox "\n$(TXT ziperror)" 6 40
     fi
 }
 
@@ -631,7 +645,6 @@ cleanup_temp_files() {
         zip_with_gauge "$SWITCH_SAVES" "$ZIP_FILE"
     fi
 
-    # --- Nettoyage forcé du dossier TMP après le gauge ---
     rm -rf "$TMP_BASE" 2>/dev/null
     sync
 
@@ -831,10 +844,8 @@ sleep 2
 
 update_steps "cleanup"
 ask_zip_backup
-sleep 2
 
 update_steps
-sleep 2
 
 post_install_prompt
 
