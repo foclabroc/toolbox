@@ -387,6 +387,11 @@ remove_old_installations() {
         /userdata/system/.cache/citron
         /userdata/system/.cache/eden
         /userdata/system/.cache/sudachi
+        /userdata/system/.cache/Ryujinx
+        /userdata/system/.cache/radv_builtin_shaders
+        /userdata/system/.cache/mesa_shader_cache
+        /userdata/system/cache/radv_builtin_shaders
+        /userdata/system/cache/mesa_shader_cache
         /userdata/system/.config/Ryujinx
         /userdata/system/.config/yuzu
         /userdata/system/.config/yuzu-early-access
