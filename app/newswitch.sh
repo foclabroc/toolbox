@@ -100,6 +100,33 @@ case "$LANGUE:$1" in
 1:Estimated) echo "Estimated time remaining";;
 2:Estimated) echo "Temps restant estimé";;
 
+1:archive_created) echo "Archive created successfully";;
+2:archive_created) echo "Archive cree avec succes";;
+
+1:size) echo "Size";;
+2:size) echo "Taille";;
+
+1:ziperror) echo "ZIP was not created";;
+2:ziperror) echo "Le ZIP n'a pas ete cree";;
+
+1:location) echo "Location";;
+2:location) echo "Emplacement";;
+
+1:backupT) echo "Backup usersave";;
+2:backupT) echo "Sauvegarde usersave";;
+
+1:backupask) echo "Create a ZIP archive of your Switch saves and mods";;
+2:backupask) echo "Creer une archive ZIP de vos sauvegardes et mods Switch";;
+
+1:zip) echo "Ziping in progress";;
+2:zip) echo "Compression en cours";;
+
+1:file) echo "Files";;
+2:file) echo "Fichiers";;
+
+1:zipF) echo "Ziping Done";;
+2:zipF) echo "Compression Termine";;
+
 1:finished_full) cat <<EOF
 Switch installation completed
 
@@ -497,7 +524,7 @@ install_new_pack() {
 
 restore_switch_data() {
 
-    copy_content() {
+    move_content() {
         SRC="$1"
         DEST="$2"
 
@@ -505,21 +532,93 @@ restore_switch_data() {
             mkdir -p "$DEST"
 
             shopt -s dotglob nullglob
-            cp -a "$SRC"/* "$DEST"/ 2>/dev/null
+            mv "$SRC"/* "$DEST"/ 2>/dev/null
             shopt -u dotglob nullglob
         fi
     }
 
-    copy_content "/userdata/tmp/tmp_yuzu_mods" "/userdata/saves/switch/eden_citron/mods"
-    copy_content "/userdata/tmp/tmp_yuzu_save_user" "/userdata/saves/switch/eden_citron/save/save_user"
-    copy_content "/userdata/tmp/tmp_yuzu_save_system" "/userdata/saves/switch/eden_citron/save/save_system"
+    move_content "/userdata/tmp/tmp_yuzu_mods" "/userdata/saves/switch/eden_citron/mods"
+    move_content "/userdata/tmp/tmp_yuzu_save_user" "/userdata/saves/switch/eden_citron/save/save_user"
+    move_content "/userdata/tmp/tmp_yuzu_save_system" "/userdata/saves/switch/eden_citron/save/save_system"
 
-    copy_content "/userdata/tmp/tmp_ryujinx_save_user" "/userdata/saves/switch/ryujinx/save/save_user"
-    copy_content "/userdata/tmp/tmp_ryujinx_save_system" "/userdata/saves/switch/ryujinx/save/save_system"
-    copy_content "/userdata/tmp/tmp_ryujinx_mods" "/userdata/saves/switch/ryujinx/mods"
+    move_content "/userdata/tmp/tmp_ryujinx_save_user" "/userdata/saves/switch/ryujinx/save/save_user"
+    move_content "/userdata/tmp/tmp_ryujinx_save_system" "/userdata/saves/switch/ryujinx/save/save_system"
+    move_content "/userdata/tmp/tmp_ryujinx_mods" "/userdata/saves/switch/ryujinx/mods"
 
     mark_step_done "restore"
 }
+
+ask_zip_backup() {
+
+    DO_ZIP="no"
+
+    dialog --backtitle "$BACKTITLE" \
+           --title "$(TXT backupT)" \
+           --yes-label "$(TXT yes)" \
+           --no-label "$(TXT no)" \
+           --yesno "\n$(TXT backupask) ?" 8 63 2>&1 >/dev/tty
+
+    if [[ $? -eq 0 ]]; then
+        DO_ZIP="yes"
+    fi
+
+    cleanup_temp_files
+}
+
+zip_with_gauge() {
+
+    SRC_DIR="$1"
+    ZIP_FILE="$2"
+
+    BASE_DIR="/userdata"
+
+    cd "$BASE_DIR" || exit 1
+
+    TOTAL=$(find "saves/switch" | wc -l)
+    [ "$TOTAL" -eq 0 ] && TOTAL=1
+
+    COUNT=0
+
+    (
+        find "saves/switch" | while read -r entry; do
+            ((COUNT++))
+            PERCENT=$(( COUNT * 100 / TOTAL ))
+
+            echo "$PERCENT"
+            echo "XXX"
+            echo "────────────────────────────────────────"
+            echo "$(TXT zip)..."
+            echo ""
+            echo "$(TXT file) : $COUNT / $TOTAL"
+            echo "XXX"
+
+            echo "$entry"
+        done | zip -r "$ZIP_FILE" -@ >/dev/null
+
+        echo "100"
+        echo "XXX"
+        echo "$(TXT zipF)"
+        echo "XXX"
+
+    ) | dialog --backtitle "$BACKTITLE" \
+               --title "$(TXT backupT)" \
+               --gauge "$(TXT zip)..." 10 60 0
+
+    # --- Affichage du résultat final ---
+    if [[ -f "$ZIP_FILE" ]]; then
+        SIZE_BYTES=$(stat -c%s "$ZIP_FILE")
+        SIZE_MB=$(( SIZE_BYTES / 1024 / 1024 ))
+
+        dialog --backtitle "$BACKTITLE" \
+               --title "Backup terminé" \
+               --ok-label "$(TXT ok)" \
+               --msgbox "\n$(TXT archive_created) \n\n $(TXT size) : ${SIZE_MB} Mo\n\n $(TXT location) : $ZIP_FILE" 11 85
+    else
+        dialog --backtitle "$BACKTITLE" \
+               --msgbox "\nErreur : $(TXT ziperror)." 6 40
+    fi
+}
+
 
 cleanup_temp_files() {
 
@@ -528,16 +627,13 @@ cleanup_temp_files() {
     DATE_TAG=$(date +"%Y-%m-%d_%H-%M-%S")
     ZIP_FILE="/userdata/Backup_Switch_save_mods_${DATE_TAG}.zip"
 
-    # Supprimer complètement le dossier tmp
-    rm -rf "$TMP_BASE" 2>/dev/null
-
-    # Vérifier que les saves existent
-    if [[ -d "$SWITCH_SAVES" ]]; then
-        (
-            cd /userdata || exit 1
-            zip -r "$ZIP_FILE" "saves/switch" >/dev/null
-        )
+    if [[ "$DO_ZIP" == "yes" && -d "$SWITCH_SAVES" ]]; then
+        zip_with_gauge "$SWITCH_SAVES" "$ZIP_FILE"
     fi
+
+    # --- Nettoyage forcé du dossier TMP après le gauge ---
+    rm -rf "$TMP_BASE" 2>/dev/null
+    sync
 
     mark_step_done "cleanup"
 }
@@ -734,7 +830,7 @@ restore_switch_data
 sleep 2
 
 update_steps "cleanup"
-cleanup_temp_files
+ask_zip_backup
 sleep 2
 
 update_steps
@@ -750,5 +846,9 @@ dialog --backtitle "$BACKTITLE" \
            --msgbox "$(cat)" 36 86
 
 curl http://127.0.0.1:1234/reloadgames
+clear
+reset
 exit 0
+
+
 
