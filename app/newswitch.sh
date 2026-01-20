@@ -130,6 +130,9 @@ case "$LANGUE:$1" in
 1:zipF) echo "Compression Done";;
 2:zipF) echo "Compression Termine";;
 
+1:download_finished) echo "Download complete";;
+2:download_finished) echo "Telechargement termine";;
+
 1:finalizing) echo "\nFinalizing...\n\n[may take some time if you have large Mods like (CTGP-DX...)]";;
 2:finalizing) echo "\nFinalisation...\n\n[peut prendre du temps si vous avez de gros Mods comme (CTGP-DX...)]";;
 
@@ -439,7 +442,16 @@ remove_old_installations() {
     if [[ -f "$CUSTOM" ]]; then
         sed -i '\|/userdata/system/switch/extra/batocera-switch-startup|d' "$CUSTOM"
     fi
-	
+
+	# Nettoyage du batocera.conf (Switch)
+	BATOCERA_CONF="/userdata/system/batocera.conf"
+
+	if [[ -f "$BATOCERA_CONF" ]]; then
+		sed -i \
+			-e '/^switch/d' \
+			"$BATOCERA_CONF"
+	fi
+
     mark_step_done "remove"
 }
 
@@ -789,11 +801,11 @@ download_with_gauge() {
         sleep 0.5
     done
 
-    wait $PID_CURL
+    # wait $PID_CURL
 
     echo "100"
     echo "XXX"
-    echo "Téléchargement terminé ✔️"
+    echo "$(TXT download_finished)"
     echo "XXX"
 
     ) | dialog --backtitle "$BACKTITLE" \
