@@ -197,7 +197,7 @@ update_citron() {
         return
     fi
 
-    url="httpsb://git.citron-emu.org/Citron/Emulator/releases/download/$release/citron_stable-$commit-linux-x86_64.AppImage"
+    url="https://git.citron-emu.org/Citron/Emulator/releases/download/$release/citron_stable-$commit-linux-x86_64.AppImage"
     dest="$SWITCH_APPIMAGES/citron-emu.AppImage"
 
     if wget_step "$url" "$dest" "citron-emu" 25 && deploy_if_valid "$dest"; then
