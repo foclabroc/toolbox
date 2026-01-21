@@ -1,19 +1,5 @@
 #!/bin/bash
 
-BACKTITLE="Foclabroc Toolbox"
-
-# Choix de la langue au lancement
-LANGUE=$(dialog --backtitle "$BACKTITLE" \
-                --ok-label "Select" \
-                --cancel-label "Cancel" \
-                --menu "\nChoose your language / Choisissez votre langue :" 11 55 2 \
-                1 "English" \
-                2 "Français" \
-                3>&1 1>&2 2>&3)
-
-clear
-[ -z "$LANGUE" ] && exit 0
-
 ##############################################################
 # 🧠 Fonction de traduction
 ##############################################################
@@ -38,6 +24,12 @@ case "$LANGUE:$1" in
 
 1:step_remove) echo "Removing previous Switch installations";;
 2:step_remove) echo "Suppression des anciennes installations Switch";;
+
+1:full_install) echo "Full Switch installation";;
+2:full_install) echo "Installation complète Switch";;
+
+1:update_emu) echo "Emulator updates only";;
+2:update_emu) echo "Mise à jours des emulateurs uniquement";;
 
 1:step_install) echo "Downloading/Installing new Switch pack";;
 2:step_install) echo "Téléchargement/Installation du nouveau pack Switch";;
@@ -135,6 +127,15 @@ case "$LANGUE:$1" in
 
 1:finalizing) echo "\nFinalizing...\n\n[may take some time if you have large Mods like (CTGP-DX...)]";;
 2:finalizing) echo "\nFinalisation...\n\n[peut prendre du temps si vous avez de gros Mods comme (CTGP-DX...)]";;
+
+1:update_emu_title) echo "Emulator update";;
+2:update_emu_title) echo "Mise à jour des émulateurs";;
+
+1:update_emu_ask) echo "Do you want to update emulator AppImages now?";;
+2:update_emu_ask) echo "Voulez-vous mettre à jour les AppImages des émulateurs maintenant ?";;
+
+1:update_emu_running) echo "Updating emulator AppImages...";;
+2:update_emu_running) echo "Mise à jour des AppImages des émulateurs...";;
 
 1:finished_full) cat <<EOF
 Switch installation completed
@@ -260,6 +261,51 @@ EOF
 *) echo "$1";;
 esac
 }
+
+BACKTITLE="Foclabroc Toolbox"
+
+# Choix de la langue au lancement
+LANGUE=$(dialog --backtitle "$BACKTITLE" \
+                --title "$(TXT welcome)" \
+                --ok-label "Select" \
+                --cancel-label "Cancel" \
+                --menu "\nChoose your language / Choisissez votre langue :" 11 55 2 \
+                1 "English" \
+                2 "Français" \
+                3>&1 1>&2 2>&3)
+
+clear
+[ -z "$LANGUE" ] && exit 0
+
+##############################################################
+# 📦 Choix du mode
+##############################################################
+
+MODE=$(dialog --backtitle "$BACKTITLE" \
+              --title "$(TXT welcome)" \
+              --ok-label "$(TXT ok)" \
+              --cancel-label "$(TXT cancel)" \
+              --menu "\nChoisissez une action / Choose an action:" 11 60 2 \
+              1 "$(TXT update_emu)" \
+              2 "$(TXT full_install)" \
+              3>&1 1>&2 2>&3)
+
+clear
+[ -z "$MODE" ] && exit 0
+
+##############################################################
+# ▶️ Lancement selon le mode choisi
+##############################################################
+
+if [[ "$MODE" == "1" ]]; then
+    dialog --backtitle "$BACKTITLE" \
+           --infobox "\nUpdate AppImages..." 5 60
+    sleep 1
+
+    clear
+    curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/appimage_updater.sh | bash
+    exit 0
+fi
 
 ##############################################################
 # ⚠️ Avertissement au lancement
@@ -865,6 +911,26 @@ ask_zip_backup
 update_steps
 
 post_install_prompt
+
+
+##############################################################
+# 🔄 Proposition de mise à jour des émulateurs
+##############################################################
+
+dialog --backtitle "$BACKTITLE" \
+       --title "$(TXT update_emu_title)" \
+       --yes-label "$(TXT yes)" \
+       --no-label "$(TXT no)" \
+       --yesno "\n$(TXT update_emu_ask)" 8 70 2>&1 >/dev/tty
+
+if [[ $? -eq 0 ]]; then
+    dialog --backtitle "$BACKTITLE" \
+           --infobox "\n$(TXT update_emu_running)" 5 60
+    sleep 1
+
+    clear
+    curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/appimage_updater.sh | bash
+fi
 
 
 printf "%b" "\n$(TXT finished_full)" | \
