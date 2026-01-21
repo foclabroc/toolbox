@@ -571,12 +571,12 @@ install_new_pack() {
         -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/ryujinx_config.png" \
         "$gamelist_file"
 
-    # Ajouter Eden/Citron Config
+    # Ajouter Eden Config
     xmlstarlet ed -L \
         -s "/gameList" -t elem -n "game" -v "" \
         -s "/gameList/game[last()]" -t elem -n "path" -v "./yuzu_config.sh" \
-        -s "/gameList/game[last()]" -t elem -n "name" -v "Eden Citron Config App" \
-        -s "/gameList/game[last()]" -t elem -n "desc" -v "Lancement de EDEN en mode application pour configuration manuelle Unifié de Citron et Eden." \
+        -s "/gameList/game[last()]" -t elem -n "name" -v "Eden Config App" \
+        -s "/gameList/game[last()]" -t elem -n "desc" -v "Lancement de EDEN en mode application pour configuration manuelle de Eden." \
         -s "/gameList/game[last()]" -t elem -n "developer" -v "Foclabroc DreamerCG Spirit" \
         -s "/gameList/game[last()]" -t elem -n "publisher" -v "Foclabroc DreamerCG Spirit" \
         -s "/gameList/game[last()]" -t elem -n "genre" -v "Switch" \
@@ -586,6 +586,23 @@ install_new_pack() {
         -s "/gameList/game[last()]" -t elem -n "image" -v "./images/yuzu_config_screen.png" \
         -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/yuzu_config_logo.png" \
         -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/yuzu_config.png" \
+        "$gamelist_file"
+
+    # Ajouter Citron Config
+    xmlstarlet ed -L \
+        -s "/gameList" -t elem -n "game" -v "" \
+        -s "/gameList/game[last()]" -t elem -n "path" -v "./citron_config.sh" \
+        -s "/gameList/game[last()]" -t elem -n "name" -v "Citron Config App" \
+        -s "/gameList/game[last()]" -t elem -n "desc" -v "Lancement de CITRON en mode application pour configuration manuelle de Citron." \
+        -s "/gameList/game[last()]" -t elem -n "developer" -v "Foclabroc DreamerCG Spirit" \
+        -s "/gameList/game[last()]" -t elem -n "publisher" -v "Foclabroc DreamerCG Spirit" \
+        -s "/gameList/game[last()]" -t elem -n "genre" -v "Switch" \
+        -s "/gameList/game[last()]" -t elem -n "rating" -v "1.00" \
+        -s "/gameList/game[last()]" -t elem -n "region" -v "eu" \
+        -s "/gameList/game[last()]" -t elem -n "lang" -v "fr" \
+        -s "/gameList/game[last()]" -t elem -n "image" -v "./images/citron_config_screen.png" \
+        -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/citron_config_logo.png" \
+        -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/citron_config.png" \
         "$gamelist_file"
     rm -rf "/userdata/README.md"
     mark_step_done "install"
