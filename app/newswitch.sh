@@ -141,7 +141,7 @@ case "$LANGUE:$1" in
 Switch installation completed
 
 ✔️ Your saves / profiles / mods have been restored
-A backup has been created in :
+A backup has been created (If you selected "yes" to the request to create the zip file) in :
 /userdata/backup_save_mods_switch
 
 ✔️ If you have downloaded the appimages+firmware package mentioned earlier,
@@ -155,9 +155,10 @@ and switch firmware/keys in /userdata/bios/switch.
 ✔️ F1 application configuration has been removed
 (for better controller detection)
 You can find new configuration apps in :
-Ports → ryujinx_config
-Ports → yuzu_config (Eden / Citron / Eden-PGO)
-
+Ports → Ryujinx config App
+Ports → Eden config App
+Ports → Citron config App
+Ports → Switch Appimages Updater
 Mouse navigation : Right stick
 Click : L1 / R1
 Exit : Hotkey + Start
@@ -165,7 +166,7 @@ Exit : Hotkey + Start
 ✔️ Controller auto-configuration works on all emulators
 (Tested with DS4 / Switch Pro Controller / SteamDeck)
 
-Thanks Spirit for autoconfig
+Thanks Spirit for autoconfig and DreamerCG for fix Xbox autoconfig
 EOF
 ;;
 
@@ -173,7 +174,7 @@ EOF
 Installation Switch terminée
 
 ✔️ Vos saves / profils / mods ont été restaurés
-Un backup a été créé dans :
+Un backup a été créé (si vous avez selectionné oui a la demande creation du zip) dans :
 /userdata/backup_save_mods_switch
 
 ✔️ Si vous avez téléchargé le pack AppImages + firmware mentionné précédemment,
@@ -188,8 +189,10 @@ et le firmware/keys Switch dans : /userdata/bios/switch
 (par souci de détection manette)
 
 Vous trouverez les nouvelles applis de configuration dans :
-Ports → ryujinx_config
-Ports → yuzu_config (Eden / Citron / Eden-PGO)
+Ports → Ryujinx config App
+Ports → Eden config App
+Ports → Citron config App
+Ports → Switch Appimages Updater
 Navigation souris : Stick droit
 Clic : L1 / R1
 Quitter : Hotkey + Start
@@ -197,7 +200,7 @@ Quitter : Hotkey + Start
 ✔️ L'autoconfiguration des manettes fonctionne pour tous les émulateurs
 (Testé sur DS4 / Switch Pro Controller / SteamDeck)
 
-Merci Spirit pour l'autoconfig
+Merci Spirit pour l'autoconfig et DreamerCG pour le fix Xbox autoconfig
 EOF
 ;;
 
@@ -973,7 +976,7 @@ printf "%b" "\n$(TXT finished_full)" | \
 dialog --backtitle "$BACKTITLE" \
            --title "$(TXT finished_title)" \
            --ok-label "$(TXT ok)" \
-           --msgbox "$(cat)" 36 86
+           --msgbox "$(cat)" 37 86
 
 curl http://127.0.0.1:1234/reloadgames
 clear

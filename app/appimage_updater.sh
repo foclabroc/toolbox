@@ -6,7 +6,7 @@
 LANG_UI="fr"
 
 select_language() {
-    dialog --backtitle "Switch AppImages Updater" \
+    dialog --backtitle "Foclabroc Switch AppImages Updater" \
            --title "Language / Langue" \
 		   --ok-label "OK" \
 		   --cancel-label "Cancel" \
@@ -75,6 +75,9 @@ Do you want to update Switch AppImages?
 
         fr:DOWNLOAD_DONE) echo "Téléchargement terminé" ;;
         en:DOWNLOAD_DONE) echo "Download completed" ;;
+
+        fr:UPDATE_RESULT) echo "Résultat mise à jour :" ;;
+        en:UPDATE_RESULT) echo "Update Result :" ;;
 
         *) echo "$1" ;;
     esac
@@ -356,6 +359,7 @@ run_update() {
            --no-collapse \
            --msgbox "$(cat <<EOF
 
+"$(tr UPDATE_RESULT)"
 
 $CITRON_LINE
 $EDEN_LINE
@@ -364,7 +368,7 @@ $RYUJINX_LINE
 
 Logs : $LOG_FILE
 EOF
-)" 13 70
+)" 14 70
 
 exit 0
 }
