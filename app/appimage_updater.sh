@@ -359,7 +359,7 @@ run_update() {
            --no-collapse \
            --msgbox "$(cat <<EOF
 
-"$(tr UPDATE_RESULT)"
+$(tr UPDATE_RESULT)
 
 $CITRON_LINE
 $EDEN_LINE
