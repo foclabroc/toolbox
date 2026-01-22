@@ -749,7 +749,7 @@ post_install_prompt() {
 
 install_emulators_pack() {
 
-    ZIP_URL="https://foclabroc.freeboxos.fr:55973/share/Mr8ZscUaUnVXSyKr/firmware_appimage21.1.zip"
+    ZIP_URL="https://foclabroc.freeboxos.fr:55973/share/j4HRYFkF_tq5IV_A/firmware_appimage_21.1.zip"
     ZIP_FILE="/userdata/tmp/firmware_appimage.zip"
 
     mkdir -p /userdata/tmp
