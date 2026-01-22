@@ -171,39 +171,49 @@ deploy_if_valid() {
 # UPDATE CITRON
 # ===============================
 update_citron() {
-    local page release commit url dest
+    local page tag tag_decoded version url dest
 
-    log "Checking Citron releases page"
+    log "Checking Citron GitHub tags (stable only)"
 
-    page=$(curl -Ls "https://git.citron-emu.org/Citron/Emulator/releases" 2>>"$LOG_FILE")
+    page=$(curl -Ls "https://github.com/pkgforge-dev/Citron-AppImage/tags" 2>>"$LOG_FILE")
 
     if [[ -z "$page" ]]; then
-        log "ERROR Citron: unable to download releases page"
+        log "ERROR Citron: unable to download tags page"
         echo "STATUS_CITRON=ERREUR" >> "$STATUS_FILE"
         return
     fi
 
-    release=$(echo "$page" |
-        grep -Eo '/download/[0-9]+\.[0-9]+\.[0-9]+' |
-        sed 's#.*/##' | sort -V | tail -n1)
+    # Dernier tag stable (URL encodé)
+    tag=$(echo "$page" |
+        grep -Eo '/pkgforge-dev/Citron-AppImage/releases/tag/[^"]+' |
+        grep -v nightly |
+        head -n1 |
+        sed 's#.*/##')
 
-    commit=$(echo "$page" |
-        grep -Eo '/commit/[a-f0-9]{9}' |
-        head -n1 | sed 's#.*/##')
-
-    if [[ -z "$release" || -z "$commit" ]]; then
-        log "ERROR Citron: parsing failed"
+    if [[ -z "$tag" ]]; then
+        log "ERROR Citron: no stable tag found"
         echo "STATUS_CITRON=ERREUR" >> "$STATUS_FILE"
         return
     fi
 
-    url="https://git.citron-emu.org/Citron/Emulator/releases/download/$release/citron_stable-$commit-linux-x86_64.AppImage"
+    # Décodage %40 → @
+    tag_decoded="${tag//%40/@}"
+
+    # Version = avant @
+    version="${tag_decoded%%@*}"
+
+    url="https://github.com/pkgforge-dev/Citron-AppImage/releases/download/$tag_decoded/Citron-$version-anylinux-x86_64.AppImage"
     dest="$SWITCH_APPIMAGES/citron-emu.AppImage"
+
+    log "Detected stable Citron tag: $tag_decoded"
+    log "Detected Citron version: $version"
+    log "Downloading: $url"
 
     if wget_step "$url" "$dest" "citron-emu" 25 && deploy_if_valid "$dest"; then
         echo "STATUS_CITRON=OK" >> "$STATUS_FILE"
-        echo "CITRON_VERSION=$release" >> "$VERSIONS_FILE"
+        echo "CITRON_VERSION=$version" >> "$VERSIONS_FILE"
     else
+        log "ERROR Citron: download or deploy failed"
         echo "STATUS_CITRON=ERREUR" >> "$STATUS_FILE"
     fi
 }
