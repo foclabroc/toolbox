@@ -206,6 +206,7 @@ EOF
 
 
 1:warning_text) cat <<EOF
+NEW SWITCH INSTALLER (Batocera V42+ x86_64 only !) !!!!!IMPORTANT USERDATA MUST BE IN EXT4 OR BTRFS!!!!!
 This new Switch installation script will completely remove all folders/files from previous installations.
 
 A backup of your Switch saves, mods and profiles will be automatically created and restored at the end of the installation.
@@ -234,6 +235,7 @@ EOF
 ;;
 
 2:warning_text) cat <<EOF
+NOUVEL INSTALLEUR SWITCH (Batocera V42+ x86_64 uniquement !) !!!!!IMPORTANT : VOTRE SHARE DOIT OBLIGATOIREMENT ETRE EN EXT4 OU BTRFS!!!!!
 Ce nouveau script Switch va supprimer complètement tous les dossiers/fichiers des installations précédentes.
 
 Une sauvegarde de vos saves, mods et profils Switch sera automatiquement réalisée et restaurée en fin d’installation.
@@ -319,7 +321,7 @@ dialog --backtitle "$BACKTITLE" \
        --title "$(TXT warning_title)" \
        --yes-label "$(TXT yes)" \
        --no-label "$(TXT no)" \
-       --yesno "$(cat)" 34 100 2>&1 >/dev/tty
+       --yesno "$(cat)" 36 100 2>&1 >/dev/tty
 
 if [[ $? -ne 0 ]]; then
     dialog --backtitle "$BACKTITLE" --infobox "\n$(TXT returnmenu)" 5 60 2>&1 >/dev/tty
