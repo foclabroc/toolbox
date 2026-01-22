@@ -49,6 +49,9 @@ tr() {
         fr:NO_LABEL) echo "Non" ;;
         en:NO_LABEL) echo "No" ;;
 
+        fr:PROGRESS) echo "Téléchargement en cours..." ;;
+        en:PROGRESS) echo "Download in progress..." ;;
+
         fr:CONFIRM_TEXT) echo "
 Voulez-vous mettre à jour les AppImages Switch ?
 
@@ -117,31 +120,33 @@ wget_step() {
     local url="$1"
     local dest="$2"
     local label="$3"
-    local end="$4"
 
     log "Downloading $label"
-    log "URL: $url"
 
-    wget --show-progress --tries=3 --timeout=10 --connect-timeout=5 \
-         "$url" -O "$dest" 2>>"$LOG_FILE"
+    local spinner=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
+    local i=0
 
-    if [[ -s "$dest" ]]; then
-        chmod +x "$dest"
+    wget --tries=3 --timeout=10 --connect-timeout=5 \
+         "$url" -O "$dest" 2>>"$LOG_FILE" &
+    pid=$!
 
-        echo "$end"
+    while kill -0 $pid 2>/dev/null; do
         echo "XXX"
-        echo "===================="
-        echo "${label}.AppImage"
+        echo "$GLOBAL_PERCENT"
+        echo "$(tr GAUGE_TEXT)"
+        echo "======================="
         echo " "
-        echo "$(tr DOWNLOAD_DONE)"
+        echo "-->[${label}.AppImage]"
+        echo "--> ${spinner[$i]} $(tr PROGRESS)"
         echo "XXX"
 
-        log "Installed $label"
-        return 0
-    else
-        log "ERROR $label: downloaded file is empty or missing"
-        return 1
-    fi
+        i=$(( (i + 1) % ${#spinner[@]} ))
+        sleep 0.15
+    done
+
+    wait $pid || return 1
+    chmod +x "$dest"
+    return 0
 }
 
 deploy_if_valid() {
@@ -212,7 +217,7 @@ update_citron() {
     log "Detected Citron version: $version"
     log "Downloading: $url"
 
-    if wget_step "$url" "$dest" "citron-emu" 25 && deploy_if_valid "$dest"; then
+    if wget_step "$url" "$dest" "citron-emu" && deploy_if_valid "$dest"; then
         echo "STATUS_CITRON=OK" >> "$STATUS_FILE"
         echo "CITRON_VERSION=$version" >> "$VERSIONS_FILE"
     else
@@ -250,7 +255,7 @@ update_eden() {
     url="https://github.com/eden-emulator/Releases/releases/download/$release/Eden-Linux-$release-amd64-gcc-standard.AppImage"
     dest="$SWITCH_APPIMAGES/eden-emu.AppImage"
 
-    if wget_step "$url" "$dest" "eden-emu" 50 && deploy_if_valid "$dest"; then
+    if wget_step "$url" "$dest" "eden-emu" && deploy_if_valid "$dest"; then
         echo "STATUS_EDEN=OK" >> "$STATUS_FILE"
         echo "EDEN_VERSION=$release" >> "$VERSIONS_FILE"
     else
@@ -275,7 +280,7 @@ update_eden_pgo() {
     url="https://github.com/eden-emulator/Releases/releases/download/$release/Eden-Linux-$release-amd64-clang-pgo.AppImage"
     dest="$SWITCH_APPIMAGES/eden-pgo.AppImage"
 
-    if wget_step "$url" "$dest" "eden-pgo" 75 && deploy_if_valid "$dest"; then
+    if wget_step "$url" "$dest" "eden-pgo" && deploy_if_valid "$dest"; then
         echo "STATUS_EDEN_PGO=OK" >> "$STATUS_FILE"
         echo "EDEN_PGO_VERSION=$release" >> "$VERSIONS_FILE"
     else
@@ -312,7 +317,7 @@ update_ryujinx() {
     url="https://git.ryujinx.app/api/v4/projects/68/packages/generic/Ryubing-Canary/$release/ryujinx-canary-$release-x64.AppImage"
     dest="$SWITCH_APPIMAGES/ryujinx-emu.AppImage"
 
-    if wget_step "$url" "$dest" "ryujinx-emu" 100 && deploy_if_valid "$dest"; then
+    if wget_step "$url" "$dest" "ryujinx-emu" && deploy_if_valid "$dest"; then
         echo "STATUS_RYUJINX=OK" >> "$STATUS_FILE"
         echo "RYUJINX_VERSION=$release" >> "$VERSIONS_FILE"
     else
@@ -325,17 +330,30 @@ update_ryujinx() {
 # ===============================
 run_update() {
 
+GLOBAL_PERCENT=0
+
 (
     update_citron
+    GLOBAL_PERCENT=25
+
     update_eden
+    GLOBAL_PERCENT=50
+
     update_eden_pgo
+    GLOBAL_PERCENT=75
+
     update_ryujinx
+    GLOBAL_PERCENT=100
+
 ) | dialog --backtitle "$BACKTITLE" \
            --title "$(tr GAUGE_TITLE)" \
-           --gauge "\n$(tr GAUGE_TEXT)" 10 60 0
+           --gauge "\n$(tr GAUGE_TEXT)" 12 60 0
 
-    source "$STATUS_FILE"
-    source "$VERSIONS_FILE"
+    touch "$STATUS_FILE" "$VERSIONS_FILE"
+	set -a
+	source "$STATUS_FILE"
+	source "$VERSIONS_FILE"
+	set +a
 
     [[ "$STATUS_CITRON" == "OK" ]] \
         && CITRON_LINE="Citron    : OK ---->(${CITRON_VERSION})" \
