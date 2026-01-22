@@ -444,6 +444,7 @@ remove_old_installations() {
         /userdata/system/.config/Ryujinx
         /userdata/system/.config/yuzu
         /userdata/system/.config/yuzu-early-access
+        /userdata/system/.config/citron
         /userdata/system/.local/share/eden
         /userdata/system/.local/share/yuzu
         /userdata/system/.local/share/yuzu-early-access
