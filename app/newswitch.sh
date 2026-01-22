@@ -608,7 +608,7 @@ install_new_pack() {
     # Ajouter Updater
     xmlstarlet ed -L \
         -s "/gameList" -t elem -n "game" -v "" \
-        -s "/gameList/game[last()]" -t elem -n "path" -v "./Switch Updater.sh" \
+        -s "/gameList/game[last()]" -t elem -n "path" -v "./Switch AppImages Updater.sh" \
         -s "/gameList/game[last()]" -t elem -n "name" -v "Switch Emulator Updater" \
         -s "/gameList/game[last()]" -t elem -n "desc" -v "Script de Mise à jour des emulateurs Switch." \
         -s "/gameList/game[last()]" -t elem -n "developer" -v "Foclabroc" \
