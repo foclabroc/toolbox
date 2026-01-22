@@ -604,6 +604,24 @@ install_new_pack() {
         -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/citron_config_logo.png" \
         -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/citron_config.png" \
         "$gamelist_file"
+
+    # Ajouter Updater
+    xmlstarlet ed -L \
+        -s "/gameList" -t elem -n "game" -v "" \
+        -s "/gameList/game[last()]" -t elem -n "path" -v "./Switch Updater.sh" \
+        -s "/gameList/game[last()]" -t elem -n "name" -v "Switch Emulator Updater" \
+        -s "/gameList/game[last()]" -t elem -n "desc" -v "Script de Mise à jour des emulateurs Switch." \
+        -s "/gameList/game[last()]" -t elem -n "developer" -v "Foclabroc" \
+        -s "/gameList/game[last()]" -t elem -n "publisher" -v "Foclabroc" \
+        -s "/gameList/game[last()]" -t elem -n "genre" -v "Switch" \
+        -s "/gameList/game[last()]" -t elem -n "rating" -v "1.00" \
+        -s "/gameList/game[last()]" -t elem -n "region" -v "eu" \
+        -s "/gameList/game[last()]" -t elem -n "lang" -v "fr" \
+        -s "/gameList/game[last()]" -t elem -n "image" -v "./images/updater_app_screen.png" \
+        -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/updater_app_logo.png" \
+        -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/updater_app.png" \
+        "$gamelist_file"
+
     rm -rf "/userdata/README.md"
     mark_step_done "install"
 }
