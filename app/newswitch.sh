@@ -643,7 +643,7 @@ install_new_pack() {
     xmlstarlet ed -L \
         -s "/gameList" -t elem -n "game" -v "" \
         -s "/gameList/game[last()]" -t elem -n "path" -v "./_Switch-Home-menu.xci" \
-        -s "/gameList/game[last()]" -t elem -n "name" -v "Switch Home Menu (Only with Eden-emu)" \
+        -s "/gameList/game[last()]" -t elem -n "name" -v "_Switch Home Menu (Only with Eden-emu)" \
         -s "/gameList/game[last()]" -t elem -n "desc" -v "Démarrage en mode Ecran d'accueil Switch réel (qlauncher) A lancer uniquement avec EDEN !!!." \
         -s "/gameList/game[last()]" -t elem -n "developer" -v "Foclabroc" \
         -s "/gameList/game[last()]" -t elem -n "publisher" -v "Foclabroc" \
