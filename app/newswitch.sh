@@ -708,9 +708,9 @@ restore_switch_data() {
         fi
     }
 
-    move_content "/userdata/tmp/tmp_yuzu_mods" "/userdata/system/configs/yuzu/load"
-    move_content "/userdata/tmp/tmp_yuzu_save_user" "/userdata/system/configs/yuzu/nand/user/save"
-    move_content "/userdata/tmp/tmp_yuzu_save_system" "/userdata/system/configs/yuzu/nand/system/save"
+    move_content "/userdata/tmp/tmp_yuzu_mods" "/userdata/saves/switch/eden_citron/mods"
+    move_content "/userdata/tmp/tmp_yuzu_save_user" "/userdata/saves/switch/eden_citron/save/save_user"
+    move_content "/userdata/tmp/tmp_yuzu_save_system" "/userdata/saves/switch/eden_citron/save/save_system"
 
     move_content "/userdata/tmp/tmp_ryujinx_save_user" "/userdata/saves/switch/ryujinx/save/save_user"
     move_content "/userdata/tmp/tmp_ryujinx_save_system" "/userdata/saves/switch/ryujinx/save/save_system"
