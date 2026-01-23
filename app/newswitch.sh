@@ -162,6 +162,7 @@ Ports → Switch Appimages Updater
 Mouse navigation : Right stick
 Click : L1 / R1
 Exit : Hotkey + Start
+✔️ But also the real Switch menu (Qlauncher) in /roms/switch: "1-Switch Home Menu (Only with Eden-emu)"
 
 ✔️ Controller auto-configuration works on all emulators
 (Tested with DS4 / Switch Pro Controller / SteamDeck)
@@ -196,6 +197,7 @@ Ports → Switch Appimages Updater
 Navigation souris : Stick droit
 Clic : L1 / R1
 Quitter : Hotkey + Start
+✔️ Mais egalement le vrai menu Switch (Qlauncher) dans /roms/switch : "1-Switch Home Menu (Only with Eden-emu)"
 
 ✔️ L'autoconfiguration des manettes fonctionne pour tous les émulateurs
 (Testé sur DS4 / Switch Pro Controller / SteamDeck)
@@ -571,6 +573,25 @@ install_new_pack() {
         ln -sf "$XMLSTARLET_BIN" "$XMLSTARLET_SYMLINK"
     fi
 
+remove_game_by_path() {
+    local file="$1"
+    local gamepath="$2"
+
+    xmlstarlet ed -L -d "/gameList/game[path='$gamepath']" "$file" 2>/dev/null
+}
+
+    # Supprimer anciennes entrées
+    remove_game_by_path "$gamelist_file" "./updateryujinx.sh"
+    remove_game_by_path "$gamelist_file" "./updateryujinxavalonia.sh"
+    remove_game_by_path "$gamelist_file" "./batocera-switch-installer.sh"
+    remove_game_by_path "$gamelist_file" "./Suyu Qlauncher.sh"
+    remove_game_by_path "$gamelist_file" "./batocera-switch-updater.sh"
+    remove_game_by_path "$gamelist_file" "./Switch Updater.sh"
+    remove_game_by_path "$gamelist_file" "./updateyuzuEA.sh"
+    remove_game_by_path "$gamelist_file" "./updateyuzu.sh"
+
+    # Supprimer entrée avant création
+    remove_game_by_path "$gamelist_file" "./ryujinx_config.sh"
     # Ajouter Ryujinx Config
     xmlstarlet ed -L \
         -s "/gameList" -t elem -n "game" -v "" \
@@ -588,6 +609,8 @@ install_new_pack() {
         -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/ryujinx_config.png" \
         "$gamelist_file"
 
+    # Supprimer entrée avant création
+    remove_game_by_path "$gamelist_file" "./yuzu_config.sh"
     # Ajouter Eden Config
     xmlstarlet ed -L \
         -s "/gameList" -t elem -n "game" -v "" \
@@ -605,6 +628,8 @@ install_new_pack() {
         -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/yuzu_config.png" \
         "$gamelist_file"
 
+    # Supprimer entrée avant création
+    remove_game_by_path "$gamelist_file" "./citron_config.sh"
     # Ajouter Citron Config
     xmlstarlet ed -L \
         -s "/gameList" -t elem -n "game" -v "" \
@@ -622,6 +647,8 @@ install_new_pack() {
         -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/citron_config.png" \
         "$gamelist_file"
 
+    # Supprimer entrée avant création
+    remove_game_by_path "$gamelist_file" "./Switch AppImages Updater.sh"
     # Ajouter Updater
     xmlstarlet ed -L \
         -s "/gameList" -t elem -n "game" -v "" \
@@ -639,11 +666,13 @@ install_new_pack() {
         -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/updater_app.png" \
         "$gamelist_file"
 
+    # Supprimer entrée avant création
+    remove_game_by_path "$gamelist_file2" "./_Switch-Home-menu.xci"
     # Ajouter Qlauncher
     xmlstarlet ed -L \
         -s "/gameList" -t elem -n "game" -v "" \
         -s "/gameList/game[last()]" -t elem -n "path" -v "./_Switch-Home-menu.xci" \
-        -s "/gameList/game[last()]" -t elem -n "name" -v "_Switch Home Menu (Only with Eden-emu)" \
+        -s "/gameList/game[last()]" -t elem -n "name" -v "1-Switch Home Menu (Only with Eden-emu)" \
         -s "/gameList/game[last()]" -t elem -n "desc" -v "Démarrage en mode Ecran d'accueil Switch réel (qlauncher) A lancer uniquement avec EDEN !!!." \
         -s "/gameList/game[last()]" -t elem -n "developer" -v "Foclabroc" \
         -s "/gameList/game[last()]" -t elem -n "publisher" -v "Foclabroc" \
@@ -655,6 +684,10 @@ install_new_pack() {
         -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/_Switch-Home-menu-logo.png" \
         -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/_Switch-Home-menu-box.png" \
         "$gamelist_file2"
+
+        for file in "$gamelist_file" "$gamelist_file2"; do
+            [ -f "$file" ] && sed -i '/<sortname>[^<]*<\/sortname>/d' "$file"
+        done
 
     rm -rf "/userdata/README.md"
     mark_step_done "install"

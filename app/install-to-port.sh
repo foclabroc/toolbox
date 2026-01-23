@@ -90,7 +90,14 @@ else
         echo "ln -sf $XMLSTARLET_BIN $XMLSTARLET_SYMLINK" >> "$CUSTOM_SH"
     fi
 fi
+remove_game_by_path() {
+    local file="$1"
+    local gamepath="$2"
 
+    xmlstarlet ed -L -d "/gameList/game[path='$gamepath']" "$file" 2>/dev/null
+}
+
+remove_game_by_path "$gamelist_file" "./foclabroc-tools.sh"
 xmlstarlet ed -L \
     -s "/gameList" -t elem -n "game" -v "" \
     -s "/gameList/game[last()]" -t elem -n "path" -v "./foclabroc-tools.sh" \

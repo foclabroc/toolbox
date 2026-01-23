@@ -126,6 +126,12 @@ afficher_barre_progression() {
     rm -f "$TMP_FILE"
 }
 
+remove_game_by_path() {
+    local file="$1"
+    local gamepath="$2"
+    xmlstarlet ed -L -d "/gameList/game[path='$gamepath']" "$file" 2>/dev/null
+}
+
 # Fonction edit gamelist
 ajouter_entree_gamelist() {
     (
@@ -169,6 +175,7 @@ ajouter_entree_gamelist() {
             echo "$i"; sleep 0.01
         done
 
+        remove_game_by_path "$GAMELIST_FILE" "./$GAME_FILE_FINAL"
         xmlstarlet ed -L \
             -s "/gameList" -t elem -n "game" -v "" \
             -s "/gameList/game[last()]" -t elem -n "path" -v "./$GAME_FILE_FINAL" \
