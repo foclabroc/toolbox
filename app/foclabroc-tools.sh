@@ -6,4 +6,4 @@ dos2unix /tmp/scripttool.sh 2>/dev/null
 
 # Ouvrir un terminal interactif et exécuter le script
 DISPLAY=:0.0
-xterm -hold -bg black -fa "DejaVuSansMono" -fs 12 -en UTF-8 -e "bash /tmp/scripttool.sh" 
+xterm -hold -bg black -fa -fullscreen "DejaVuSansMono" -fs 12 -en UTF-8 -e "bash /tmp/scripttool.sh" 

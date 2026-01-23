@@ -2,6 +2,11 @@
 
 clear
 
+if [ -f /userdata/roms/ports/foclabroc-tools.sh ]; then
+    curl -fsL --connect-timeout 10 --retry 3 https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/foclabroc-tools.sh \
+         -o /userdata/roms/ports/foclabroc-tools.sh
+fi
+
 # Vérification et téléchargement de .dialogrc si nécessaire
 DIALOGRC_PATH="/userdata/system/pro/extra/.dialogrc"
 DIALOGRC_URL="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/.dialogrc"
