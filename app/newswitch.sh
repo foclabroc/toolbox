@@ -450,6 +450,7 @@ remove_old_installations() {
         /userdata/system/.config/yuzu
         /userdata/system/.config/yuzu-early-access
         /userdata/system/.config/citron
+        /userdata/system/.config/eden
         /userdata/system/.local/share/eden
         /userdata/system/.local/share/yuzu
         /userdata/system/.local/share/yuzu-early-access
@@ -647,9 +648,9 @@ restore_switch_data() {
         fi
     }
 
-    move_content "/userdata/tmp/tmp_yuzu_mods" "/userdata/saves/switch/eden_citron/mods"
-    move_content "/userdata/tmp/tmp_yuzu_save_user" "/userdata/saves/switch/eden_citron/save/save_user"
-    move_content "/userdata/tmp/tmp_yuzu_save_system" "/userdata/saves/switch/eden_citron/save/save_system"
+    move_content "/userdata/tmp/tmp_yuzu_mods" "/userdata/system/configs/yuzu/load"
+    move_content "/userdata/tmp/tmp_yuzu_save_user" "/userdata/system/configs/yuzu/nand/user/save"
+    move_content "/userdata/tmp/tmp_yuzu_save_system" "/userdata/system/configs/yuzu/nand/system/save"
 
     move_content "/userdata/tmp/tmp_ryujinx_save_user" "/userdata/saves/switch/ryujinx/save/save_user"
     move_content "/userdata/tmp/tmp_ryujinx_save_system" "/userdata/saves/switch/ryujinx/save/save_system"
@@ -978,7 +979,7 @@ printf "%b" "\n$(TXT finished_full)" | \
 dialog --backtitle "$BACKTITLE" \
            --title "$(TXT finished_title)" \
            --ok-label "$(TXT ok)" \
-           --msgbox "$(cat)" 37 86
+           --msgbox "$(cat)" 39 86
 
 curl http://127.0.0.1:1234/reloadgames
 clear
