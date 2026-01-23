@@ -496,13 +496,18 @@ remove_old_installations() {
         sed -i '\|/userdata/system/switch/extra/batocera-switch-startup|d' "$CUSTOM"
     fi
 
-	# Nettoyage du batocera.conf (Switch)
+	# Nettoyage et configuration du batocera.conf (Switch)
 	BATOCERA_CONF="/userdata/system/batocera.conf"
 
 	if [[ -f "$BATOCERA_CONF" ]]; then
-		sed -i \
-			-e '/^switch/d' \
-			"$BATOCERA_CONF"
+		# Supprime toutes les anciennes lignes switch
+		sed -i '/^switch/d' "$BATOCERA_CONF"
+
+		# Ajoute les nouvelles lignes
+		{
+			echo 'switch["_Switch-Home-menu.xci"].core=eden-emu'
+			echo 'switch["_Switch-Home-menu.xci"].emulator=eden-emu'
+		} >> "$BATOCERA_CONF"
 	fi
 
     mark_step_done "remove"
@@ -545,11 +550,16 @@ install_new_pack() {
 	shopt -u dotglob nullglob
 
     gamelist_file="/userdata/roms/ports/gamelist.xml"
+    gamelist_file2="/userdata/roms/switch/gamelist.xml"
 
     # Ensure the gamelist.xml exists
     if [ ! -f "$gamelist_file" ]; then
         echo '<?xml version="1.0" encoding="UTF-8"?><gameList></gameList>' > "$gamelist_file"
     fi
+
+	if [ ! -f "$gamelist_file2" ]; then
+		echo '<?xml version="1.0" encoding="UTF-8"?><gameList></gameList>' > "$gamelist_file2"
+	fi
 
     # Installation de xmlstarlet si absent.
     XMLSTARLET_DIR="/userdata/system/switch/extra"
@@ -628,6 +638,23 @@ install_new_pack() {
         -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/updater_app_logo.png" \
         -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/updater_app.png" \
         "$gamelist_file"
+
+    # Ajouter Qlauncher
+    xmlstarlet ed -L \
+        -s "/gameList" -t elem -n "game" -v "" \
+        -s "/gameList/game[last()]" -t elem -n "path" -v "./_Switch-Home-menu.xci" \
+        -s "/gameList/game[last()]" -t elem -n "name" -v "Switch Home Menu (Only with Eden-emu)" \
+        -s "/gameList/game[last()]" -t elem -n "desc" -v "Démarrage en mode Ecran d'accueil Switch réel (qlauncher) A lancer uniquement avec EDEN !!!." \
+        -s "/gameList/game[last()]" -t elem -n "developer" -v "Foclabroc" \
+        -s "/gameList/game[last()]" -t elem -n "publisher" -v "Foclabroc" \
+        -s "/gameList/game[last()]" -t elem -n "genre" -v "Switch" \
+        -s "/gameList/game[last()]" -t elem -n "rating" -v "1.00" \
+        -s "/gameList/game[last()]" -t elem -n "region" -v "eu" \
+        -s "/gameList/game[last()]" -t elem -n "lang" -v "fr" \
+        -s "/gameList/game[last()]" -t elem -n "image" -v "./images/_Switch-Home-menu-screen.png" \
+        -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/_Switch-Home-menu-logo.png" \
+        -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/_Switch-Home-menu-box.png" \
+        "$gamelist_file2"
 
     rm -rf "/userdata/README.md"
     mark_step_done "install"
