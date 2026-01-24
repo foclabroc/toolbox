@@ -28,8 +28,8 @@ case "$LANGUE:$1" in
 1:full_install) echo "Full Switch installation";;
 2:full_install) echo "Installation complète Switch";;
 
-1:update_emu) echo "Emulator updates only";;
-2:update_emu) echo "Mise à jours des emulateurs uniquement";;
+1:update_emu) echo "Emulator updates and system files only";;
+2:update_emu) echo "Mise à jours des emulateurs et fichiers systeme seulement";;
 
 1:step_install) echo "Downloading/Installing new Switch pack";;
 2:step_install) echo "Téléchargement/Installation du nouveau pack Switch";;
@@ -292,7 +292,7 @@ MODE=$(dialog --backtitle "$BACKTITLE" \
               --title "$(TXT welcome)" \
               --ok-label "$(TXT ok)" \
               --cancel-label "$(TXT cancel)" \
-              --menu "\nChoisissez une action / Choose an action:" 11 60 2 \
+              --menu "\nChoisissez une action / Choose an action:" 11 80 2 \
               1 "$(TXT update_emu)" \
               2 "$(TXT full_install)" \
               3>&1 1>&2 2>&3)

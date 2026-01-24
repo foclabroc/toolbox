@@ -25,6 +25,18 @@ select_language() {
 
 tr() {
     case "$LANG_UI:$1" in
+        fr:SYS_FILES) echo "Fichiers système" ;;
+        en:SYS_FILES) echo "System files" ;;
+
+        fr:SYS_UPDATE) echo "Mise à jour des fichiers système…" ;;
+        en:SYS_UPDATE) echo "Updating system files…" ;;
+
+        fr:SYS_DONE) echo "Fichiers système mis à jour" ;;
+        en:SYS_DONE) echo "System files updated" ;;
+
+        fr:SYS_FAIL) echo "Échec mise à jour fichiers système" ;;
+        en:SYS_FAIL) echo "System files update failed" ;;
+
         fr:BACKTITLE) echo "Foclabroc Switch AppImages Updater" ;;
         en:BACKTITLE) echo "Foclabroc Switch AppImages Updater" ;;
 
@@ -70,8 +82,8 @@ Do you want to update Switch AppImages?
         fr:GAUGE_TITLE) echo "Mise à jour des AppImages Switch" ;;
         en:GAUGE_TITLE) echo "Updating Switch AppImages" ;;
 
-        fr:GAUGE_TEXT) echo "Téléchargement des émulateurs…" ;;
-        en:GAUGE_TEXT) echo "Downloading emulators…" ;;
+        fr:GAUGE_TEXT) echo "Téléchargement des fichiers…" ;;
+        en:GAUGE_TEXT) echo "Downloading files…" ;;
 
         fr:FINAL_TITLE) echo "Mise à jour terminée" ;;
         en:FINAL_TITLE) echo "Update completed" ;;
@@ -173,6 +185,196 @@ deploy_if_valid() {
 
     log "Deployed $name to final folder (${size_mb}MB)"
     return 0
+}
+
+# ===============================
+# UPDATE SYSTEM FILES
+# ===============================
+install_new_pack() {
+
+    log "Starting system files update pack"
+
+    PACK_URL="https://github.com/foclabroc/New-batocera-switch/archive/refs/heads/main.zip"
+    PACK_ZIP="/userdata/tmpf/pack.zip"
+    EXTRACT_DIR="/userdata/tmpf/new_switch_pack"
+
+    mkdir -p /userdata/tmpf
+
+    echo "XXX"
+    echo "$GLOBAL_PERCENT"
+    echo "$(tr GAUGE_TEXT)"
+    echo "======================="
+    echo " "
+    echo "-->$(tr SYS_UPDATE)"
+    echo "XXX"
+
+    wget -q -O "$PACK_ZIP" "$PACK_URL" || {
+        log "ERROR system pack download failed"
+        echo "STATUS_SYS=ERREUR" >> "$STATUS_FILE"
+        return
+    }
+
+    if [[ ! -s "$PACK_ZIP" ]]; then
+        log "ERROR system pack zip empty"
+        echo "STATUS_SYS=ERREUR" >> "$STATUS_FILE"
+        return
+    fi
+
+    rm -rf "$EXTRACT_DIR"
+    mkdir -p "$EXTRACT_DIR"
+    unzip -o "$PACK_ZIP" -d "$EXTRACT_DIR" >>"$LOG_FILE" 2>&1
+
+    ROOT_DIR=$(find "$EXTRACT_DIR" -mindepth 1 -maxdepth 1 -type d | head -n1)
+
+    [[ -d "$ROOT_DIR" ]] || {
+        log "ERROR system pack extraction failed"
+        echo "STATUS_SYS=ERREUR" >> "$STATUS_FILE"
+        return
+    }
+
+    shopt -s dotglob nullglob
+    cp -r "$ROOT_DIR"/* /userdata/ >>"$LOG_FILE" 2>&1
+    shopt -u dotglob nullglob
+
+    log "System files copied"
+
+    # --- XMLSTARLET SETUP ---
+    XMLSTARLET_DIR="/userdata/system/switch/extra"
+    XMLSTARLET_BIN="$XMLSTARLET_DIR/xmlstarlet"
+    XMLSTARLET_SYMLINK="/usr/bin/xmlstarlet"
+
+    if [ -f "$XMLSTARLET_BIN" ]; then
+        chmod +x "$XMLSTARLET_BIN"
+        ln -sf "$XMLSTARLET_BIN" "$XMLSTARLET_SYMLINK"
+        log "xmlstarlet ready"
+    fi
+
+    gamelist_file="/userdata/roms/ports/gamelist.xml"
+    gamelist_file2="/userdata/roms/switch/gamelist.xml"
+
+    [[ -f "$gamelist_file" ]] || echo '<?xml version="1.0"?><gameList></gameList>' > "$gamelist_file"
+    [[ -f "$gamelist_file2" ]] || echo '<?xml version="1.0"?><gameList></gameList>' > "$gamelist_file2"
+
+    remove_game_by_path() {
+        xmlstarlet ed -L -d "/gameList/game[path='$2']" "$1" 2>/dev/null
+    }
+
+    log "Updating gamelists"
+
+    # Supprimer anciennes entrées
+    remove_game_by_path "$gamelist_file" "./updateryujinx.sh"
+    remove_game_by_path "$gamelist_file" "./updateryujinxavalonia.sh"
+    remove_game_by_path "$gamelist_file" "./batocera-switch-installer.sh"
+    remove_game_by_path "$gamelist_file" "./Suyu Qlauncher.sh"
+    remove_game_by_path "$gamelist_file" "./batocera-switch-updater.sh"
+    remove_game_by_path "$gamelist_file" "./Switch Updater.sh"
+    remove_game_by_path "$gamelist_file" "./updateyuzuEA.sh"
+    remove_game_by_path "$gamelist_file" "./updateyuzu.sh"
+
+    # Supprimer entrée avant création
+    remove_game_by_path "$gamelist_file" "./ryujinx_config.sh"
+    # Ajouter Ryujinx Config
+    xmlstarlet ed -L \
+        -s "/gameList" -t elem -n "game" -v "" \
+        -s "/gameList/game[last()]" -t elem -n "path" -v "./ryujinx_config.sh" \
+        -s "/gameList/game[last()]" -t elem -n "name" -v "Ryujinx Config App" \
+        -s "/gameList/game[last()]" -t elem -n "desc" -v "Lancement de RYUJINX en mode application pour configuration manuelle." \
+        -s "/gameList/game[last()]" -t elem -n "developer" -v "Foclabroc DreamerCG Spirit" \
+        -s "/gameList/game[last()]" -t elem -n "publisher" -v "Foclabroc DreamerCG Spirit" \
+        -s "/gameList/game[last()]" -t elem -n "genre" -v "Switch" \
+        -s "/gameList/game[last()]" -t elem -n "rating" -v "1.00" \
+        -s "/gameList/game[last()]" -t elem -n "region" -v "eu" \
+        -s "/gameList/game[last()]" -t elem -n "lang" -v "fr" \
+        -s "/gameList/game[last()]" -t elem -n "image" -v "./images/ryujinx_config_screen.png" \
+        -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/ryujinx_config_logo.png" \
+        -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/ryujinx_config.png" \
+        "$gamelist_file"
+
+    # Supprimer entrée avant création
+    remove_game_by_path "$gamelist_file" "./yuzu_config.sh"
+    # Ajouter Eden Config
+    xmlstarlet ed -L \
+        -s "/gameList" -t elem -n "game" -v "" \
+        -s "/gameList/game[last()]" -t elem -n "path" -v "./yuzu_config.sh" \
+        -s "/gameList/game[last()]" -t elem -n "name" -v "Eden Config App" \
+        -s "/gameList/game[last()]" -t elem -n "desc" -v "Lancement de EDEN en mode application pour configuration manuelle de Eden." \
+        -s "/gameList/game[last()]" -t elem -n "developer" -v "Foclabroc DreamerCG Spirit" \
+        -s "/gameList/game[last()]" -t elem -n "publisher" -v "Foclabroc DreamerCG Spirit" \
+        -s "/gameList/game[last()]" -t elem -n "genre" -v "Switch" \
+        -s "/gameList/game[last()]" -t elem -n "rating" -v "1.00" \
+        -s "/gameList/game[last()]" -t elem -n "region" -v "eu" \
+        -s "/gameList/game[last()]" -t elem -n "lang" -v "fr" \
+        -s "/gameList/game[last()]" -t elem -n "image" -v "./images/yuzu_config_screen.png" \
+        -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/yuzu_config_logo.png" \
+        -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/yuzu_config.png" \
+        "$gamelist_file"
+
+    # Supprimer entrée avant création
+    remove_game_by_path "$gamelist_file" "./citron_config.sh"
+    # Ajouter Citron Config
+    xmlstarlet ed -L \
+        -s "/gameList" -t elem -n "game" -v "" \
+        -s "/gameList/game[last()]" -t elem -n "path" -v "./citron_config.sh" \
+        -s "/gameList/game[last()]" -t elem -n "name" -v "Citron Config App" \
+        -s "/gameList/game[last()]" -t elem -n "desc" -v "Lancement de CITRON en mode application pour configuration manuelle de Citron." \
+        -s "/gameList/game[last()]" -t elem -n "developer" -v "Foclabroc DreamerCG Spirit" \
+        -s "/gameList/game[last()]" -t elem -n "publisher" -v "Foclabroc DreamerCG Spirit" \
+        -s "/gameList/game[last()]" -t elem -n "genre" -v "Switch" \
+        -s "/gameList/game[last()]" -t elem -n "rating" -v "1.00" \
+        -s "/gameList/game[last()]" -t elem -n "region" -v "eu" \
+        -s "/gameList/game[last()]" -t elem -n "lang" -v "fr" \
+        -s "/gameList/game[last()]" -t elem -n "image" -v "./images/citron_config_screen.png" \
+        -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/citron_config_logo.png" \
+        -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/citron_config.png" \
+        "$gamelist_file"
+
+    # Supprimer entrée avant création
+    remove_game_by_path "$gamelist_file" "./Switch AppImages Updater.sh"
+    # Ajouter Updater
+    xmlstarlet ed -L \
+        -s "/gameList" -t elem -n "game" -v "" \
+        -s "/gameList/game[last()]" -t elem -n "path" -v "./Switch AppImages Updater.sh" \
+        -s "/gameList/game[last()]" -t elem -n "name" -v "Switch Emulator Updater" \
+        -s "/gameList/game[last()]" -t elem -n "desc" -v "Script de Mise à jour des emulateurs Switch." \
+        -s "/gameList/game[last()]" -t elem -n "developer" -v "Foclabroc" \
+        -s "/gameList/game[last()]" -t elem -n "publisher" -v "Foclabroc" \
+        -s "/gameList/game[last()]" -t elem -n "genre" -v "Switch" \
+        -s "/gameList/game[last()]" -t elem -n "rating" -v "1.00" \
+        -s "/gameList/game[last()]" -t elem -n "region" -v "eu" \
+        -s "/gameList/game[last()]" -t elem -n "lang" -v "fr" \
+        -s "/gameList/game[last()]" -t elem -n "image" -v "./images/updater_app_screen.png" \
+        -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/updater_app_logo.png" \
+        -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/updater_app.png" \
+        "$gamelist_file"
+
+    # Supprimer entrée avant création
+    remove_game_by_path "$gamelist_file2" "./_Switch-Home-menu.xci"
+    # Ajouter Qlauncher
+    xmlstarlet ed -L \
+        -s "/gameList" -t elem -n "game" -v "" \
+        -s "/gameList/game[last()]" -t elem -n "path" -v "./_Switch-Home-menu.xci" \
+        -s "/gameList/game[last()]" -t elem -n "name" -v "1-Switch Home Menu (Only with Eden-emu)" \
+        -s "/gameList/game[last()]" -t elem -n "desc" -v "Démarrage en mode Ecran d'accueil Switch réel (qlauncher) A lancer uniquement avec EDEN !!!." \
+        -s "/gameList/game[last()]" -t elem -n "developer" -v "Foclabroc" \
+        -s "/gameList/game[last()]" -t elem -n "publisher" -v "Foclabroc" \
+        -s "/gameList/game[last()]" -t elem -n "genre" -v "Switch" \
+        -s "/gameList/game[last()]" -t elem -n "rating" -v "1.00" \
+        -s "/gameList/game[last()]" -t elem -n "region" -v "eu" \
+        -s "/gameList/game[last()]" -t elem -n "lang" -v "fr" \
+        -s "/gameList/game[last()]" -t elem -n "image" -v "./images/_Switch-Home-menu-screen.png" \
+        -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/_Switch-Home-menu-logo.png" \
+        -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/_Switch-Home-menu-box.png" \
+        "$gamelist_file2"
+
+    for file in "$gamelist_file" "$gamelist_file2"; do
+        [ -f "$file" ] && sed -i '/<sortname>[^<]*<\/sortname>/d' "$file"
+    done
+
+    rm -f "/userdata/README.md"
+    rm -rf "/userdata/tmpf"
+
+    log "System pack installation finished"
+    echo "STATUS_SYS=OK" >> "$STATUS_FILE"
 }
 
 # ===============================
@@ -333,14 +535,17 @@ run_update() {
 GLOBAL_PERCENT=0
 
 (
+    install_new_pack
+    GLOBAL_PERCENT=20
+
     update_citron
-    GLOBAL_PERCENT=25
+    GLOBAL_PERCENT=40
 
     update_eden
-    GLOBAL_PERCENT=50
+    GLOBAL_PERCENT=60
 
     update_eden_pgo
-    GLOBAL_PERCENT=75
+    GLOBAL_PERCENT=80
 
     update_ryujinx
     GLOBAL_PERCENT=100
@@ -350,26 +555,30 @@ GLOBAL_PERCENT=0
            --gauge "\n$(tr GAUGE_TEXT)" 12 60 0
 
     touch "$STATUS_FILE" "$VERSIONS_FILE"
-	set -a
-	source "$STATUS_FILE"
-	source "$VERSIONS_FILE"
-	set +a
+    set -a
+    source "$STATUS_FILE"
+    source "$VERSIONS_FILE"
+    set +a
+
+    [[ "$STATUS_SYS" == "OK" ]] \
+        && SYS_LINE="$(tr SYS_FILES) : OK" \
+        || SYS_LINE="$(tr SYS_FILES) : $(tr SYS_FAIL)"
 
     [[ "$STATUS_CITRON" == "OK" ]] \
-        && CITRON_LINE="Citron    : OK ---->(${CITRON_VERSION})" \
-        || CITRON_LINE="Citron    : $(tr ERROR) citron-emu.AppImage $(tr ERROR_EMU)"
+        && CITRON_LINE="Citron       : OK ---->(${CITRON_VERSION})" \
+        || CITRON_LINE="Citron       : $(tr ERROR) citron-emu.AppImage $(tr ERROR_EMU)"
 
     [[ "$STATUS_EDEN" == "OK" ]] \
-        && EDEN_LINE="Eden      : OK ---->(${EDEN_VERSION})" \
-        || EDEN_LINE="Eden      : $(tr ERROR) eden-emu.AppImage $(tr ERROR_EMU)"
+        && EDEN_LINE="Eden         : OK ---->(${EDEN_VERSION})" \
+        || EDEN_LINE="Eden         : $(tr ERROR) eden-emu.AppImage $(tr ERROR_EMU)"
 
     [[ "$STATUS_EDEN_PGO" == "OK" ]] \
-        && EDEN_PGO_LINE="Eden-PGO  : OK ---->(${EDEN_PGO_VERSION})" \
-        || EDEN_PGO_LINE="Eden-PGO  : $(tr ERROR) eden-pgo.AppImage $(tr ERROR_EMU)"
+        && EDEN_PGO_LINE="Eden-PGO     : OK ---->(${EDEN_PGO_VERSION})" \
+        || EDEN_PGO_LINE="Eden-PGO     : $(tr ERROR) eden-pgo.AppImage $(tr ERROR_EMU)"
 
     [[ "$STATUS_RYUJINX" == "OK" ]] \
-        && RYUJINX_LINE="Ryujinx   : OK ---->(${RYUJINX_VERSION})" \
-        || RYUJINX_LINE="Ryujinx   : $(tr ERROR) ryujinx-emu.AppImage $(tr ERROR_EMU)"
+        && RYUJINX_LINE="Ryujinx      : OK ---->(${RYUJINX_VERSION})" \
+        || RYUJINX_LINE="Ryujinx      : $(tr ERROR) ryujinx-emu.AppImage $(tr ERROR_EMU)"
 
     dialog --backtitle "$BACKTITLE" \
            --title "$(tr FINAL_TITLE)" \
@@ -379,6 +588,8 @@ GLOBAL_PERCENT=0
 
 $(tr UPDATE_RESULT)
 
+$SYS_LINE
+
 $CITRON_LINE
 $EDEN_LINE
 $EDEN_PGO_LINE
@@ -386,7 +597,7 @@ $RYUJINX_LINE
 
 Logs : $LOG_FILE
 EOF
-)" 14 70
+)" 17 70
 
 exit 0
 }
