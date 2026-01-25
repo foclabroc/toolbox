@@ -498,18 +498,26 @@ remove_old_installations() {
         sed -i '\|/userdata/system/switch/extra/batocera-switch-startup|d' "$CUSTOM"
     fi
 
-	# Nettoyage et configuration du batocera.conf (Switch)
-	BATOCERA_CONF="/userdata/system/batocera.conf"
-
 	if [[ -f "$BATOCERA_CONF" ]]; then
+		# Récupère la langue système Batocera
+		batocera_language=$(grep '^system.language=' "$BATOCERA_CONF" | cut -d '=' -f2)
+
 		# Supprime toutes les anciennes lignes switch
 		sed -i '/^switch/d' "$BATOCERA_CONF"
 
-		# Ajoute les nouvelles lignes
+		# Ajoute les nouvelles lignes de base
 		{
 			echo 'switch["_Switch-Home-menu.xci"].core=eden-emu'
 			echo 'switch["_Switch-Home-menu.xci"].emulator=eden-emu'
 		} >> "$BATOCERA_CONF"
+
+		# Préconfiguration langue FR si Batocera est en français
+		if [ "$batocera_language" = "fr_FR" ]; then
+			grep -q "^switch.region=" "$BATOCERA_CONF" || echo "switch.region=2" >> "$BATOCERA_CONF"
+			grep -q "^switch.language=" "$BATOCERA_CONF" || echo "switch.language=2" >> "$BATOCERA_CONF"
+			grep -q "^switch.system_language=" "$BATOCERA_CONF" || echo "switch.system_language=French" >> "$BATOCERA_CONF"
+			grep -q "^switch.system_region=" "$BATOCERA_CONF" || echo "switch.system_region=Europe" >> "$BATOCERA_CONF"
+		fi
 	fi
 
     mark_step_done "remove"
