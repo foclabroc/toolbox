@@ -243,18 +243,16 @@ install_new_pack() {
         sed -i '\|/userdata/system/switch/extra/batocera-switch-startup|d' "$CUSTOM"
     fi
 
+    BATOCERA_CONF="/userdata/system/batocera.conf"
 	if [[ -f "$BATOCERA_CONF" ]]; then
 		# Récupère la langue système Batocera
 		batocera_language=$(grep '^system.language=' "$BATOCERA_CONF" | cut -d '=' -f2)
 
-		# Supprime toutes les anciennes lignes switch
-		sed -i '/^switch/d' "$BATOCERA_CONF"
-
-		# Ajoute les nouvelles lignes de base
-		{
-			echo 'switch["_Switch-Home-menu.xci"].core=eden-emu'
-			echo 'switch["_Switch-Home-menu.xci"].emulator=eden-emu'
-		} >> "$BATOCERA_CONF"
+		# Ajoute la config Eden UNIQUEMENT si absente
+		grep -q 'switch\["_Switch-Home-menu.xci"\]\.core=eden-emu' "$BATOCERA_CONF" || \
+		echo 'switch["_Switch-Home-menu.xci"].core=eden-emu' >> "$BATOCERA_CONF"
+		grep -q 'switch\["_Switch-Home-menu.xci"\]\.emulator=eden-emu' "$BATOCERA_CONF" || \
+		echo 'switch["_Switch-Home-menu.xci"].emulator=eden-emu' >> "$BATOCERA_CONF"
 
 		# Préconfiguration langue FR si Batocera est en français
 		if [ "$batocera_language" = "fr_FR" ]; then
@@ -262,6 +260,7 @@ install_new_pack() {
 			grep -q "^switch.language=" "$BATOCERA_CONF" || echo "switch.language=2" >> "$BATOCERA_CONF"
 			grep -q "^switch.system_language=" "$BATOCERA_CONF" || echo "switch.system_language=French" >> "$BATOCERA_CONF"
 			grep -q "^switch.system_region=" "$BATOCERA_CONF" || echo "switch.system_region=Europe" >> "$BATOCERA_CONF"
+			grep -q "^switch.yuzu_intlanguage=" "$BATOCERA_CONF" || echo "switch.yuzu_intlanguage=fr" >> "$BATOCERA_CONF"
 		fi
 	fi
 

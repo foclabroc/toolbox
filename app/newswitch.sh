@@ -497,7 +497,8 @@ remove_old_installations() {
     if [[ -f "$CUSTOM" ]]; then
         sed -i '\|/userdata/system/switch/extra/batocera-switch-startup|d' "$CUSTOM"
     fi
-
+    
+    BATOCERA_CONF="/userdata/system/batocera.conf"
 	if [[ -f "$BATOCERA_CONF" ]]; then
 		# Récupère la langue système Batocera
 		batocera_language=$(grep '^system.language=' "$BATOCERA_CONF" | cut -d '=' -f2)
