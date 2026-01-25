@@ -395,8 +395,8 @@ backup_switch_data() {
 	[ "$(ls -A /userdata/system/configs/yuzu/load 2>/dev/null)" ] && \
 	mv /userdata/system/configs/yuzu/load/* /userdata/tmp/tmp_yuzu_mods/ 2>/dev/null
 
-	[ -d "/userdata/system/configs/yuzu/nand/user" ] && \
-	[ "$(ls -A /userdata/system/configs/yuzu/nand/user 2>/dev/null)" ] && \
+	[ -d "/userdata/system/configs/yuzu/nand/user/save" ] && \
+	[ "$(ls -A /userdata/system/configs/yuzu/nand/user/save 2>/dev/null)" ] && \
 	mv /userdata/system/configs/yuzu/nand/user/save/* /userdata/tmp/tmp_yuzu_save_user/ 2>/dev/null
 
 	[ -d "/userdata/system/configs/yuzu/nand/system/save" ] && \
