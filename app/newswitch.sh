@@ -517,6 +517,7 @@ remove_old_installations() {
 			grep -q "^switch.language=" "$BATOCERA_CONF" || echo "switch.language=2" >> "$BATOCERA_CONF"
 			grep -q "^switch.system_language=" "$BATOCERA_CONF" || echo "switch.system_language=French" >> "$BATOCERA_CONF"
 			grep -q "^switch.system_region=" "$BATOCERA_CONF" || echo "switch.system_region=Europe" >> "$BATOCERA_CONF"
+			grep -q "^switch.yuzu_intlanguage=" "$BATOCERA_CONF" || echo "switch.yuzu_intlanguage=fr" >> "$BATOCERA_CONF"
 		fi
 	fi
 
