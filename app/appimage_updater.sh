@@ -250,9 +250,9 @@ install_new_pack() {
 
 		# Ajoute la config UNIQUEMENT si absente
 		grep -q 'switch\["citron_config.xci_config"\]\.core=citron-emu' "$BATOCERA_CONF" || \
-		echo 'switch["ryujinx_config.xci_config"].core=citron-emu' >> "$BATOCERA_CONF"
-		grep -q 'switch\["ryujinx_config.xci_config"\]\.emulator=citron-emu' "$BATOCERA_CONF" || \
-		echo 'switch["ryujinx_config.xci_config"].emulator=citron-emu' >> "$BATOCERA_CONF"
+		echo 'switch["citron_config.xci_config"].core=citron-emu' >> "$BATOCERA_CONF"
+		grep -q 'switch\["citron_config.xci_config"\]\.emulator=citron-emu' "$BATOCERA_CONF" || \
+		echo 'switch["citron_config.xci_config"].emulator=citron-emu' >> "$BATOCERA_CONF"
 
 		grep -q 'switch\["eden_qlaunch.xci_config"\]\.core=eden-emu' "$BATOCERA_CONF" || \
 		echo 'switch["eden_qlaunch.xci_config"].core=eden-emu' >> "$BATOCERA_CONF"
