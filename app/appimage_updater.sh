@@ -248,11 +248,26 @@ install_new_pack() {
 		# Récupère la langue système Batocera
 		batocera_language=$(grep '^system.language=' "$BATOCERA_CONF" | cut -d '=' -f2)
 
-		# Ajoute la config Eden UNIQUEMENT si absente
-		grep -q 'switch\["_Switch-Home-menu.xci"\]\.core=eden-emu' "$BATOCERA_CONF" || \
-		echo 'switch["_Switch-Home-menu.xci"].core=eden-emu' >> "$BATOCERA_CONF"
-		grep -q 'switch\["_Switch-Home-menu.xci"\]\.emulator=eden-emu' "$BATOCERA_CONF" || \
-		echo 'switch["_Switch-Home-menu.xci"].emulator=eden-emu' >> "$BATOCERA_CONF"
+		# Ajoute la config UNIQUEMENT si absente
+		grep -q 'switch\["citron_config.xci_config"\]\.core=citron-emu' "$BATOCERA_CONF" || \
+		echo 'switch["ryujinx_config.xci_config"].core=citron-emu' >> "$BATOCERA_CONF"
+		grep -q 'switch\["ryujinx_config.xci_config"\]\.emulator=citron-emu' "$BATOCERA_CONF" || \
+		echo 'switch["ryujinx_config.xci_config"].emulator=citron-emu' >> "$BATOCERA_CONF"
+
+		grep -q 'switch\["eden_qlaunch.xci_config"\]\.core=eden-emu' "$BATOCERA_CONF" || \
+		echo 'switch["eden_qlaunch.xci_config"].core=eden-emu' >> "$BATOCERA_CONF"
+		grep -q 'switch\["eden_qlaunch.xci_config"\]\.emulator=eden-emu' "$BATOCERA_CONF" || \
+		echo 'switch["eden_qlaunch.xci_config"].emulator=eden-emu' >> "$BATOCERA_CONF"
+
+		grep -q 'switch\["eden_config.xci_config"\]\.core=eden-emu' "$BATOCERA_CONF" || \
+		echo 'switch["eden_config.xci_config"].core=eden-emu' >> "$BATOCERA_CONF"
+		grep -q 'switch\["eden_config.xci_config"\]\.emulator=eden-emu' "$BATOCERA_CONF" || \
+		echo 'switch["eden_config.xci_config"].emulator=eden-emu' >> "$BATOCERA_CONF"
+
+		grep -q 'switch\["ryujinx_config.xci_config"\]\.core=ryujinx-emu' "$BATOCERA_CONF" || \
+		echo 'switch["ryujinx_config.xci_config"].core=ryujinx-emu' >> "$BATOCERA_CONF"
+		grep -q 'switch\["ryujinx_config.xci_config"\]\.emulator=ryujinx-emu' "$BATOCERA_CONF" || \
+		echo 'switch["ryujinx_config.xci_config"].emulator=ryujinx-emu' >> "$BATOCERA_CONF"
 
 		# Préconfiguration langue FR si Batocera est en français
 		if [ "$batocera_language" = "fr_FR" ]; then
@@ -296,14 +311,18 @@ install_new_pack() {
     remove_game_by_path "$gamelist_file" "./Switch Updater.sh"
     remove_game_by_path "$gamelist_file" "./updateyuzuEA.sh"
     remove_game_by_path "$gamelist_file" "./updateyuzu.sh"
+    remove_game_by_path "$gamelist_file" "./ryujinx_config.sh"
+    remove_game_by_path "$gamelist_file" "./yuzu_config.sh"
+    remove_game_by_path "$gamelist_file" "./citron_config.sh"
+    remove_game_by_path "$gamelist_file2" "./_Switch-Home-menu.xci"
 
     # Supprimer entrée avant création
-    remove_game_by_path "$gamelist_file" "./ryujinx_config.sh"
+    remove_game_by_path "$gamelist_file2" "./ryujinx_config.sh"
     # Ajouter Ryujinx Config
     xmlstarlet ed -L \
         -s "/gameList" -t elem -n "game" -v "" \
-        -s "/gameList/game[last()]" -t elem -n "path" -v "./ryujinx_config.sh" \
-        -s "/gameList/game[last()]" -t elem -n "name" -v "Ryujinx Config App" \
+        -s "/gameList/game[last()]" -t elem -n "path" -v "./ryujinx_config.xci_config" \
+        -s "/gameList/game[last()]" -t elem -n "name" -v "1-Ryujinx Config App" \
         -s "/gameList/game[last()]" -t elem -n "desc" -v "Lancement de RYUJINX en mode application pour configuration manuelle." \
         -s "/gameList/game[last()]" -t elem -n "developer" -v "Foclabroc DreamerCG Spirit" \
         -s "/gameList/game[last()]" -t elem -n "publisher" -v "Foclabroc DreamerCG Spirit" \
@@ -314,15 +333,15 @@ install_new_pack() {
         -s "/gameList/game[last()]" -t elem -n "image" -v "./images/ryujinx_config_screen.png" \
         -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/ryujinx_config_logo.png" \
         -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/ryujinx_config.png" \
-        "$gamelist_file"
+        "$gamelist_file2"
 
     # Supprimer entrée avant création
-    remove_game_by_path "$gamelist_file" "./yuzu_config.sh"
+    remove_game_by_path "$gamelist_file2" "./yuzu_config.sh"
     # Ajouter Eden Config
     xmlstarlet ed -L \
         -s "/gameList" -t elem -n "game" -v "" \
-        -s "/gameList/game[last()]" -t elem -n "path" -v "./yuzu_config.sh" \
-        -s "/gameList/game[last()]" -t elem -n "name" -v "Eden Config App" \
+        -s "/gameList/game[last()]" -t elem -n "path" -v "./eden_config.xci_config" \
+        -s "/gameList/game[last()]" -t elem -n "name" -v "1-Eden Config App" \
         -s "/gameList/game[last()]" -t elem -n "desc" -v "Lancement de EDEN en mode application pour configuration manuelle de Eden." \
         -s "/gameList/game[last()]" -t elem -n "developer" -v "Foclabroc DreamerCG Spirit" \
         -s "/gameList/game[last()]" -t elem -n "publisher" -v "Foclabroc DreamerCG Spirit" \
@@ -333,15 +352,15 @@ install_new_pack() {
         -s "/gameList/game[last()]" -t elem -n "image" -v "./images/yuzu_config_screen.png" \
         -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/yuzu_config_logo.png" \
         -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/yuzu_config.png" \
-        "$gamelist_file"
+        "$gamelist_file2"
 
     # Supprimer entrée avant création
-    remove_game_by_path "$gamelist_file" "./citron_config.sh"
+    remove_game_by_path "$gamelist_file2" "./citron_config.sh"
     # Ajouter Citron Config
     xmlstarlet ed -L \
         -s "/gameList" -t elem -n "game" -v "" \
-        -s "/gameList/game[last()]" -t elem -n "path" -v "./citron_config.sh" \
-        -s "/gameList/game[last()]" -t elem -n "name" -v "Citron Config App" \
+        -s "/gameList/game[last()]" -t elem -n "path" -v "./citron_config.xci_config" \
+        -s "/gameList/game[last()]" -t elem -n "name" -v "1-Citron Config App" \
         -s "/gameList/game[last()]" -t elem -n "desc" -v "Lancement de CITRON en mode application pour configuration manuelle de Citron." \
         -s "/gameList/game[last()]" -t elem -n "developer" -v "Foclabroc DreamerCG Spirit" \
         -s "/gameList/game[last()]" -t elem -n "publisher" -v "Foclabroc DreamerCG Spirit" \
@@ -352,7 +371,7 @@ install_new_pack() {
         -s "/gameList/game[last()]" -t elem -n "image" -v "./images/citron_config_screen.png" \
         -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/citron_config_logo.png" \
         -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/citron_config.png" \
-        "$gamelist_file"
+        "$gamelist_file2"
 
     # Supprimer entrée avant création
     remove_game_by_path "$gamelist_file" "./Switch AppImages Updater.sh"
@@ -374,11 +393,11 @@ install_new_pack() {
         "$gamelist_file"
 
     # Supprimer entrée avant création
-    remove_game_by_path "$gamelist_file2" "./_Switch-Home-menu.xci"
+    remove_game_by_path "$gamelist_file2" "./eden_qlaunch.xci_config"
     # Ajouter Qlauncher
     xmlstarlet ed -L \
         -s "/gameList" -t elem -n "game" -v "" \
-        -s "/gameList/game[last()]" -t elem -n "path" -v "./_Switch-Home-menu.xci" \
+        -s "/gameList/game[last()]" -t elem -n "path" -v "./eden_qlaunch.xci_config" \
         -s "/gameList/game[last()]" -t elem -n "name" -v "1-Switch Home Menu (Only with Eden-emu)" \
         -s "/gameList/game[last()]" -t elem -n "desc" -v "Démarrage en mode Ecran d'accueil Switch réel (qlauncher) A lancer uniquement avec EDEN !!!." \
         -s "/gameList/game[last()]" -t elem -n "developer" -v "Foclabroc" \
@@ -392,9 +411,9 @@ install_new_pack() {
         -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/_Switch-Home-menu-box.png" \
         "$gamelist_file2"
 
-    for file in "$gamelist_file" "$gamelist_file2"; do
-        [ -f "$file" ] && sed -i '/<sortname>[^<]*<\/sortname>/d' "$file"
-    done
+        for file in "$gamelist_file" "$gamelist_file2"; do
+            [ -f "$file" ] && sed -i '/<sortname>[^<]*<\/sortname>/d' "$file"
+        done
 
     rm -f "/userdata/README.md"
     rm -rf "/userdata/tmpf"
