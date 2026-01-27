@@ -138,7 +138,7 @@ wget_step() {
     local spinner=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
     local i=0
 
-    wget --tries=3 --timeout=10 --connect-timeout=5 \
+    wget -nv --tries=3 --timeout=10 --connect-timeout=5 \
          "$url" -O "$dest" 2>>"$LOG_FILE" &
     pid=$!
 
@@ -184,6 +184,7 @@ deploy_if_valid() {
     mv -f "$src" "$SWITCH_APPIMAGES_FINAL/$name"
 
     log "Deployed $name to final folder (${size_mb}MB)"
+    log "!!!!Update $name AppImage Finished!!!!"
     return 0
 }
 
@@ -192,7 +193,8 @@ deploy_if_valid() {
 # ===============================
 install_new_pack() {
 
-    log "Starting system files update pack"
+    log "!!!!Starting system files update pack!!!!"
+    log "  "
 
     PACK_URL="https://github.com/foclabroc/New-batocera-switch/archive/refs/heads/main.zip"
     PACK_ZIP="/userdata/tmpf/pack.zip"
@@ -208,6 +210,7 @@ install_new_pack() {
     echo "-->$(tr SYS_UPDATE)"
     echo "XXX"
 
+    log "Download system .zip at : https://github.com/foclabroc/New-batocera-switch/archive/refs/heads/main.zip"
     wget -q -O "$PACK_ZIP" "$PACK_URL" || {
         log "ERROR system pack download failed"
         echo "STATUS_SYS=ERREUR" >> "$STATUS_FILE"
@@ -220,9 +223,13 @@ install_new_pack() {
         return
     fi
 
+    log "Download system .zip done."
+    log "  "
+    log "Extracting system .zip."
     rm -rf "$EXTRACT_DIR"
     mkdir -p "$EXTRACT_DIR"
-    unzip -o "$PACK_ZIP" -d "$EXTRACT_DIR" >>"$LOG_FILE" 2>&1
+    unzip -q -o "$PACK_ZIP" -d "$EXTRACT_DIR" >>"$LOG_FILE" 2>&1
+    log "System pack extraction done."
 
     ROOT_DIR=$(find "$EXTRACT_DIR" -mindepth 1 -maxdepth 1 -type d | head -n1)
 
@@ -232,8 +239,10 @@ install_new_pack() {
         return
     }
 
+    log "  "
+    log "Copy extracted files to finale destination"
     shopt -s dotglob nullglob
-    cp -r "$ROOT_DIR"/* /userdata/ >>"$LOG_FILE" 2>&1
+    cp -rv "$ROOT_DIR"/* /userdata/ >>"$LOG_FILE" 2>&1
     shopt -u dotglob nullglob
 
     log "System files copied"
@@ -415,10 +424,11 @@ install_new_pack() {
             [ -f "$file" ] && sed -i '/<sortname>[^<]*<\/sortname>/d' "$file"
         done
 
+    log "Cleanup temporary files"
     rm -f "/userdata/README.md"
     rm -rf "/userdata/tmpf"
 
-    log "System pack installation finished"
+    log "!!!!System pack update finished!!!!"
     echo "STATUS_SYS=OK" >> "$STATUS_FILE"
 }
 
@@ -428,6 +438,9 @@ install_new_pack() {
 update_citron() {
     local page tag tag_decoded version url dest
 
+    log "  "
+    log "  "
+    log "!!!!START Citron AppImage update!!!!"
     log "Checking Citron GitHub tags (stable only)"
 
     page=$(curl -Ls "https://github.com/pkgforge-dev/Citron-AppImage/tags" 2>>"$LOG_FILE")
@@ -479,6 +492,9 @@ update_citron() {
 update_eden() {
     local json release url dest
 
+    log "  "
+    log "  "
+    log "!!!!START Eden AppImage update!!!!"
     log "Checking Eden latest release"
 
     json=$(curl -fsL "https://api.github.com/repos/eden-emulator/Releases/releases/latest" 2>>"$LOG_FILE")
@@ -502,6 +518,8 @@ update_eden() {
     url="https://github.com/eden-emulator/Releases/releases/download/$release/Eden-Linux-$release-amd64-gcc-standard.AppImage"
     dest="$SWITCH_APPIMAGES/eden-emu.AppImage"
 
+    log "Detected Eden version: $release"
+    log "Downloading: $url"
     if wget_step "$url" "$dest" "eden-emu" && deploy_if_valid "$dest"; then
         echo "STATUS_EDEN=OK" >> "$STATUS_FILE"
         echo "EDEN_VERSION=$release" >> "$VERSIONS_FILE"
@@ -516,6 +534,10 @@ update_eden() {
 update_eden_pgo() {
     local release url dest
 
+    log "  "
+    log "  "
+    log "!!!!START Eden PGO AppImage update!!!!"
+    log "Checking Eden PGO latest release"
     release=$(grep '^EDEN_VERSION=' "$VERSIONS_FILE" | cut -d= -f2)
 
     if [[ -z "$release" ]]; then
@@ -527,6 +549,8 @@ update_eden_pgo() {
     url="https://github.com/eden-emulator/Releases/releases/download/$release/Eden-Linux-$release-amd64-clang-pgo.AppImage"
     dest="$SWITCH_APPIMAGES/eden-pgo.AppImage"
 
+    log "Detected Eden PGO version: $release"
+    log "Downloading: $url"
     if wget_step "$url" "$dest" "eden-pgo" && deploy_if_valid "$dest"; then
         echo "STATUS_EDEN_PGO=OK" >> "$STATUS_FILE"
         echo "EDEN_PGO_VERSION=$release" >> "$VERSIONS_FILE"
@@ -541,6 +565,9 @@ update_eden_pgo() {
 update_ryujinx() {
     local page release url dest
 
+    log "  "
+    log "  "
+    log "!!!!START Ryujinx AppImage update!!!!"
     log "Checking Ryujinx Canary version"
 
     page=$(curl -fsL "https://release-monitoring.org/project/377871/" 2>>"$LOG_FILE")
@@ -564,6 +591,8 @@ update_ryujinx() {
     url="https://git.ryujinx.app/api/v4/projects/68/packages/generic/Ryubing-Canary/$release/ryujinx-canary-$release-x64.AppImage"
     dest="$SWITCH_APPIMAGES/ryujinx-emu.AppImage"
 
+    log "Detected Ryujinx version: $release"
+    log "Downloading: $url"
     if wget_step "$url" "$dest" "ryujinx-emu" && deploy_if_valid "$dest"; then
         echo "STATUS_RYUJINX=OK" >> "$STATUS_FILE"
         echo "RYUJINX_VERSION=$release" >> "$VERSIONS_FILE"
