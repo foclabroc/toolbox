@@ -310,7 +310,7 @@ if [[ "$MODE" == "1" ]]; then
     sleep 1
 
     clear
-    curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/appimage_updater.sh | bash
+    curl -L --retry 3 https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/appimage_updater.sh | bash
     exit 0
 fi
 
@@ -562,12 +562,15 @@ install_new_pack() {
     rm -rf "$PACK_ZIP"
 
     # Télécharger
-    wget -q -O "$PACK_ZIP" "$PACK_URL"
+	wget -q --tries=3 --timeout=20 --retry-connrefused -O "$PACK_ZIP" "$PACK_URL"
+	WGET_STATUS=$?
 
-    if [[ ! -s "$PACK_ZIP" ]]; then
-        dialog --backtitle "$BACKTITLE" --msgbox "\n$(TXT error)\nDownload failed." 6 50
-        exit 1
-    fi
+	if [ $WGET_STATUS -ne 0 ] || [ ! -s "$PACK_ZIP" ]; then
+		dialog --title "Erreur téléchargement" \
+			   --msgbox "Impossible de télécharger le pack après plusieurs tentatives." 8 60
+		rm -f "$PACK_ZIP"
+		return 1
+	fi
 
     # Extraire
     rm -rf "$EXTRACT_DIR"
@@ -940,23 +943,26 @@ download_with_gauge() {
     DEST_FILE="$2"
 
     mkdir -p "$(dirname "$DEST_FILE")"
+    rm -f "$DEST_FILE"
 
-    # Récupérer la taille totale du fichier (HEAD)
+    # Taille totale du fichier (si dispo)
     poids_bytes=$(wget --spider "$URL" 2>&1 | awk '/Length:/ {print $2}')
     [ -z "$poids_bytes" ] && poids_bytes=600000000
 
     poids=$((poids_bytes / 1024 / 1024))
-
     START_TIME=$(date +%s)
 
     # Lancer le téléchargement en arrière-plan
-    wget -q -O "$DEST_FILE" "$URL" &
-    PID_CURL=$!
+    wget -q --tries=3 --timeout=20 --retry-connrefused -O "$DEST_FILE" "$URL" &
+    PID_WGET=$!
 
     (
-    while kill -0 $PID_CURL 2>/dev/null; do
+    LAST_SIZE=0
+
+    while kill -0 $PID_WGET 2>/dev/null; do
         if [ -f "$DEST_FILE" ]; then
             CURRENT_SIZE=$(stat -c%s "$DEST_FILE" 2>/dev/null)
+            LAST_SIZE=$CURRENT_SIZE
 
             NOW=$(date +%s)
             ELAPSED=$((NOW - START_TIME))
@@ -969,7 +975,7 @@ download_with_gauge() {
             TOTAL_MB=$poids
 
             REMAINING_BYTES=$((poids_bytes - CURRENT_SIZE))
-            [ "$SPEED_BPS" -eq 0 ] && SPEED_BPS=1
+            [ "$SPEED_BPS" -le 0 ] && SPEED_BPS=1
 
             ETA_SEC=$((REMAINING_BYTES / SPEED_BPS))
             ETA_MIN=$((ETA_SEC / 60))
@@ -978,6 +984,7 @@ download_with_gauge() {
 
             PROGRESS=$((CURRENT_SIZE * 100 / poids_bytes))
             [ "$PROGRESS" -gt 100 ] && PROGRESS=100
+            [ "$PROGRESS" -lt 0 ] && PROGRESS=0
 
             echo "$PROGRESS"
             echo "XXX"
@@ -992,17 +999,41 @@ download_with_gauge() {
         sleep 0.5
     done
 
-    # wait $PID_CURL
+    FINAL_SIZE=$(stat -c%s "$DEST_FILE" 2>/dev/null)
 
-    echo "100"
-    echo "XXX"
-    echo "$(TXT download_finished)"
-    echo "XXX"
+    # Si le fichier est très incomplet (<90%) → erreur affichée dans la jauge
+    if [ -z "$FINAL_SIZE" ] || [ "$FINAL_SIZE" -lt $((poids_bytes * 90 / 100)) ]; then
+        echo "0"
+        echo "XXX"
+        echo "$(TXT download_error)"
+        echo "$(TXT check_connection)"
+        echo "XXX"
+        sleep 2
+    else
+        echo "100"
+        echo "XXX"
+        echo "$(TXT download_finished)"
+        echo "XXX"
+    fi
 
     ) | dialog --backtitle "$BACKTITLE" \
                --title "$(TXT step_download_pack)" \
                --gauge "$(TXT downloading)" 12 70 0
+
+    # Attendre proprement la fin de wget (dans le bon shell)
+    wait $PID_WGET 2>/dev/null
+
+    FILE_SIZE=$(stat -c%s "$DEST_FILE" 2>/dev/null)
+
+    # Vérification finale de sécurité
+    if [ -z "$FILE_SIZE" ] || [ "$FILE_SIZE" -lt 1048576 ]; then
+        dialog --title "$(TXT download_error)" \
+               --msgbox "$(TXT check_connection)" 8 50
+        rm -f "$DEST_FILE"
+        return 1
+    fi
 }
+
 
 
 extract_with_gauge() {
@@ -1074,7 +1105,7 @@ if [[ $? -eq 0 ]]; then
     sleep 1
 
     clear
-    curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/appimage_updater.sh | bash
+    curl -L --retry 3 https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/appimage_updater.sh | bash
 fi
 
 

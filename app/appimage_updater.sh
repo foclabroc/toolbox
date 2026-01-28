@@ -211,12 +211,20 @@ install_new_pack() {
     echo "-->$(tr SYS_UPDATE)"
     echo "XXX"
 
-    log "Download system .zip at : https://github.com/foclabroc/New-batocera-switch/archive/refs/heads/main.zip"
-    wget -q -O "$PACK_ZIP" "$PACK_URL" || {
-        log "ERROR system pack download failed"
-        echo "STATUS_SYS=ERREUR" >> "$STATUS_FILE"
-        return
-    }
+	log "Download system .zip at : $PACK_URL"
+
+	wget -q --tries=3 --timeout=20 --retry-connrefused -O "$PACK_ZIP" "$PACK_URL"
+	WGET_STATUS=$?
+
+	FILE_SIZE=$(stat -c%s "$PACK_ZIP" 2>/dev/null)
+
+	if [ $WGET_STATUS -ne 0 ] || [ -z "$FILE_SIZE" ] || [ "$FILE_SIZE" -lt 1048576 ]; then
+		log "ERROR system pack download failed"
+		log "WGET_STATUS=$WGET_STATUS SIZE=$FILE_SIZE"
+		echo "STATUS_SYS=ERREUR" >> "$STATUS_FILE"
+		rm -f "$PACK_ZIP"
+		return 1
+	fi
 
     if [[ ! -s "$PACK_ZIP" ]]; then
         log "ERROR system pack zip empty"
