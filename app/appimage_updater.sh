@@ -201,6 +201,7 @@ install_new_pack() {
     EXTRACT_DIR="/userdata/tmpf/new_switch_pack"
 
     mkdir -p /userdata/tmpf
+    rm -rf "$PACK_ZIP"
 
     echo "XXX"
     echo "$GLOBAL_PERCENT"

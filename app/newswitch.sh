@@ -559,6 +559,7 @@ install_new_pack() {
     EXTRACT_DIR="/userdata/tmp/new_switch_pack"
 
     mkdir -p /userdata/tmp
+    rm -rf "$PACK_ZIP"
 
     # Télécharger
     wget -q -O "$PACK_ZIP" "$PACK_URL"
@@ -879,6 +880,7 @@ install_emulators_pack() {
     ZIP_FILE="/userdata/tmp/firmware_appimage.zip"
 
     mkdir -p /userdata/tmp
+    rm -rf "$ZIP_FILE"
 
     download_with_gauge "$ZIP_URL" "$ZIP_FILE"
 
