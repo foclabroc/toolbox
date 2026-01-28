@@ -310,7 +310,7 @@ if [[ "$MODE" == "1" ]]; then
     sleep 1
 
     clear
-    curl -L --retry 3 https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/appimage_updater.sh | bash
+    curl -Ls --retry 3 https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/appimage_updater.sh | bash
     exit 0
 fi
 
@@ -1105,7 +1105,7 @@ if [[ $? -eq 0 ]]; then
     sleep 1
 
     clear
-    curl -L --retry 3 https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/appimage_updater.sh | bash
+    curl -Ls --retry 3 https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/appimage_updater.sh | bash
 fi
 
 
