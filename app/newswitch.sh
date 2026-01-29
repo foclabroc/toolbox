@@ -28,7 +28,7 @@ case "$LANGUE:$1" in
 1:full_install) echo "Full Switch installation";;
 2:full_install) echo "Installation complète Switch";;
 
-1:update_emu) echo "Emulator updates and system files only";;
+1:update_emu) echo "Updates Emulators and System files only";;
 2:update_emu) echo "Mise à jours des emulateurs et fichiers systeme seulement";;
 
 1:step_install) echo "Downloading/Installing new Switch pack";;
