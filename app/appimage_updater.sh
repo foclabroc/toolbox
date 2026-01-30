@@ -267,6 +267,8 @@ install_new_pack() {
 		batocera_language=$(grep '^system.language=' "$BATOCERA_CONF" | cut -d '=' -f2)
 
 		# Ajoute la config UNIQUEMENT si absente
+		grep -q '^switch\.bezel=none' "$BATOCERA_CONF" || \
+		echo 'switch.bezel=none' >> "$BATOCERA_CONF"
 		grep -q 'switch\["citron_config.xci_config"\]\.core=citron-emu' "$BATOCERA_CONF" || \
 		echo 'switch["citron_config.xci_config"].core=citron-emu' >> "$BATOCERA_CONF"
 		grep -q 'switch\["citron_config.xci_config"\]\.emulator=citron-emu' "$BATOCERA_CONF" || \

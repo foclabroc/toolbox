@@ -519,6 +519,9 @@ remove_old_installations() {
 		sed -i '/^switch/d' "$BATOCERA_CONF"
 		
 		# Ajoute la config UNIQUEMENT si absente
+
+		grep -q '^switch\.bezel=none' "$BATOCERA_CONF" || \
+		echo 'switch.bezel=none' >> "$BATOCERA_CONF"
 		grep -q 'switch\["citron_config.xci_config"\]\.core=citron-emu' "$BATOCERA_CONF" || \
 		echo 'switch["citron_config.xci_config"].core=citron-emu' >> "$BATOCERA_CONF"
 		grep -q 'switch\["citron_config.xci_config"\]\.emulator=citron-emu' "$BATOCERA_CONF" || \
