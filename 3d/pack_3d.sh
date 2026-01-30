@@ -4,7 +4,9 @@
 URL_40="https://github.com/foclabroc/toolbox/releases/download/Fichiers/3d.zip"
 URL_41="https://github.com/foclabroc/toolbox/releases/download/Fichiers/3d-41.zip"
 URL_42="https://github.com/foclabroc/toolbox/releases/download/Fichiers/3d-42.zip"
-URL_43="https://github.com/foclabroc/toolbox/releases/download/Fichiers/3d-43.zip"
+# URL_43="https://github.com/foclabroc/toolbox/releases/download/Fichiers/3d-43.zip"
+URL_43="https://foclabroc.freeboxos.fr:55973/share/3g4E1VIWsUojpQKm/3d-43.zip"
+
 clear
 
 # Détecter la version de Batocera
@@ -34,6 +36,9 @@ DESTINATION="/userdata/"
 
 # Suppression des anciens dossiers
 echo "Suppression des anciens fichiers..."
+rm -f /userdata/system/configs/evmapy/3dnes.keys
+rm -f /userdata/system/configs/emulationstation/es_features_3dnes.cfg
+rm -f /userdata/system/configs/emulationstation/es_systems_3dnes.cfg
 rm -rf /userdata/system/3dnes
 rm -rf /userdata/system/nes3d
 rm -rf /userdata/roms/nes3d
@@ -41,7 +46,7 @@ rm -rf /userdata/system/wine-bottles/3dnes
 rm -rf /userdata/system/wine-bottles/nes3d
 
 # Vérification de l'espace disque
-ARCHIVE_SIZE_MB=1080
+ARCHIVE_SIZE_MB=1800
 REQUIRED_SPACE_MB=$((ARCHIVE_SIZE_MB * 2 + 200))
 
 # Récupérer l’espace libre sur /userdata (en Mo)
@@ -95,4 +100,4 @@ sleep 2
 
 # Affichage du message de confirmation
 dialog --backtitle "Foclabroc Toolbox" --title "Terminé" \
---msgbox "Installation du pack Nes3D terminée avec succès.\n\nAu tout premier lancement patientez 30sec à 1 minutes\npour l'installation des winetricks" 10 70
+--msgbox "Installation du pack Nes3D terminée avec succès." 10 70
