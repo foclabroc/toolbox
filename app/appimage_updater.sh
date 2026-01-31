@@ -733,7 +733,7 @@ GLOBAL_PERCENT=0
     [[ "$STATUS_RYUJINX" == "OK" ]] \
         && RYUJINX_LINE="Ryujinx        : OK ---->(${RYUJINX_VERSION})" \
         || RYUJINX_LINE="Ryujinx        : $(tr ERROR) ryujinx-emu.AppImage $(tr ERROR_EMU)"
-
+    curl http://127.0.0.1:1234/reloadgames
     dialog --backtitle "$BACKTITLE" \
            --title "$(tr FINAL_TITLE)" \
            --ok-label "$(tr OK_LABEL)" \
@@ -753,7 +753,7 @@ $RYUJINX_LINE
 Logs : $LOG_FILE
 EOF
 )" 18 70
-curl http://127.0.0.1:1234/reloadgames
+
 clear
 exit 0
 }
