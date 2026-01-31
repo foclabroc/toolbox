@@ -70,6 +70,7 @@ Voulez-vous mettre à jour les AppImages Switch ?
 • Citron
 • Eden
 • Eden PGO
+• Eden Nightly
 • Ryujinx" ;;
         en:CONFIRM_TEXT) echo "
 Do you want to update Switch AppImages?
@@ -77,6 +78,7 @@ Do you want to update Switch AppImages?
 • Citron
 • Eden
 • Eden PGO
+• Eden Nightly
 • Ryujinx" ;;
 
         fr:GAUGE_TITLE) echo "Mise à jour des AppImages Switch" ;;
@@ -498,6 +500,66 @@ update_citron() {
 }
 
 # ===============================
+# UPDATE EDEN NIGHTLY
+# ===============================
+update_nightly() {
+    local json release date url asset dest
+
+    log "  "
+    log "  "
+    log "!!!!START Eden Nightly AppImage update!!!!"
+    log "Checking Eden Nightly latest release"
+
+    json=$(curl -fsL "https://api.github.com/repos/Eden-CI/Nightly/releases/latest" 2>>"$LOG_FILE")
+
+    if [[ -z "$json" ]]; then
+        log "ERROR Nightly: GitHub API unreachable"
+        echo "STATUS_NIGHTLY=ERREUR" >> "$STATUS_FILE"
+        return
+    fi
+
+    release=$(echo "$json" |
+        grep -Eo '"tag_name": *"[^"]+"' |
+        sed -E 's/.*"([^"]+)".*/\1/')
+
+    if [[ -z "$release" ]]; then
+        log "ERROR Nightly: tag_name not found"
+        echo "STATUS_NIGHTLY=ERREUR" >> "$STATUS_FILE"
+        return
+    fi
+
+    date=$(echo "$json" |
+        grep -Eo '"published_at": *"[^"]+"' |
+        sed -E 's/.*"([^T]+)T.*/\1/')
+
+    [[ -n "$date" ]] && log "Release date: $date"
+
+    asset=$(echo "$json" |
+        grep -oE '"browser_download_url": *"[^"]+Eden-Linux-[^"]+amd64-gcc-standard.AppImage"' |
+        head -n1 |
+        sed -E 's/.*"([^"]+)".*/\1/')
+
+    if [[ -z "$asset" ]]; then
+        log "ERROR Nightly: AppImage asset not found"
+        echo "STATUS_NIGHTLY=ERREUR" >> "$STATUS_FILE"
+        return
+    fi
+
+    url="$asset"
+    dest="$SWITCH_APPIMAGES/eden-nightly.AppImage"
+
+    log "Detected Nightly version: $release"
+    log "Downloading: $url"
+    if wget_step "$url" "$dest" "eden-nightly" && deploy_if_valid "$dest"; then
+        echo "STATUS_NIGHTLY=OK" >> "$STATUS_FILE"
+        echo "NIGHTLY_VERSION=$release" >> "$VERSIONS_FILE"
+        [[ -n "$date" ]] && echo "NIGHTLY_DATE=$date" >> "$VERSIONS_FILE"
+    else
+        echo "STATUS_NIGHTLY=ERREUR" >> "$STATUS_FILE"
+    fi
+}
+
+# ===============================
 # UPDATE EDEN
 # ===============================
 update_eden() {
@@ -624,13 +686,16 @@ GLOBAL_PERCENT=0
     GLOBAL_PERCENT=20
 
     update_citron
-    GLOBAL_PERCENT=40
+    GLOBAL_PERCENT=33
+
+    update_nightly
+    GLOBAL_PERCENT=53
 
     update_eden
-    GLOBAL_PERCENT=60
+    GLOBAL_PERCENT=68
 
     update_eden_pgo
-    GLOBAL_PERCENT=80
+    GLOBAL_PERCENT=83
 
     update_ryujinx
     GLOBAL_PERCENT=100
@@ -650,20 +715,24 @@ GLOBAL_PERCENT=0
         || SYS_LINE="$(tr SYS_FILES) : $(tr SYS_FAIL)"
 
     [[ "$STATUS_CITRON" == "OK" ]] \
-        && CITRON_LINE="Citron       : OK ---->(${CITRON_VERSION})" \
-        || CITRON_LINE="Citron       : $(tr ERROR) citron-emu.AppImage $(tr ERROR_EMU)"
+        && CITRON_LINE="Citron         : OK ---->(${CITRON_VERSION})" \
+        || CITRON_LINE="Citron         : $(tr ERROR) citron-emu.AppImage $(tr ERROR_EMU)"
+
+    [[ "$STATUS_NIGHTLY" == "OK" ]] \
+        && NIGHTLY_LINE="Eden-Nightly   : OK ---->(${NIGHTLY_DATE})" \
+        || NIGHTLY_LINE="Eden-Nightly   : $(tr ERROR) eden-nightly.AppImage $(tr ERROR_EMU)"
 
     [[ "$STATUS_EDEN" == "OK" ]] \
-        && EDEN_LINE="Eden         : OK ---->(${EDEN_VERSION})" \
-        || EDEN_LINE="Eden         : $(tr ERROR) eden-emu.AppImage $(tr ERROR_EMU)"
+        && EDEN_LINE="Eden           : OK ---->(${EDEN_VERSION})" \
+        || EDEN_LINE="Eden           : $(tr ERROR) eden-emu.AppImage $(tr ERROR_EMU)"
 
     [[ "$STATUS_EDEN_PGO" == "OK" ]] \
-        && EDEN_PGO_LINE="Eden-PGO     : OK ---->(${EDEN_PGO_VERSION})" \
-        || EDEN_PGO_LINE="Eden-PGO     : $(tr ERROR) eden-pgo.AppImage $(tr ERROR_EMU)"
+        && EDEN_PGO_LINE="Eden-PGO       : OK ---->(${EDEN_PGO_VERSION})" \
+        || EDEN_PGO_LINE="Eden-PGO       : $(tr ERROR) eden-pgo.AppImage $(tr ERROR_EMU)"
 
     [[ "$STATUS_RYUJINX" == "OK" ]] \
-        && RYUJINX_LINE="Ryujinx      : OK ---->(${RYUJINX_VERSION})" \
-        || RYUJINX_LINE="Ryujinx      : $(tr ERROR) ryujinx-emu.AppImage $(tr ERROR_EMU)"
+        && RYUJINX_LINE="Ryujinx        : OK ---->(${RYUJINX_VERSION})" \
+        || RYUJINX_LINE="Ryujinx        : $(tr ERROR) ryujinx-emu.AppImage $(tr ERROR_EMU)"
 
     dialog --backtitle "$BACKTITLE" \
            --title "$(tr FINAL_TITLE)" \
@@ -676,13 +745,14 @@ $(tr UPDATE_RESULT)
 $SYS_LINE
 
 $CITRON_LINE
+$NIGHTLY_LINE
 $EDEN_LINE
 $EDEN_PGO_LINE
 $RYUJINX_LINE
 
 Logs : $LOG_FILE
 EOF
-)" 17 70
+)" 18 70
 
 exit 0
 }
@@ -694,7 +764,7 @@ dialog --backtitle "$BACKTITLE" \
        --title "$(tr CONFIRM_TITLE)" \
        --yes-label "$(tr YES_LABEL)" \
        --no-label "$(tr NO_LABEL)" \
-       --yesno "$(tr CONFIRM_TEXT)" 13 60
+       --yesno "$(tr CONFIRM_TEXT)" 14 60
 
 case $? in
     0) run_update ;;

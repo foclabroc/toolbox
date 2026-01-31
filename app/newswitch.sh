@@ -225,6 +225,7 @@ Folders to back up for safety:
 After installation you will be able to choose between:
 - Eden
 - Eden-pgo
+- Eden-nightly
 - Citron
 - Ryujinx (ryubing)
 
@@ -254,6 +255,7 @@ Dossiers à sauvegarder par prudence :
 Après l’installation vous aurez le choix entre :
 - Eden
 - Eden-pgo
+- Eden-nightly
 - Citron
 - Ryujinx (ryubing)
 
