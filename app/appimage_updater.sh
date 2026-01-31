@@ -753,7 +753,8 @@ $RYUJINX_LINE
 Logs : $LOG_FILE
 EOF
 )" 18 70
-
+curl http://127.0.0.1:1234/reloadgames
+clear
 exit 0
 }
 
