@@ -4,8 +4,8 @@
 URL_40="https://github.com/foclabroc/toolbox/releases/download/Fichiers/3d.zip"
 URL_41="https://github.com/foclabroc/toolbox/releases/download/Fichiers/3d-41.zip"
 URL_42="https://github.com/foclabroc/toolbox/releases/download/Fichiers/3d-42.zip"
-# URL_43="https://github.com/foclabroc/toolbox/releases/download/Fichiers/3d-43.zip"
-URL_43="https://foclabroc.freeboxos.fr:55973/share/3g4E1VIWsUojpQKm/3d-43.zip"
+URL_43="https://github.com/foclabroc/toolbox/releases/download/Fichiers/3d-43.zip"
+# URL_43="https://foclabroc.freeboxos.fr:55973/share/3g4E1VIWsUojpQKm/3d-43.zip"
 
 clear
 
