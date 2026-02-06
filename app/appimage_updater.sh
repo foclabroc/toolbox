@@ -440,6 +440,7 @@ install_new_pack() {
     log "Cleanup temporary files"
     rm -f "/userdata/README.md"
     rm -rf "/userdata/tmpf"
+    rm -f "/userdata/system/services/foclaswitch"
 
     log "!!!!System pack update finished!!!!"
     echo "STATUS_SYS=OK" >> "$STATUS_FILE"

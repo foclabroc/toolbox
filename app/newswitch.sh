@@ -434,6 +434,7 @@ remove_old_installations() {
         /userdata/system/configs/sudachi
         /userdata/system/configs/suyu
         /userdata/system/configs/eden
+        /userdata/system/services/foclaswitch
         /userdata/system/configs/emulationstation/es_systems_switch.cfg
         /userdata/system/configs/emulationstation/es_features_switch.cfg
         /userdata/system/configs/evmapy/switch.keys
