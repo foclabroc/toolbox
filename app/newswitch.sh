@@ -766,6 +766,10 @@ restore_switch_data() {
     move_content "/userdata/tmp/tmp_ryujinx_save_system" "/userdata/saves/switch/ryujinx/save/save_system"
     move_content "/userdata/tmp/tmp_ryujinx_mods" "/userdata/saves/switch/ryujinx/mods"
 
+    [ -L "/userdata/saves/switch/ryujinx/save/save_user/save" ] && rm "/userdata/saves/switch/ryujinx/save/save_user/save"
+    move_content "/userdata/saves/switch/ryujinx/save/save_user/user" "/userdata/saves/switch/ryujinx/save/save_user"
+    rmdir "/userdata/saves/switch/ryujinx/save/save_user/user" 2>/dev/null
+
     mark_step_done "restore"
 }
 
