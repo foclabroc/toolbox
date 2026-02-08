@@ -10,6 +10,7 @@ declare -A poids_versions=(
     [40]=3340
     [41]=3400
     [42]=3900
+    [43-V3]=4090
 )
 
 # Message initial
@@ -28,12 +29,13 @@ verifier_connexion() {
 
 # Fonction: sélectionner version
 selectionner_version() {
-  choix=$(dialog --backtitle "$BACKTITLE" --title "Choisir une version" --menu "\nVersion actuelle : $VERSION\n\nSélectionnez une version à télécharger :\n " 20 55 8 \
+  choix=$(dialog --backtitle "$BACKTITLE" --title "Choisir une version" --menu "\nVersion actuelle : $VERSION\n\nSélectionnez une version à télécharger :\n " 20 80 8 \
     38 "->Version 38 (3.02 Go)" \
     39 "->Version 39 (3.16 Go)" \
     40 "->Version 40 (3.34 Go)" \
     41 "->Version 41 (3.40 Go)" \
     42 "->Version 42 (3.90 Go)" \
+    43-V3 "->Version 43 Zen3 : Console portables x86_64 AMD et Intel seulement (4.09 Go)" \
     2>&1 >/dev/tty)
 
   if [ $? -ne 0 ] || [ -z "$choix" ]; then
