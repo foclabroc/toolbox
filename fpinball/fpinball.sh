@@ -12,11 +12,11 @@ dialog --backtitle "Foclabroc Toolbox" \
 sleep 2
 
 # Déterminer l'URL en fonction de la version
-if [ "$VERSION" -ge 42 ]; then
+if [ "$VERSION" -eq 42 ]; then
     ARCHIVE_URL="$URL_FP"
 else
     dialog --backtitle "Foclabroc Toolbox" \
-           --msgbox "\nVotre version de Batocera ($VERSION) n'est pas prise en charge.\n\nMettez à jour vers la version 42 ou supérieure." 8 60 2>&1 >/dev/tty
+           --msgbox "\nVotre version de Batocera ($VERSION) n'est pas prise en charge.\n\nMettez à jour vers la version 42." 8 60 2>&1 >/dev/tty
     exit 1
 fi
 
