@@ -538,7 +538,7 @@ update_citron() {
     fi
 
     appimage_url=$(echo "$assets_page" \
-        | grep -Eo '/Zephyron-Dev/Citron-CI/releases/download/[^"]+Citron-[^"]+-Linux-x86_64\.AppImage' \
+        | grep -Eo '/Zephyron-Dev/Citron-CI/releases/download/[^"]+Citron-[^"]+-Linux-x86_64_v3\.AppImage' \
         | head -n1)
 
     if [[ -z "$appimage_url" ]]; then
@@ -637,36 +637,36 @@ update_nightly() {
 # UPDATE EDEN
 # ===============================
 update_eden() {
-    local json release url dest
+    local html release url dest
 
     log "  "
     log "  "
-    log "!!!!START Eden AppImage update!!!!"
+    log "!!!!START Eden AppImage update (git.eden-emu.dev)!!!!"
     log "Checking Eden latest release"
 
-    json=$(curl -fsL "https://api.github.com/repos/eden-emulator/Releases/releases/latest" 2>>"$LOG_FILE")
+    html=$(curl -fsL "https://git.eden-emu.dev/eden-emu/eden/releases" 2>>"$LOG_FILE")
 
-    if [[ -z "$json" ]]; then
-        log "ERROR Eden: GitHub API unreachable"
+    if [[ -z "$html" ]]; then
+        log "ERROR Eden: cannot fetch releases page"
         echo "STATUS_EDEN=ERREUR" >> "$STATUS_FILE"
         return
     fi
 
-    release=$(echo "$json" |
-        grep -Eo '"tag_name": *"[^"]+"' |
-        sed -E 's/.*"([^"]+)".*/\1/')
+    # Récupère le premier tag trouvé
+    release=$(echo "$html" | grep -oE '/eden-emu/eden/releases/tag/[^"]+' | head -n1 | sed 's#.*/tag/##')
 
     if [[ -z "$release" ]]; then
-        log "ERROR Eden: tag_name not found"
+        log "ERROR Eden: latest version not found"
         echo "STATUS_EDEN=ERREUR" >> "$STATUS_FILE"
         return
     fi
 
-    url="https://github.com/eden-emulator/Releases/releases/download/$release/Eden-Linux-$release-amd64-gcc-standard.AppImage"
+    url="https://git.eden-emu.dev/eden-emu/eden/releases/download/$release/Eden-Linux-$release-amd64-gcc-standard.AppImage"
     dest="$SWITCH_APPIMAGES/eden-emu.AppImage"
 
     log "Detected Eden version: $release"
     log "Downloading: $url"
+
     if wget_step "$url" "$dest" "eden-emu" && deploy_if_valid "$dest"; then
         echo "STATUS_EDEN=OK" >> "$STATUS_FILE"
         echo "EDEN_VERSION=$release" >> "$VERSIONS_FILE"
@@ -685,6 +685,7 @@ update_eden_pgo() {
     log "  "
     log "!!!!START Eden PGO AppImage update!!!!"
     log "Checking Eden PGO latest release"
+
     release=$(grep '^EDEN_VERSION=' "$VERSIONS_FILE" | cut -d= -f2)
 
     if [[ -z "$release" ]]; then
@@ -693,11 +694,12 @@ update_eden_pgo() {
         return
     fi
 
-    url="https://github.com/eden-emulator/Releases/releases/download/$release/Eden-Linux-$release-amd64-clang-pgo.AppImage"
+    url="https://git.eden-emu.dev/eden-emu/eden/releases/download/$release/Eden-Linux-$release-amd64-clang-pgo.AppImage"
     dest="$SWITCH_APPIMAGES/eden-pgo.AppImage"
 
     log "Detected Eden PGO version: $release"
     log "Downloading: $url"
+
     if wget_step "$url" "$dest" "eden-pgo" && deploy_if_valid "$dest"; then
         echo "STATUS_EDEN_PGO=OK" >> "$STATUS_FILE"
         echo "EDEN_PGO_VERSION=$release" >> "$VERSIONS_FILE"
@@ -710,24 +712,27 @@ update_eden_pgo() {
 # UPDATE RYUJINX
 # ===============================
 update_ryujinx() {
-    local page release url dest
+    local json release url dest project="ryubing%2Fcanary"
 
     log "  "
     log "  "
-    log "!!!!START Ryujinx AppImage update!!!!"
-    log "Checking Ryujinx Canary version"
+    log "!!!!START Ryujinx AppImage update (Canary API optimized)!!!!"
+    log "Checking Ryujinx Canary latest release"
 
-    page=$(curl -fsL "https://release-monitoring.org/project/377871/" 2>>"$LOG_FILE")
+    json=$(curl -fsL \
+        "https://git.ryujinx.app/api/v4/projects/${project}/releases?order_by=created_at&sort=desc&per_page=1" \
+        2>>"$LOG_FILE")
 
-    if [[ -z "$page" ]]; then
-        log "ERROR Ryujinx: unable to fetch version page"
+    if [[ -z "$json" ]]; then
+        log "ERROR Ryujinx: unable to fetch API"
         echo "STATUS_RYUJINX=ERREUR" >> "$STATUS_FILE"
         return
     fi
 
-    release=$(echo "$page" |
-        grep -Eo 'Canary-[0-9]+\.[0-9]+\.[0-9]+' |
-        sort -V | tail -n1 | cut -d- -f2)
+    release=$(echo "$json" \
+        | grep '"tag_name"' \
+        | sed -E 's/.*"([^"]+)".*/\1/' \
+        | awk -F/ '{print $NF}')
 
     if [[ -z "$release" ]]; then
         log "ERROR Ryujinx: version parsing failed"
@@ -740,6 +745,7 @@ update_ryujinx() {
 
     log "Detected Ryujinx version: $release"
     log "Downloading: $url"
+
     if wget_step "$url" "$dest" "ryujinx-emu" && deploy_if_valid "$dest"; then
         echo "STATUS_RYUJINX=OK" >> "$STATUS_FILE"
         echo "RYUJINX_VERSION=$release" >> "$VERSIONS_FILE"
