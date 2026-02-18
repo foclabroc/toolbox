@@ -796,7 +796,7 @@ GLOBAL_PERCENT=0
 
     [[ "$STATUS_CITRON" == "OK" ]] \
         && CITRON_LINE="Citron         : OK ---->(${CITRON_VERSION})" \
-        || CITRON_LINE="Citron         : $(tr ERROR) citron-emu.AppImage $(tr ERROR_EMU)"
+        || CITRON_LINE="Citron         : $(tr ERROR) [CITRON SERVERS DOWN!!] citron-emu.AppImage $(tr ERROR_EMU)"
 
     [[ "$STATUS_NIGHTLY" == "OK" ]] \
         && NIGHTLY_LINE="Eden-Nightly   : OK ---->(${NIGHTLY_DATE})" \
