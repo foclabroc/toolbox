@@ -450,27 +450,25 @@ install_new_pack() {
 # UPDATE CITRON
 # ===============================
 # update_citron() {
-    # local page tag tag_decoded version url dest
+    # local releases_page tag assets_page appimage_url file_name version suffix dest
 
     # log "  "
     # log "  "
     # log "!!!!START Citron AppImage update!!!!"
-    # log "Checking Citron GitHub tags (stable only)"
+    # log "Checking latest stable Citron release on GitHub"
 
-    # page=$(curl -Ls "https://github.com/pkgforge-dev/Citron-AppImage/tags" 2>>"$LOG_FILE")
+    # releases_page=$(curl -Ls "https://github.com/Zephyron-Dev/Citron-CI/releases" 2>>"$LOG_FILE")
 
-    # if [[ -z "$page" ]]; then
-        # log "ERROR Citron: unable to download tags page"
+    # if [[ -z "$releases_page" ]]; then
+        # log "ERROR Citron: unable to download releases page"
         # echo "STATUS_CITRON=ERREUR" >> "$STATUS_FILE"
         # return
     # fi
 
-    # # Dernier tag stable (URL encodé)
-    # tag=$(echo "$page" |
-        # grep -Eo '/pkgforge-dev/Citron-AppImage/releases/tag/[^"]+' |
-        # grep -v nightly |
-        # head -n1 |
-        # sed 's#.*/##')
+    # tag=$(echo "$releases_page" \
+        # | grep -Eo '/Zephyron-Dev/Citron-CI/releases/tag/[0-9]+\.[0-9]+\.[0-9]+' \
+        # | head -n1 \
+        # | sed 's#.*/##')
 
     # if [[ -z "$tag" ]]; then
         # log "ERROR Citron: no stable tag found"
@@ -478,89 +476,67 @@ install_new_pack() {
         # return
     # fi
 
-    # # Décodage %40 → @
-    # tag_decoded="${tag//%40/@}"
+    # version="$tag"
+    # log "Detected stable Citron tag: $version"
 
-    # # Version = avant @
-    # version="${tag_decoded%%@*}"
+    # assets_page=$(curl -Ls "https://github.com/Zephyron-Dev/Citron-CI/releases/expanded_assets/$tag" 2>>"$LOG_FILE")
 
-    # url="https://github.com/pkgforge-dev/Citron-AppImage/releases/download/$tag_decoded/Citron-$version-anylinux-x86_64.AppImage"
+    # if [[ -z "$assets_page" ]]; then
+        # log "ERROR Citron: unable to fetch expanded assets page"
+        # echo "STATUS_CITRON=ERREUR" >> "$STATUS_FILE"
+        # return
+    # fi
+
+    # appimage_url=$(echo "$assets_page" \
+        # | grep -Eo '/Zephyron-Dev/Citron-CI/releases/download/[^"]+Citron-[^"]+-Linux-x86_64_v3\.AppImage' \
+        # | head -n1)
+
+    # if [[ -z "$appimage_url" ]]; then
+        # log "ERROR Citron: no Linux AppImage found in release assets"
+        # echo "STATUS_CITRON=ERREUR" >> "$STATUS_FILE"
+        # return
+    # fi
+
+    # appimage_url="https://github.com${appimage_url}"
+    # file_name="${appimage_url##*/}"
+
+    # # 🔥 Extrait le suffixe entre version et -Linux
+    # # Exemple: Citron-2026.02.1-Pathfinder-Linux-x86_64.AppImage
+    # suffix=$(echo "$file_name" | sed -E 's/^Citron-[0-9]+\.[0-9]+\.[0-9]+-([^-]+)-Linux.*/\1/')
+
+    # # Version complète affichée
+    # full_version="${version}-${suffix}"
+
     # dest="$SWITCH_APPIMAGES/citron-emu.AppImage"
 
-    # log "Detected stable Citron tag: $tag_decoded"
-    # log "Detected Citron version: $version"
-    # log "Downloading: $url"
+    # log "Detected AppImage file: $file_name"
+    # log "Detected full version: $full_version"
+    # log "Downloading: $appimage_url"
 
-    # if wget_step "$url" "$dest" "citron-emu" && deploy_if_valid "$dest"; then
+    # if wget_step "$appimage_url" "$dest" "citron" && deploy_if_valid "$dest"; then
         # echo "STATUS_CITRON=OK" >> "$STATUS_FILE"
-        # echo "CITRON_VERSION=$version" >> "$VERSIONS_FILE"
+        # echo "CITRON_VERSION=$full_version" >> "$VERSIONS_FILE"
     # else
         # log "ERROR Citron: download or deploy failed"
         # echo "STATUS_CITRON=ERREUR" >> "$STATUS_FILE"
     # fi
 # }
 update_citron() {
-    local releases_page tag assets_page appimage_url file_name version suffix dest
+    local appimage_url dest full_version
 
     log "  "
     log "  "
-    log "!!!!START Citron AppImage update!!!!"
-    log "Checking latest stable Citron release on GitHub"
+    log "!!!!START Citron AppImage download (fixed version)!!!!"
 
-    releases_page=$(curl -Ls "https://github.com/Zephyron-Dev/Citron-CI/releases" 2>>"$LOG_FILE")
+    # Version fixe
+    full_version="2026.02.1-Pathfinder"
 
-    if [[ -z "$releases_page" ]]; then
-        log "ERROR Citron: unable to download releases page"
-        echo "STATUS_CITRON=ERREUR" >> "$STATUS_FILE"
-        return
-    fi
-
-    tag=$(echo "$releases_page" \
-        | grep -Eo '/Zephyron-Dev/Citron-CI/releases/tag/[0-9]+\.[0-9]+\.[0-9]+' \
-        | head -n1 \
-        | sed 's#.*/##')
-
-    if [[ -z "$tag" ]]; then
-        log "ERROR Citron: no stable tag found"
-        echo "STATUS_CITRON=ERREUR" >> "$STATUS_FILE"
-        return
-    fi
-
-    version="$tag"
-    log "Detected stable Citron tag: $version"
-
-    assets_page=$(curl -Ls "https://github.com/Zephyron-Dev/Citron-CI/releases/expanded_assets/$tag" 2>>"$LOG_FILE")
-
-    if [[ -z "$assets_page" ]]; then
-        log "ERROR Citron: unable to fetch expanded assets page"
-        echo "STATUS_CITRON=ERREUR" >> "$STATUS_FILE"
-        return
-    fi
-
-    appimage_url=$(echo "$assets_page" \
-        | grep -Eo '/Zephyron-Dev/Citron-CI/releases/download/[^"]+Citron-[^"]+-Linux-x86_64_v3\.AppImage' \
-        | head -n1)
-
-    if [[ -z "$appimage_url" ]]; then
-        log "ERROR Citron: no Linux AppImage found in release assets"
-        echo "STATUS_CITRON=ERREUR" >> "$STATUS_FILE"
-        return
-    fi
-
-    appimage_url="https://github.com${appimage_url}"
-    file_name="${appimage_url##*/}"
-
-    # 🔥 Extrait le suffixe entre version et -Linux
-    # Exemple: Citron-2026.02.1-Pathfinder-Linux-x86_64.AppImage
-    suffix=$(echo "$file_name" | sed -E 's/^Citron-[0-9]+\.[0-9]+\.[0-9]+-([^-]+)-Linux.*/\1/')
-
-    # Version complète affichée
-    full_version="${version}-${suffix}"
+    # URL directe
+    appimage_url="https://foclabroc.freeboxos.fr:55973/share/h8_4jY4c_fFsHWrf/citron-emu(2026.02.1-Pathfinder).AppImage"
 
     dest="$SWITCH_APPIMAGES/citron-emu.AppImage"
 
-    log "Detected AppImage file: $file_name"
-    log "Detected full version: $full_version"
+    log "Fixed version: $full_version"
     log "Downloading: $appimage_url"
 
     if wget_step "$appimage_url" "$dest" "citron" && deploy_if_valid "$dest"; then
@@ -571,7 +547,6 @@ update_citron() {
         echo "STATUS_CITRON=ERREUR" >> "$STATUS_FILE"
     fi
 }
-
 
 # ===============================
 # UPDATE EDEN NIGHTLY
