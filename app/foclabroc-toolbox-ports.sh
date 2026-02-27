@@ -235,7 +235,7 @@ main_menu() {
             --menu "\nSélectionnez une option :\n " 24 100 15 \
             1 "[Nintendo Switch]  -> Installer l'émulation Switch sur Batocera" \
             2 "[Rgsx]             -> Installer RGSX l'outils de telechargement de jeux pour Batocera" \
-            3 "[Fpinball]         -> Installer le launcher Future Pinball pour V42 et +" \
+            3 "[Fpinball]         -> Installer le launcher Future Pinball pour V42 only" \
             4 "[Youtube TV]       -> Installer Youtube TV" \
             5 "[Gparted]          -> Installer Gparted" \
             6 "[Pack Kodi]        -> Installer le pack streaming/iptv kodi" \
