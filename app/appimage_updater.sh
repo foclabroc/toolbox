@@ -112,9 +112,10 @@ TEMP_DIR="/userdata/system/switch/appimages-updater-temp"
 LOG_DIR="/userdata/system/switch/appimages-updater-temp"
 
 LOG_FILE="$LOG_DIR/update.log"
-VERSIONS_FILE="$TEMP_DIR/versions.tmp"
-STATUS_FILE="$TEMP_DIR/status.tmp"
+VERSIONS_FILE="$TEMP_DIR/versions.log"
+STATUS_FILE="$TEMP_DIR/status.log"
 
+rm -rf "$SWITCH_APPIMAGES"
 mkdir -p "$SWITCH_APPIMAGES" "$TEMP_DIR" "$LOG_DIR"
 > "$LOG_FILE"
 > "$VERSIONS_FILE"
