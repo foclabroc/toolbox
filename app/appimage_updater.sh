@@ -619,16 +619,17 @@ update_eden() {
     log "!!!!START Eden AppImage update (git.eden-emu.dev)!!!!"
     log "Checking Eden latest release"
 
-    html=$(curl -fsL "https://git.eden-emu.dev/eden-emu/eden/releases" 2>>"$LOG_FILE")
+    # html=$(curl -fsL "https://git.eden-emu.dev/eden-emu/eden/releases" 2>>"$LOG_FILE")
+    # if [[ -z "$html" ]]; then
+        # log "ERROR Eden: cannot fetch releases page"
+        # echo "STATUS_EDEN=ERREUR" >> "$STATUS_FILE"
+        # return
+    # fi
+    # # Récupère le premier tag trouvé
+    # release=$(echo "$html" | grep -oE '/eden-emu/eden/releases/tag/[^"]+' | head -n1 | sed 's#.*/tag/##')
 
-    if [[ -z "$html" ]]; then
-        log "ERROR Eden: cannot fetch releases page"
-        echo "STATUS_EDEN=ERREUR" >> "$STATUS_FILE"
-        return
-    fi
-
-    # Récupère le premier tag trouvé
-    release=$(echo "$html" | grep -oE '/eden-emu/eden/releases/tag/[^"]+' | head -n1 | sed 's#.*/tag/##')
+    # Récupère tag trouvé
+    release="$(curl -s https://git.eden-emu.dev/api/v1/repos/eden-emu/eden/releases/latest | jq -r .tag_name)"
 
     if [[ -z "$release" ]]; then
         log "ERROR Eden: latest version not found"
