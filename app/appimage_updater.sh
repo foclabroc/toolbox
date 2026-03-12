@@ -529,11 +529,15 @@ update_citron() {
     log "  "
     log "!!!!START Citron AppImage download (fixed version)!!!!"
 
-    # Version fixe
-    full_version="2026.02.1-Pathfinder"
+    # # Version fixe
+    # full_version="2026.02.1-Pathfinder"
+    # # URL directe
+    # appimage_url="https://foclabroc.freeboxos.fr:55973/share/h8_4jY4c_fFsHWrf/citron-emu(2026.02.1-Pathfinder).AppImage"
 
+    # Version fixe
+    full_version="2026.03.12-Final"
     # URL directe
-    appimage_url="https://foclabroc.freeboxos.fr:55973/share/h8_4jY4c_fFsHWrf/citron-emu(2026.02.1-Pathfinder).AppImage"
+    appimage_url="https://foclabroc.freeboxos.fr:55973/share/oZ4k4wPXDTu-fy3g/citron-emu(2026.03.12).AppImage"
 
     dest="$SWITCH_APPIMAGES/citron-emu.AppImage"
 
