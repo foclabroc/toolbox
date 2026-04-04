@@ -558,50 +558,39 @@ update_citron() {
 # ===============================
 update_nightly() {
     local json release date url asset dest
-
     log "  "
     log "  "
     log "!!!!START Eden Nightly AppImage update!!!!"
     log "Checking Eden Nightly latest release"
-
-    json=$(curl -fsL "https://api.github.com/repos/Eden-CI/Nightly/releases/latest" 2>>"$LOG_FILE")
-
+    json=$(curl -fsL "https://git.eden-emu.dev/api/v1/repos/eden-ci/nightly/releases/latest" 2>>"$LOG_FILE")
     if [[ -z "$json" ]]; then
-        log "ERROR Nightly: GitHub API unreachable"
+        log "ERROR Nightly: Gitea API unreachable"
         echo "STATUS_NIGHTLY=ERREUR" >> "$STATUS_FILE"
         return
     fi
-
     release=$(echo "$json" |
         grep -Eo '"tag_name": *"[^"]+"' |
         sed -E 's/.*"([^"]+)".*/\1/')
-
     if [[ -z "$release" ]]; then
         log "ERROR Nightly: tag_name not found"
         echo "STATUS_NIGHTLY=ERREUR" >> "$STATUS_FILE"
         return
     fi
-
     date=$(echo "$json" |
         grep -Eo '"published_at": *"[^"]+"' |
         sed -E 's/.*"([^T]+)T.*/\1/')
-
     [[ -n "$date" ]] && log "Release date: $date"
-
     asset=$(echo "$json" |
-        grep -oE '"browser_download_url": *"[^"]+Eden-Linux-[^"]+amd64-gcc-standard.AppImage"' |
+        grep -oE '"browser_download_url": *"[^"]+Eden-Linux-[^"]+amd64-gcc-standard\.AppImage"' |
         head -n1 |
         sed -E 's/.*"([^"]+)".*/\1/')
-
     if [[ -z "$asset" ]]; then
         log "ERROR Nightly: AppImage asset not found"
         echo "STATUS_NIGHTLY=ERREUR" >> "$STATUS_FILE"
         return
     fi
-
     url="$asset"
     dest="$SWITCH_APPIMAGES/eden-nightly.AppImage"
-
     log "Detected Nightly version: $release"
     log "Downloading: $url"
     if wget_step "$url" "$dest" "eden-nightly" && deploy_if_valid "$dest"; then
