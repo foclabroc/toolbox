@@ -682,27 +682,25 @@ update_eden_pgo() {
 # UPDATE RYUJINX
 # ===============================
 update_ryujinx() {
-    local json release url dest project="ryubing%2Fcanary"
+    local html release url dest
+    log "  "
+    log "  "
+    log "!!!!START Ryujinx AppImage update (Canary new method)!!!!"
 
-    log "  "
-    log "  "
-    log "!!!!START Ryujinx AppImage update (Canary API optimized)!!!!"
     log "Checking Ryujinx Canary latest release"
 
-    json=$(curl -fsL \
-        "https://git.ryujinx.app/api/v4/projects/${project}/releases?order_by=created_at&sort=desc&per_page=1" \
-        2>>"$LOG_FILE")
+    html=$(curl -fsL "https://git.ryujinx.app/Ryubing/Canary/releases" 2>>"$LOG_FILE")
 
-    if [[ -z "$json" ]]; then
-        log "ERROR Ryujinx: unable to fetch API"
+    if [[ -z "$html" ]]; then
+        log "ERROR Ryujinx: unable to fetch releases page"
         echo "STATUS_RYUJINX=ERREUR" >> "$STATUS_FILE"
         return
     fi
 
-    release=$(echo "$json" \
-        | grep '"tag_name"' \
-        | sed -E 's/.*"([^"]+)".*/\1/' \
-        | awk -F/ '{print $NF}')
+    # Récupère la première version trouvée
+    release=$(echo "$html" \
+        | grep -oP 'releases/download/\K[0-9.]+' \
+        | head -n1)
 
     if [[ -z "$release" ]]; then
         log "ERROR Ryujinx: version parsing failed"
@@ -710,7 +708,7 @@ update_ryujinx() {
         return
     fi
 
-    url="https://git.ryujinx.app/api/v4/projects/68/packages/generic/Ryubing-Canary/$release/ryujinx-canary-$release-x64.AppImage"
+    url="https://git.ryujinx.app/Ryubing/Canary/releases/download/${release}/ryujinx-canary-${release}-x64.AppImage"
     dest="$SWITCH_APPIMAGES/ryujinx-emu.AppImage"
 
     log "Detected Ryujinx version: $release"
