@@ -557,42 +557,64 @@ update_citron() {
 # UPDATE EDEN NIGHTLY
 # ===============================
 update_nightly() {
-    local json release date url asset dest
-    log "  "
-    log "  "
+    local json release raw date base short url dest
+
+    log ""
+    log ""
     log "!!!!START Eden Nightly AppImage update!!!!"
     log "Checking Eden Nightly latest release"
-    json=$(curl -fsL "https://git.eden-emu.dev/api/v1/repos/eden-ci/nightly/releases/latest" 2>>"$LOG_FILE")
+
+    json=$(curl -fsL "https://nightly.eden-emu.dev/latest/release.json" 2>>"$LOG_FILE")
     if [[ -z "$json" ]]; then
-        log "ERROR Nightly: Gitea API unreachable"
+        log "ERROR Nightly: release.json unreachable"
         echo "STATUS_NIGHTLY=ERREUR" >> "$STATUS_FILE"
         return
     fi
-    release=$(echo "$json" |
-        grep -Eo '"tag_name": *"[^"]+"' |
-        sed -E 's/.*"([^"]+)".*/\1/')
+
+    release=$(echo "$json" \
+        | grep -Eo '"tag_name": *"[^"]+"' \
+        | sed -E 's/.*"([^"]+)"$/\1/')
     if [[ -z "$release" ]]; then
         log "ERROR Nightly: tag_name not found"
         echo "STATUS_NIGHTLY=ERREUR" >> "$STATUS_FILE"
         return
     fi
-    date=$(echo "$json" |
-        grep -Eo '"published_at": *"[^"]+"' |
-        sed -E 's/.*"([^T]+)T.*/\1/')
-    [[ -n "$date" ]] && log "Release date: $date"
-    asset=$(echo "$json" |
-        grep -oE '"browser_download_url": *"[^"]+Eden-Linux-[^"]+amd64-gcc-standard\.AppImage"' |
-        head -n1 |
-        sed -E 's/.*"([^"]+)".*/\1/')
-    if [[ -z "$asset" ]]; then
-        log "ERROR Nightly: AppImage asset not found"
+
+    # Base URL (fallback si absente du JSON)
+    base=$(echo "$json" \
+        | grep -Eo '"base": *"[^"]+"' \
+        | sed -E 's/.*"([^"]+)"$/\1/')
+    [[ -z "$base" ]] && base="https://nightly.eden-emu.dev"
+
+    # Commit court = partie après le "." du tag
+    short="${release#*.}"
+    if [[ "$short" == "$release" || -z "$short" ]]; then
+        log "ERROR Nightly: unexpected tag format ($release)"
         echo "STATUS_NIGHTLY=ERREUR" >> "$STATUS_FILE"
         return
     fi
-    url="$asset"
+
+    # Date depuis le champ "name": "Eden Nightly - Apr 23 2026"
+    raw=$(echo "$json" \
+        | grep -Eo '"name": *"Eden Nightly - [^"]+"' \
+        | sed -E 's/.*"Eden Nightly - ([^"]+)"$/\1/')
+    date=$(date -d "$raw" +%Y-%m-%d 2>/dev/null)
+    [[ -n "$date" ]] && log "Release date: $date"
+
+    # Construction de l'URL
+    url="${base}/${release}/Eden-Linux-${short}-amd64-gcc-standard.AppImage"
+
+    # Vérification d'existence (HEAD)
+    if ! curl -fsLI "$url" >/dev/null 2>>"$LOG_FILE"; then
+        log "ERROR Nightly: AppImage not reachable ($url)"
+        echo "STATUS_NIGHTLY=ERREUR" >> "$STATUS_FILE"
+        return
+    fi
+
     dest="$SWITCH_APPIMAGES/eden-nightly.AppImage"
     log "Detected Nightly version: $release"
     log "Downloading: $url"
+
     if wget_step "$url" "$dest" "eden-nightly" && deploy_if_valid "$dest"; then
         echo "STATUS_NIGHTLY=OK" >> "$STATUS_FILE"
         echo "NIGHTLY_VERSION=$release" >> "$VERSIONS_FILE"
@@ -606,34 +628,43 @@ update_nightly() {
 # UPDATE EDEN
 # ===============================
 update_eden() {
-    local html release url dest
+    local json release base url dest
 
-    log "  "
-    log "  "
-    log "!!!!START Eden AppImage update (git.eden-emu.dev)!!!!"
+    log ""
+    log ""
+    log "!!!!START Eden AppImage update!!!!"
     log "Checking Eden latest release"
 
-    # html=$(curl -fsL "https://git.eden-emu.dev/eden-emu/eden/releases" 2>>"$LOG_FILE")
-    # if [[ -z "$html" ]]; then
-        # log "ERROR Eden: cannot fetch releases page"
-        # echo "STATUS_EDEN=ERREUR" >> "$STATUS_FILE"
-        # return
-    # fi
-    # # Récupère le premier tag trouvé
-    # release=$(echo "$html" | grep -oE '/eden-emu/eden/releases/tag/[^"]+' | head -n1 | sed 's#.*/tag/##')
-
-    # Récupère tag trouvé
-    release="$(curl -s https://git.eden-emu.dev/api/v1/repos/eden-emu/eden/releases/latest | jq -r .tag_name)"
-
-    if [[ -z "$release" ]]; then
-        log "ERROR Eden: latest version not found"
+    json=$(curl -fsL "https://stable.eden-emu.dev/latest/release.json" 2>>"$LOG_FILE")
+    if [[ -z "$json" ]]; then
+        log "ERROR Eden: release.json unreachable"
         echo "STATUS_EDEN=ERREUR" >> "$STATUS_FILE"
         return
     fi
 
-    url="https://git.eden-emu.dev/eden-emu/eden/releases/download/$release/Eden-Linux-$release-amd64-gcc-standard.AppImage"
-    dest="$SWITCH_APPIMAGES/eden-emu.AppImage"
+    release=$(echo "$json" \
+        | grep -Eo '"tag_name": *"[^"]+"' \
+        | sed -E 's/.*"([^"]+)"$/\1/')
+    if [[ -z "$release" ]]; then
+        log "ERROR Eden: tag_name not found"
+        echo "STATUS_EDEN=ERREUR" >> "$STATUS_FILE"
+        return
+    fi
 
+    base=$(echo "$json" \
+        | grep -Eo '"base": *"[^"]+"' \
+        | sed -E 's/.*"([^"]+)"$/\1/')
+    [[ -z "$base" ]] && base="https://stable.eden-emu.dev"
+
+    url="${base}/${release}/Eden-Linux-${release}-amd64-gcc-standard.AppImage"
+
+    if ! curl -fsLI "$url" >/dev/null 2>>"$LOG_FILE"; then
+        log "ERROR Eden: AppImage not reachable ($url)"
+        echo "STATUS_EDEN=ERREUR" >> "$STATUS_FILE"
+        return
+    fi
+
+    dest="$SWITCH_APPIMAGES/eden-emu.AppImage"
     log "Detected Eden version: $release"
     log "Downloading: $url"
 
@@ -651,22 +682,27 @@ update_eden() {
 update_eden_pgo() {
     local release url dest
 
-    log "  "
-    log "  "
+    log ""
+    log ""
     log "!!!!START Eden PGO AppImage update!!!!"
     log "Checking Eden PGO latest release"
 
     release=$(grep '^EDEN_VERSION=' "$VERSIONS_FILE" | cut -d= -f2)
-
     if [[ -z "$release" ]]; then
         log "ERROR Eden-PGO: Eden version missing"
         echo "STATUS_EDEN_PGO=ERREUR" >> "$STATUS_FILE"
         return
     fi
 
-    url="https://git.eden-emu.dev/eden-emu/eden/releases/download/$release/Eden-Linux-$release-amd64-clang-pgo.AppImage"
-    dest="$SWITCH_APPIMAGES/eden-pgo.AppImage"
+    url="https://stable.eden-emu.dev/${release}/Eden-Linux-${release}-amd64-clang-pgo.AppImage"
 
+    if ! curl -fsLI "$url" >/dev/null 2>>"$LOG_FILE"; then
+        log "ERROR Eden-PGO: AppImage not reachable ($url)"
+        echo "STATUS_EDEN_PGO=ERREUR" >> "$STATUS_FILE"
+        return
+    fi
+
+    dest="$SWITCH_APPIMAGES/eden-pgo.AppImage"
     log "Detected Eden PGO version: $release"
     log "Downloading: $url"
 
