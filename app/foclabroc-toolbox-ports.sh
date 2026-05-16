@@ -255,7 +255,7 @@ main_menu() {
             1)
                 confirm_install "Nintendo Switch" || continue
                 clear
-                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls bit.ly/foclabroc-switch-all | bash" 
+                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/batocera-switch/refs/heads/main/system/switch/extra/switch-install.sh | bash" 
                 ;;
             2)
                 confirm_install "Rgsx" || continue

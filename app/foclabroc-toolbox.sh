@@ -268,7 +268,7 @@ main_menu() {
             1)
                 confirm_install "Nintendo Switch" || continue
                 clear
-                curl -Ls bit.ly/foclabroc-switch-all | bash
+                curl -Ls https://raw.githubusercontent.com/foclabroc/batocera-switch/refs/heads/main/system/switch/extra/switch-install.sh | bash
                 ;;
             2)
                 confirm_install "Rgsx" || continue
