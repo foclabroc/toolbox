@@ -904,6 +904,20 @@ install_emulators_pack() {
 
     extract_with_gauge "$ZIP_FILE" "/userdata/"
 
+    # Extraction Ryujinx AppImage (bypass FUSE/root check)
+    RYUJINX_APPIMAGE="/userdata/system/switch/appimages/ryujinx-emu.AppImage"
+    if [ -f "$RYUJINX_APPIMAGE" ]; then
+        cd /userdata/system/switch/appimages
+        rm -rf ryujinx-extracted
+        chmod +x "$RYUJINX_APPIMAGE"
+        ./ryujinx-emu.AppImage --appimage-extract 2>/dev/null
+        if [ -d "squashfs-root/usr/bin" ]; then
+            mv squashfs-root ryujinx-extracted
+            rm -f ryujinx-emu.AppImage
+        fi
+        chmod +x /userdata/system/switch/extra/ryu_wrapper 2>/dev/null
+    fi
+
 	NCA_SRC_DIR="/userdata/bios/switch/firmware"
 	KEYS_SRC_DIR="/userdata/bios/switch/keys"
 	RYUJINX_SYSTEM_DIR="/userdata/system/configs/Ryujinx/system"

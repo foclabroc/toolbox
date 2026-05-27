@@ -722,35 +722,44 @@ update_ryujinx() {
     log "  "
     log "  "
     log "!!!!START Ryujinx AppImage update (Canary new method)!!!!"
-
     log "Checking Ryujinx Canary latest release"
-
     html=$(curl -fsL "https://git.ryujinx.app/Ryubing/Canary/releases" 2>>"$LOG_FILE")
-
     if [[ -z "$html" ]]; then
         log "ERROR Ryujinx: unable to fetch releases page"
         echo "STATUS_RYUJINX=ERREUR" >> "$STATUS_FILE"
         return
     fi
-
     # Récupère la première version trouvée
     release=$(echo "$html" \
         | grep -oP 'releases/download/\K[0-9.]+' \
         | head -n1)
-
     if [[ -z "$release" ]]; then
         log "ERROR Ryujinx: version parsing failed"
         echo "STATUS_RYUJINX=ERREUR" >> "$STATUS_FILE"
         return
     fi
-
     url="https://git.ryujinx.app/Ryubing/Canary/releases/download/${release}/ryujinx-canary-${release}-x64.AppImage"
     dest="$SWITCH_APPIMAGES/ryujinx-emu.AppImage"
-
     log "Detected Ryujinx version: $release"
     log "Downloading: $url"
-
     if wget_step "$url" "$dest" "ryujinx-emu" && deploy_if_valid "$dest"; then
+
+        # Extraction Ryujinx AppImage (bypass FUSE/root check)
+        log "Extraction Ryujinx AppImage..."
+        cd "$SWITCH_APPIMAGES_FINAL"
+        rm -rf ryujinx-extracted
+        ./ryujinx-emu.AppImage --appimage-extract 2>>"$LOG_FILE"
+        if [ -d "squashfs-root/usr/bin" ]; then
+            mv squashfs-root ryujinx-extracted
+            rm -f ryujinx-emu.AppImage
+            log "Extraction Ryujinx terminée, AppImage supprimée"
+        else
+            log "WARN: Extraction échouée, AppImage conservée"
+        fi
+
+        # chmod wrapper
+        chmod +x /userdata/system/switch/extra/ryu_wrapper 2>/dev/null
+
         echo "STATUS_RYUJINX=OK" >> "$STATUS_FILE"
         echo "RYUJINX_VERSION=$release" >> "$VERSIONS_FILE"
     else
