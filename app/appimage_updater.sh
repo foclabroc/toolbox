@@ -733,7 +733,7 @@ update_ryujinx() {
     # release=$(echo "$html" \
         # | grep -oP 'releases/download/\K[0-9.]+' \
         # | head -n1)
-    release="1.3.320 last with working pad"
+    release="1.3.320-last-with-working-pad"
     if [[ -z "$release" ]]; then
         log "ERROR Ryujinx: version parsing failed"
         echo "STATUS_RYUJINX=ERREUR" >> "$STATUS_FILE"
