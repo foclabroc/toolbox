@@ -730,15 +730,17 @@ update_ryujinx() {
         return
     fi
     # Récupère la première version trouvée
-    release=$(echo "$html" \
-        | grep -oP 'releases/download/\K[0-9.]+' \
-        | head -n1)
+    # release=$(echo "$html" \
+        # | grep -oP 'releases/download/\K[0-9.]+' \
+        # | head -n1)
+    release="1.3.320 last with working pad"
     if [[ -z "$release" ]]; then
         log "ERROR Ryujinx: version parsing failed"
         echo "STATUS_RYUJINX=ERREUR" >> "$STATUS_FILE"
         return
     fi
-    url="https://git.ryujinx.app/Ryubing/Canary/releases/download/${release}/ryujinx-canary-${release}-x64.AppImage"
+    # url="https://git.ryujinx.app/Ryubing/Canary/releases/download/${release}/ryujinx-canary-${release}-x64.AppImage"
+    url="https://git.ryujinx.app/Ryubing/Canary/releases/download/1.3.320/ryujinx-canary-1.3.320-x64.AppImage"
     dest="$SWITCH_APPIMAGES/ryujinx-emu.AppImage"
     log "Detected Ryujinx version: $release"
     log "Downloading: $url"
