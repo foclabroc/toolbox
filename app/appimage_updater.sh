@@ -535,9 +535,9 @@ update_citron() {
     # appimage_url="https://foclabroc.freeboxos.fr:55973/share/h8_4jY4c_fFsHWrf/citron-emu(2026.02.1-Pathfinder).AppImage"
 
     # Version fixe
-    full_version="2026.03.12-Final"
+    full_version="Neo-2026.09.10"
     # URL directe
-    appimage_url="https://foclabroc.freeboxos.fr:55973/share/oZ4k4wPXDTu-fy3g/citron-emu(2026.03.12).AppImage"
+    appimage_url="https://foclabroc.freeboxos.fr:55973/share/4Hd7ueCAGnpabXA5/citron-emu(2026.09.10).AppImage"
 
     dest="$SWITCH_APPIMAGES/citron-emu.AppImage"
 
