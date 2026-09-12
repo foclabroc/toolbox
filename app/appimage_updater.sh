@@ -450,68 +450,72 @@ install_new_pack() {
 # ===============================
 # UPDATE CITRON
 # ===============================
+update_citron() {
+    local assets_page tag_page appimage_path appimage_url file_name commit build_date dest
+
+    log "  "
+    log "  "
+    log "!!!!START Citron AppImage update!!!!"
+    log "Checking latest Citron nightly-linux release on GitHub"
+
+    assets_page=$(curl -Ls "https://github.com/NextendoNetwork/citron-nextendo/releases/expanded_assets/nightly-linux" 2>>"$LOG_FILE")
+
+    if [[ -z "$assets_page" ]]; then
+        log "ERROR Citron: unable to fetch expanded assets page"
+        echo "STATUS_CITRON=ERREUR" >> "$STATUS_FILE"
+        return
+    fi
+
+    appimage_path=$(echo "$assets_page" \
+        | grep -Eo '/NextendoNetwork/citron-nextendo/releases/download/nightly-linux/citron_nightly-[0-9a-f]+-linux-x86_64_v3\.AppImage' \
+        | head -n1)
+
+    if [[ -z "$appimage_path" ]]; then
+        log "ERROR Citron: no Linux x86_64_v3 AppImage found in release assets"
+        echo "STATUS_CITRON=ERREUR" >> "$STATUS_FILE"
+        return
+    fi
+
+    appimage_url="https://github.com${appimage_path}"
+    file_name="${appimage_url##*/}"
+    commit=$(echo "$file_name" | sed -E 's/^citron_nightly-([0-9a-f]+)-linux.*/\1/')
+    tag_page=$(curl -Ls "https://github.com/NextendoNetwork/citron-nextendo/releases/tag/nightly-linux" 2>>"$LOG_FILE")
+    build_date=$(echo "$tag_page" | grep -Eo 'Date: [0-9]{4}-[0-9]{2}-[0-9]{2}' | head -n1 | sed 's/Date: //')
+
+    dest="$SWITCH_APPIMAGES/citron-emu.AppImage"
+
+    log "Detected AppImage file: $file_name"
+    log "Detected commit: $commit"
+    log "Detected build date: ${build_date:-unknown}"
+    log "Downloading: $appimage_url"
+
+    if wget_step "$appimage_url" "$dest" "citron" && deploy_if_valid "$dest"; then
+        echo "STATUS_CITRON=OK" >> "$STATUS_FILE"
+        if [[ -n "$build_date" ]]; then
+            echo "CITRON_VERSION=$build_date" >> "$VERSIONS_FILE"
+        else
+            echo "CITRON_VERSION=nightly-$commit" >> "$VERSIONS_FILE"
+        fi
+    else
+        log "ERROR Citron: download or deploy failed"
+        echo "STATUS_CITRON=ERREUR" >> "$STATUS_FILE"
+    fi
+}
 # update_citron() {
-    # local releases_page tag assets_page appimage_url file_name version suffix dest
+    # local appimage_url dest full_version
 
     # log "  "
     # log "  "
-    # log "!!!!START Citron AppImage update!!!!"
-    # log "Checking latest stable Citron release on GitHub"
+    # log "!!!!START Citron AppImage download (fixed version)!!!!"
 
-    # releases_page=$(curl -Ls "https://github.com/Zephyron-Dev/Citron-CI/releases" 2>>"$LOG_FILE")
-
-    # if [[ -z "$releases_page" ]]; then
-        # log "ERROR Citron: unable to download releases page"
-        # echo "STATUS_CITRON=ERREUR" >> "$STATUS_FILE"
-        # return
-    # fi
-
-    # tag=$(echo "$releases_page" \
-        # | grep -Eo '/Zephyron-Dev/Citron-CI/releases/tag/[0-9]+\.[0-9]+\.[0-9]+' \
-        # | head -n1 \
-        # | sed 's#.*/##')
-
-    # if [[ -z "$tag" ]]; then
-        # log "ERROR Citron: no stable tag found"
-        # echo "STATUS_CITRON=ERREUR" >> "$STATUS_FILE"
-        # return
-    # fi
-
-    # version="$tag"
-    # log "Detected stable Citron tag: $version"
-
-    # assets_page=$(curl -Ls "https://github.com/Zephyron-Dev/Citron-CI/releases/expanded_assets/$tag" 2>>"$LOG_FILE")
-
-    # if [[ -z "$assets_page" ]]; then
-        # log "ERROR Citron: unable to fetch expanded assets page"
-        # echo "STATUS_CITRON=ERREUR" >> "$STATUS_FILE"
-        # return
-    # fi
-
-    # appimage_url=$(echo "$assets_page" \
-        # | grep -Eo '/Zephyron-Dev/Citron-CI/releases/download/[^"]+Citron-[^"]+-Linux-x86_64_v3\.AppImage' \
-        # | head -n1)
-
-    # if [[ -z "$appimage_url" ]]; then
-        # log "ERROR Citron: no Linux AppImage found in release assets"
-        # echo "STATUS_CITRON=ERREUR" >> "$STATUS_FILE"
-        # return
-    # fi
-
-    # appimage_url="https://github.com${appimage_url}"
-    # file_name="${appimage_url##*/}"
-
-    # # 🔥 Extrait le suffixe entre version et -Linux
-    # # Exemple: Citron-2026.02.1-Pathfinder-Linux-x86_64.AppImage
-    # suffix=$(echo "$file_name" | sed -E 's/^Citron-[0-9]+\.[0-9]+\.[0-9]+-([^-]+)-Linux.*/\1/')
-
-    # # Version complète affichée
-    # full_version="${version}-${suffix}"
+    # # Version fixe
+    # full_version="Neo-2026.09.10"
+    # # URL directe
+    # appimage_url="https://foclabroc.freeboxos.fr:55973/share/4Hd7ueCAGnpabXA5/citron-emu(2026.09.10).AppImage"
 
     # dest="$SWITCH_APPIMAGES/citron-emu.AppImage"
 
-    # log "Detected AppImage file: $file_name"
-    # log "Detected full version: $full_version"
+    # log "Fixed version: $full_version"
     # log "Downloading: $appimage_url"
 
     # if wget_step "$appimage_url" "$dest" "citron" && deploy_if_valid "$dest"; then
@@ -522,36 +526,6 @@ install_new_pack() {
         # echo "STATUS_CITRON=ERREUR" >> "$STATUS_FILE"
     # fi
 # }
-update_citron() {
-    local appimage_url dest full_version
-
-    log "  "
-    log "  "
-    log "!!!!START Citron AppImage download (fixed version)!!!!"
-
-    # # Version fixe
-    # full_version="2026.02.1-Pathfinder"
-    # # URL directe
-    # appimage_url="https://foclabroc.freeboxos.fr:55973/share/h8_4jY4c_fFsHWrf/citron-emu(2026.02.1-Pathfinder).AppImage"
-
-    # Version fixe
-    full_version="Neo-2026.09.10"
-    # URL directe
-    appimage_url="https://foclabroc.freeboxos.fr:55973/share/4Hd7ueCAGnpabXA5/citron-emu(2026.09.10).AppImage"
-
-    dest="$SWITCH_APPIMAGES/citron-emu.AppImage"
-
-    log "Fixed version: $full_version"
-    log "Downloading: $appimage_url"
-
-    if wget_step "$appimage_url" "$dest" "citron" && deploy_if_valid "$dest"; then
-        echo "STATUS_CITRON=OK" >> "$STATUS_FILE"
-        echo "CITRON_VERSION=$full_version" >> "$VERSIONS_FILE"
-    else
-        log "ERROR Citron: download or deploy failed"
-        echo "STATUS_CITRON=ERREUR" >> "$STATUS_FILE"
-    fi
-}
 
 # ===============================
 # UPDATE EDEN NIGHTLY
@@ -810,8 +784,8 @@ GLOBAL_PERCENT=0
         || SYS_LINE="$(tr SYS_FILES) : $(tr SYS_FAIL)"
 
     [[ "$STATUS_CITRON" == "OK" ]] \
-        && CITRON_LINE="Citron         : OK ---->(${CITRON_VERSION})" \
-        || CITRON_LINE="Citron         : $(tr ERROR) [CITRON SERVERS DOWN!!] citron-emu.AppImage $(tr ERROR_EMU)"
+        && CITRON_LINE="Citron-Neo     : OK ---->(${CITRON_VERSION})" \
+        || CITRON_LINE="Citron-Neo     : $(tr ERROR) [CITRON SERVERS DOWN!!] citron-emu.AppImage $(tr ERROR_EMU)"
 
     [[ "$STATUS_NIGHTLY" == "OK" ]] \
         && NIGHTLY_LINE="Eden-Nightly   : OK ---->(${NIGHTLY_DATE})" \
