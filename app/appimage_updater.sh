@@ -692,32 +692,60 @@ update_eden_pgo() {
 # UPDATE RYUJINX
 # ===============================
 update_ryujinx() {
-    local html release url dest
+    local html release url dest product_name sys_vendor is_steamdeck
+
     log "  "
     log "  "
-    log "!!!!START Ryujinx AppImage update (Canary new method)!!!!"
-    log "Checking Ryujinx Canary latest release"
-    html=$(curl -fsL "https://git.ryujinx.app/Ryubing/Canary/releases" 2>>"$LOG_FILE")
-    if [[ -z "$html" ]]; then
-        log "ERROR Ryujinx: unable to fetch releases page"
-        echo "STATUS_RYUJINX=ERREUR" >> "$STATUS_FILE"
-        return
+    log "!!!!START Ryujinx AppImage update!!!!"
+
+    # Détection Steam Deck (last working version on steamdeck 1.3.320)
+    product_name=$(cat /sys/class/dmi/id/product_name 2>/dev/null)
+    sys_vendor=$(cat /sys/class/dmi/id/sys_vendor 2>/dev/null)
+    log "DEBUG dmi raw product_name='$product_name' sys_vendor='$sys_vendor'"
+
+    product_name="${product_name,,}"
+    sys_vendor="${sys_vendor,,}"
+
+    is_steamdeck=0
+    if [[ "$product_name" == "jupiter" || "$product_name" == "galileo" || "$product_name" == *"steam deck"* ]]; then
+        is_steamdeck=1
+    elif [[ "$sys_vendor" == "valve" ]]; then
+        is_steamdeck=1
     fi
-    # Récupère la première version trouvée
-    # release=$(echo "$html" \
-        # | grep -oP 'releases/download/\K[0-9.]+' \
-        # | head -n1)
-    release="1.3.320-last-with-working-pad"
-    if [[ -z "$release" ]]; then
-        log "ERROR Ryujinx: version parsing failed"
-        echo "STATUS_RYUJINX=ERREUR" >> "$STATUS_FILE"
-        return
+
+    if [[ "$is_steamdeck" -eq 1 ]]; then
+        log "Steam Deck detected (product_name: $product_name) — using fixed Ryujinx version with working pad support"
+        release="1.3.320-last-with-working-pad-on-steamdeck"
+        url="https://git.ryujinx.app/Ryubing/Canary/releases/download/1.3.320/ryujinx-canary-1.3.320-x64.AppImage"
+    else
+        log "Non-Steam Deck device — checking Ryujinx Canary latest release"
+
+        html=$(curl -fsL "https://git.ryujinx.app/Ryubing/Canary/releases" 2>>"$LOG_FILE")
+
+        if [[ -z "$html" ]]; then
+            log "ERROR Ryujinx: unable to fetch releases page"
+            echo "STATUS_RYUJINX=ERREUR" >> "$STATUS_FILE"
+            return
+        fi
+
+        release=$(echo "$html" \
+            | grep -oP 'releases/download/\K[0-9.]+' \
+            | head -n1)
+
+        if [[ -z "$release" ]]; then
+            log "ERROR Ryujinx: version parsing failed"
+            echo "STATUS_RYUJINX=ERREUR" >> "$STATUS_FILE"
+            return
+        fi
+
+        url="https://git.ryujinx.app/Ryubing/Canary/releases/download/${release}/ryujinx-canary-${release}-x64.AppImage"
     fi
-    # url="https://git.ryujinx.app/Ryubing/Canary/releases/download/${release}/ryujinx-canary-${release}-x64.AppImage"
-    url="https://git.ryujinx.app/Ryubing/Canary/releases/download/1.3.320/ryujinx-canary-1.3.320-x64.AppImage"
+
     dest="$SWITCH_APPIMAGES/ryujinx-emu.AppImage"
+
     log "Detected Ryujinx version: $release"
     log "Downloading: $url"
+
     if wget_step "$url" "$dest" "ryujinx-emu" && deploy_if_valid "$dest"; then
 
         # Extraction Ryujinx AppImage (bypass FUSE/root check)
