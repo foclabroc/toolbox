@@ -715,7 +715,7 @@ update_ryujinx() {
 
     if [[ "$is_steamdeck" -eq 1 ]]; then
         log "Steam Deck detected (product_name: $product_name) — using fixed Ryujinx version with working pad support"
-        release="1.3.320-last-with-working-pad-on-steamdeck"
+        release="1.3.320-last-working-for-steamdeck"
         url="https://git.ryujinx.app/Ryubing/Canary/releases/download/1.3.320/ryujinx-canary-1.3.320-x64.AppImage"
     else
         log "Non-Steam Deck device — checking Ryujinx Canary latest release"
