@@ -698,7 +698,7 @@ update_ryujinx() {
     log "  "
     log "!!!!START Ryujinx AppImage update!!!!"
 
-    # Détection Steam Deck (last working version on steamdeck 1.3.320)
+    # Détection Steam Deck
     product_name=$(cat /sys/class/dmi/id/product_name 2>/dev/null)
     sys_vendor=$(cat /sys/class/dmi/id/sys_vendor 2>/dev/null)
     log "DEBUG dmi raw product_name='$product_name' sys_vendor='$sys_vendor'"
@@ -714,41 +714,73 @@ update_ryujinx() {
     fi
 
     if [[ "$is_steamdeck" -eq 1 ]]; then
-        log "Steam Deck detected (product_name: $product_name) — using fixed Ryujinx version with working pad support"
-        release="1.3.320-last-working-for-steamdeck"
-        url="https://git.ryujinx.app/Ryubing/Canary/releases/download/1.3.320/ryujinx-canary-1.3.320-x64.AppImage"
-    else
-        log "Non-Steam Deck device — checking Ryujinx Canary latest release"
+        log "Steam Deck detected (product_name: $product_name) — using custom patched Ryujinx build"
 
-        html=$(curl -fsL "https://git.ryujinx.app/Ryubing/Canary/releases" 2>>"$LOG_FILE")
+        release="Canary-1.3.351-steamdeck-patched"
+        archive_url="https://foclabroc.freeboxos.fr:55973/share/C_RhYyewjbV-1wMa/ryujinx-1.3.351-steamdeck.tar.gz"
+        dest="$SWITCH_APPIMAGES/ryujinx-patched.tar.gz"
 
-        if [[ -z "$html" ]]; then
-            log "ERROR Ryujinx: unable to fetch releases page"
+        log "Detected Ryujinx version: $release"
+
+        # Supprime la DB de mapping périmée pour forcer le mapping custom Batocera
+        rm -f "/userdata/system/configs/Ryujinx/gamecontrollerdb.txt"
+        rm -f "/userdata/system/configs/Ryujinx/SDL_GameControllerDB.txt"
+        log "Ancien gamecontrollerdb.txt supprimé (si présent)"
+
+        if wget_step "$archive_url" "$dest" "ryujinx-emu" && deploy_if_valid "$dest"; then
+            log "Extraction du build patché Ryujinx..."
+            cd "$SWITCH_APPIMAGES_FINAL"
+            rm -rf ryujinx-extracted ryujinx-extracted-tmp
+            mkdir -p ryujinx-extracted-tmp
+            tar -xzf ryujinx-patched.tar.gz -C ryujinx-extracted-tmp 2>>"$LOG_FILE"
+
+            if [ -d "ryujinx-extracted-tmp/usr/bin" ]; then
+                mv ryujinx-extracted-tmp ryujinx-extracted
+                rm -f ryujinx-patched.tar.gz
+                chmod +x ryujinx-extracted/usr/bin/Ryujinx
+                log "Extraction du build patché terminée"
+                chmod +x /userdata/system/switch/extra/ryu_wrapper 2>/dev/null
+                echo "STATUS_RYUJINX=OK" >> "$STATUS_FILE"
+                echo "RYUJINX_VERSION=$release" >> "$VERSIONS_FILE"
+            else
+                log "ERROR Ryujinx: structure usr/bin introuvable dans l'archive patchée"
+                rm -rf ryujinx-extracted-tmp
+                echo "STATUS_RYUJINX=ERREUR" >> "$STATUS_FILE"
+            fi
+        else
+            log "ERROR Ryujinx: téléchargement ou déploiement de l'archive patchée échoué"
             echo "STATUS_RYUJINX=ERREUR" >> "$STATUS_FILE"
-            return
         fi
-
-        release=$(echo "$html" \
-            | grep -oP 'releases/download/\K[0-9.]+' \
-            | head -n1)
-
-        if [[ -z "$release" ]]; then
-            log "ERROR Ryujinx: version parsing failed"
-            echo "STATUS_RYUJINX=ERREUR" >> "$STATUS_FILE"
-            return
-        fi
-
-        url="https://git.ryujinx.app/Ryubing/Canary/releases/download/${release}/ryujinx-canary-${release}-x64.AppImage"
+        return
     fi
 
+    log "Non-Steam Deck device — checking Ryujinx Canary latest release"
+
+    html=$(curl -fsL "https://git.ryujinx.app/Ryubing/Canary/releases" 2>>"$LOG_FILE")
+
+    if [[ -z "$html" ]]; then
+        log "ERROR Ryujinx: unable to fetch releases page"
+        echo "STATUS_RYUJINX=ERREUR" >> "$STATUS_FILE"
+        return
+    fi
+
+    release=$(echo "$html" \
+        | grep -oP 'releases/download/\K[0-9.]+' \
+        | head -n1)
+
+    if [[ -z "$release" ]]; then
+        log "ERROR Ryujinx: version parsing failed"
+        echo "STATUS_RYUJINX=ERREUR" >> "$STATUS_FILE"
+        return
+    fi
+
+    url="https://git.ryujinx.app/Ryubing/Canary/releases/download/${release}/ryujinx-canary-${release}-x64.AppImage"
     dest="$SWITCH_APPIMAGES/ryujinx-emu.AppImage"
 
     log "Detected Ryujinx version: $release"
     log "Downloading: $url"
 
     if wget_step "$url" "$dest" "ryujinx-emu" && deploy_if_valid "$dest"; then
-
-        # Extraction Ryujinx AppImage (bypass FUSE/root check)
         log "Extraction Ryujinx AppImage..."
         cd "$SWITCH_APPIMAGES_FINAL"
         rm -rf ryujinx-extracted
@@ -761,7 +793,6 @@ update_ryujinx() {
             log "WARN: Extraction échouée, AppImage conservée"
         fi
 
-        # chmod wrapper
         chmod +x /userdata/system/switch/extra/ryu_wrapper 2>/dev/null
 
         echo "STATUS_RYUJINX=OK" >> "$STATUS_FILE"
