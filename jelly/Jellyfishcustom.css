@@ -9,16 +9,14 @@ button.detailButton.btnPlay.play-button {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    align-self: center !important;        /* ← force l'alignement vertical avec les autres boutons */
     gap: 0.45rem !important;
-    padding: 0.5em 1em !important;         /* ← padding vertical explicite, pas seulement horizontal */
-    height: 2.5em !important;              /* ← à ajuster selon la hauteur réelle des autres boutons */
-    background: var(--primary-accent-color) !important;
-    color: #000 !important;
+    padding-left: 1em !important;
+    padding-right: 1em !important;
+    background: var(--primary-accent-color) !important; /* fond dans la couleur du thème */
+    color: #000 !important;                             /* texte et icône noirs */
     border: none !important;
-    border-radius: var(--rounded-cards, 10px) !important;
+    border-radius: var(--rounded-cards, 10px) !important; /* arrondi cohérent avec ton thème */
     transition: transform 0.15s ease, filter 0.15s ease;
-    box-sizing: border-box !important;
 }
 /* Masquer le texte original "Play" */
 button.detailButton.btnPlay.play-button .play-text {
