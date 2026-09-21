@@ -796,6 +796,7 @@ SVCEOF
 
         chmod +x "$SERVICE_FILE"
         batocera-services enable custom_service
+        "$SERVICE_FILE"
     else
         SERVICE_FILE="/userdata/system/services/custom_service"
         MARKER_START="# >>> FOCLABROC LABWC WINDOW RULES >>>"

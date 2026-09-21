@@ -505,6 +505,7 @@ SVCEOF
 
         chmod +x "$SERVICE_FILE"
         batocera-services enable custom_service
+        "$SERVICE_FILE"
     else
         log "Architecture ${ARCH_LEVEL:-inconnue} — custom_service labwc non déployé"
         SERVICE_FILE="/userdata/system/services/custom_service"
