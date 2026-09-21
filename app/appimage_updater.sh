@@ -443,6 +443,92 @@ install_new_pack() {
     rm -rf "/userdata/tmpf"
     rm -f "/userdata/system/services/foclaswitch"
 
+    # --- CUSTOM SERVICE (labwc window decorations, x86-64-v3 only) ---
+    ARCH_LEVEL=$(batocera-info | grep '^Board:' | awk '{print $2}')
+    if [[ "$ARCH_LEVEL" == "x86-64-v3" ]]; then
+        log "Architecture x86-64-v3 détectée, déploiement du custom_service labwc"
+        SERVICE_FILE="/userdata/system/services/custom_service"
+        mkdir -p /userdata/system/services
+
+        MARKER_START="# >>> FOCLABROC LABWC WINDOW RULES >>>"
+        MARKER_END="# <<< FOCLABROC LABWC WINDOW RULES <<<"
+
+        read -r -d '' SERVICE_BLOCK <<'SVCEOF'
+# >>> FOCLABROC LABWC WINDOW RULES >>>
+ln -sf /userdata/system/pro/extra/xmlstarlet /usr/bin/xmlstarlet
+
+RC_XML="/userdata/system/.config/labwc/rc.xml"
+
+add_rule() {
+    local id="$1"
+    if ! grep -q "identifier=\"${id}\"" "$RC_XML"; then
+        xmlstarlet ed -L \
+            -s "/labwc_config/windowRules" -t elem -n "windowRule" -v "" \
+            -s "/labwc_config/windowRules/windowRule[last()]" -t attr -n "identifier" -v "${id}" \
+            -s "/labwc_config/windowRules/windowRule[last()]" -t attr -n "serverDecoration" -v "yes" \
+            "$RC_XML"
+    fi
+}
+
+if [ -f "$RC_XML" ]; then
+    add_rule "eden"
+    add_rule "Ryujinx"
+    add_rule "citron"
+
+    LABWC_PID=$(pgrep -o -x labwc)
+    if [ -n "$LABWC_PID" ]; then
+        LABWC_PID="$LABWC_PID" labwc --reconfigure
+    fi
+fi
+# <<< FOCLABROC LABWC WINDOW RULES <<<
+SVCEOF
+
+        if [ -f "$SERVICE_FILE" ]; then
+            if grep -qF "$MARKER_START" "$SERVICE_FILE"; then
+                # Bloc déjà présent : le remplace (mise à jour) sans toucher au reste du fichier
+                awk -v start="$MARKER_START" -v end="$MARKER_END" -v block="$SERVICE_BLOCK" '
+                    $0 == start {print block; skip=1; next}
+                    $0 == end {skip=0; next}
+                    skip {next}
+                    {print}
+                ' "$SERVICE_FILE" > "${SERVICE_FILE}.tmp" && mv "${SERVICE_FILE}.tmp" "$SERVICE_FILE"
+                log "Bloc labwc mis à jour dans custom_service existant"
+            else
+                # custom_service existant mais sans notre bloc : on l'ajoute à la fin, on préserve le reste
+                printf '\n%s\n' "$SERVICE_BLOCK" >> "$SERVICE_FILE"
+                log "Bloc labwc ajouté à custom_service existant (contenu préservé)"
+            fi
+        else
+            printf '#!/bin/bash\n\n%s\n' "$SERVICE_BLOCK" > "$SERVICE_FILE"
+            log "custom_service créé avec le bloc labwc"
+        fi
+
+        chmod +x "$SERVICE_FILE"
+        batocera-services enable custom_service
+    else
+        log "Architecture ${ARCH_LEVEL:-inconnue} — custom_service labwc non déployé"
+        SERVICE_FILE="/userdata/system/services/custom_service"
+        MARKER_START="# >>> FOCLABROC LABWC WINDOW RULES >>>"
+        MARKER_END="# <<< FOCLABROC LABWC WINDOW RULES <<<"
+
+        if [ -f "$SERVICE_FILE" ] && grep -qF "$MARKER_START" "$SERVICE_FILE"; then
+            awk -v start="$MARKER_START" -v end="$MARKER_END" '
+                $0 == start {skip=1; next}
+                $0 == end {skip=0; next}
+                skip {next}
+                {print}
+            ' "$SERVICE_FILE" > "${SERVICE_FILE}.tmp" && mv "${SERVICE_FILE}.tmp" "$SERVICE_FILE"
+            log "Bloc labwc retiré de custom_service (architecture non compatible)"
+
+            # Si le fichier ne contient plus rien d'utile (juste le shebang, ou vide), on le désactive/supprime
+            REMAINING=$(grep -vE '^\s*#!/bin/bash\s*$|^\s*$' "$SERVICE_FILE")
+            if [ -z "$REMAINING" ]; then
+                rm -f "$SERVICE_FILE"
+                log "custom_service supprimé (plus aucun contenu après retrait du bloc labwc)"
+            fi
+        fi
+    fi
+
     log "!!!!System pack update finished!!!!"
     echo "STATUS_SYS=OK" >> "$STATUS_FILE"
 }
