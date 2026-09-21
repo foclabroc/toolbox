@@ -783,20 +783,35 @@ fi
 # <<< FOCLABROC LABWC WINDOW RULES <<<
 SVCEOF
 
+        BLOCK_FILE=$(mktemp)
+        printf '%s\n' "$SERVICE_BLOCK" > "$BLOCK_FILE"
+
         if [ -f "$SERVICE_FILE" ]; then
             if grep -qF "$MARKER_START" "$SERVICE_FILE"; then
-                awk -v start="$MARKER_START" -v end="$MARKER_END" -v block="$SERVICE_BLOCK" '
-                    $0 == start {print block; skip=1; next}
+                # Bloc déjà présent : le remplace (mise à jour) sans toucher au reste du fichier
+                awk -v start="$MARKER_START" -v end="$MARKER_END" -v blockfile="$BLOCK_FILE" '
+                    $0 == start {
+                        while ((getline line < blockfile) > 0) print line
+                        close(blockfile)
+                        skip=1
+                        next
+                    }
                     $0 == end {skip=0; next}
                     skip {next}
                     {print}
                 ' "$SERVICE_FILE" > "${SERVICE_FILE}.tmp" && mv "${SERVICE_FILE}.tmp" "$SERVICE_FILE"
+                log "Bloc labwc mis à jour dans custom_service existant"
             else
+                # custom_service existant mais sans notre bloc : on l'ajoute à la fin, on préserve le reste
                 printf '\n%s\n' "$SERVICE_BLOCK" >> "$SERVICE_FILE"
+                log "Bloc labwc ajouté à custom_service existant (contenu préservé)"
             fi
         else
             printf '#!/bin/bash\n\n%s\n' "$SERVICE_BLOCK" > "$SERVICE_FILE"
+            log "custom_service créé avec le bloc labwc"
         fi
+
+        rm -f "$BLOCK_FILE"
 
         chmod +x "$SERVICE_FILE"
         batocera-services enable custom_service
