@@ -755,6 +755,10 @@ ln -sf /userdata/system/pro/extra/xmlstarlet /usr/bin/xmlstarlet
 
 RC_XML="/userdata/system/.config/labwc/rc.xml"
 
+if [ ! -f "$RC_XML" ]; then
+    /etc/init.d/S14labwc start
+fi
+
 add_rule() {
     local id="$1"
     if ! grep -q "identifier=\"${id}\"" "$RC_XML"; then
