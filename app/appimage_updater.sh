@@ -1000,23 +1000,23 @@ GLOBAL_PERCENT=0
 
     [[ "$STATUS_CITRON" == "OK" ]] \
         && CITRON_LINE="Citron-Neo     : OK ---->(${CITRON_VERSION})" \
-        || CITRON_LINE="Citron-Neo     : $(tr ERROR) [CITRON SERVERS DOWN!!] citron-emu.AppImage $(tr ERROR_EMU)"
+        || CITRON_LINE="Citron-Neo     : $(tr ERROR) [CITRON SERVERS DOWN!!] citron-emu $(tr ERROR_EMU)"
 
     [[ "$STATUS_NIGHTLY" == "OK" ]] \
         && NIGHTLY_LINE="Eden-Nightly   : OK ---->(${NIGHTLY_DATE})" \
-        || NIGHTLY_LINE="Eden-Nightly   : $(tr ERROR) eden-nightly.AppImage $(tr ERROR_EMU)"
+        || NIGHTLY_LINE="Eden-Nightly   : $(tr ERROR) eden-nightly $(tr ERROR_EMU)"
 
     [[ "$STATUS_EDEN" == "OK" ]] \
         && EDEN_LINE="Eden           : OK ---->(${EDEN_VERSION})" \
-        || EDEN_LINE="Eden           : $(tr ERROR) eden-emu.AppImage $(tr ERROR_EMU)"
+        || EDEN_LINE="Eden           : $(tr ERROR) eden-emu $(tr ERROR_EMU)"
 
     [[ "$STATUS_EDEN_PGO" == "OK" ]] \
         && EDEN_PGO_LINE="Eden-PGO       : OK ---->(${EDEN_PGO_VERSION})" \
-        || EDEN_PGO_LINE="Eden-PGO       : $(tr ERROR) eden-pgo.AppImage $(tr ERROR_EMU)"
+        || EDEN_PGO_LINE="Eden-PGO       : $(tr ERROR) eden-pgo $(tr ERROR_EMU)"
 
     [[ "$STATUS_RYUJINX" == "OK" ]] \
         && RYUJINX_LINE="Ryujinx        : OK ---->(${RYUJINX_VERSION})" \
-        || RYUJINX_LINE="Ryujinx        : $(tr ERROR)"
+        || RYUJINX_LINE="Ryujinx        : $(tr ERROR) Ryujinx $(tr ERROR_EMU)"
     curl http://127.0.0.1:1234/reloadgames
     dialog --backtitle "$BACKTITLE" \
            --title "$(tr FINAL_TITLE)" \
