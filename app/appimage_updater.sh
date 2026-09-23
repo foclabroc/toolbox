@@ -129,7 +129,7 @@ log() {
 }
 
 # ===============================
-# STEP DOWNLOAD (GAUGE PAR ÉTAPES)
+# STEP DOWNLOAD (GAUGE PAR ÉTAPES) — wget
 # ===============================
 wget_step() {
     local url="$1"
@@ -162,6 +162,42 @@ wget_step() {
     wait $pid || return 1
     chmod +x "$dest"
     return 0
+}
+
+# ===============================
+# STEP DOWNLOAD (GAUGE PAR ÉTAPES) — curl
+# Écrit toujours la réponse dans un fichier (jamais sur stdout),
+# pour ne pas polluer la sortie avec les lignes du gauge et pour
+# ne jamais figer l'affichage pendant un check HEAD.
+# Usage: curl_step "<label>" "<fichier_de_sortie|/dev/null>" <options curl...>
+# ===============================
+curl_step() {
+    local label="$1"
+    local outfile="$2"
+    shift 2
+
+    local spinner=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
+    local i=0
+
+    curl "$@" -o "$outfile" 2>>"$LOG_FILE" &
+    pid=$!
+
+    while kill -0 $pid 2>/dev/null; do
+        echo "XXX"
+        echo "$GLOBAL_PERCENT"
+        echo "$(tr GAUGE_TEXT)"
+        echo "======================="
+        echo " "
+        echo "-->[${label}]"
+        echo "--> ${spinner[$i]} $(tr PROGRESS)"
+        echo "XXX"
+
+        i=$(( (i + 1) % ${#spinner[@]} ))
+        sleep 0.15
+    done
+
+    wait $pid
+    return $?
 }
 
 deploy_if_valid() {
@@ -552,14 +588,17 @@ SVCEOF
 # UPDATE CITRON
 # ===============================
 update_citron() {
-    local assets_page tag_page appimage_path appimage_url file_name commit build_date dest
+    local assets_page tag_page appimage_path appimage_url file_name commit build_date dest tmp1 tmp2
 
     log "  "
     log "  "
     log "!!!!START Citron AppImage update!!!!"
     log "Checking latest Citron nightly-linux release on GitHub"
 
-    assets_page=$(curl -Ls "https://github.com/NextendoNetwork/citron-nextendo/releases/expanded_assets/nightly-linux" 2>>"$LOG_FILE")
+    tmp1=$(mktemp)
+    curl_step "citron" "$tmp1" -Ls --connect-timeout 5 --max-time 15 "https://github.com/NextendoNetwork/citron-nextendo/releases/expanded_assets/nightly-linux"
+    assets_page=$(cat "$tmp1")
+    rm -f "$tmp1"
 
     if [[ -z "$assets_page" ]]; then
         log "ERROR Citron: unable to fetch expanded assets page"
@@ -580,7 +619,12 @@ update_citron() {
     appimage_url="https://github.com${appimage_path}"
     file_name="${appimage_url##*/}"
     commit=$(echo "$file_name" | sed -E 's/^citron_nightly-([0-9a-f]+)-linux.*/\1/')
-    tag_page=$(curl -Ls "https://github.com/NextendoNetwork/citron-nextendo/releases/tag/nightly-linux" 2>>"$LOG_FILE")
+
+    tmp2=$(mktemp)
+    curl_step "citron" "$tmp2" -Ls --connect-timeout 5 --max-time 15 "https://github.com/NextendoNetwork/citron-nextendo/releases/tag/nightly-linux"
+    tag_page=$(cat "$tmp2")
+    rm -f "$tmp2"
+
     build_date=$(echo "$tag_page" | grep -Eo 'Date: [0-9]{4}-[0-9]{2}-[0-9]{2}' | head -n1 | sed 's/Date: //')
 
     dest="$SWITCH_APPIMAGES/citron-emu.AppImage"
@@ -632,14 +676,18 @@ update_citron() {
 # UPDATE EDEN NIGHTLY
 # ===============================
 update_nightly() {
-    local json release raw date base short url dest
+    local json release raw date base short url dest tmp
 
     log ""
     log ""
     log "!!!!START Eden Nightly AppImage update!!!!"
     log "Checking Eden Nightly latest release"
 
-    json=$(curl -fsL "https://nightly.eden-emu.dev/latest/release.json" 2>>"$LOG_FILE")
+    tmp=$(mktemp)
+    curl_step "eden-nightly" "$tmp" -fsL --connect-timeout 5 --max-time 15 "https://nightly.eden-emu.dev/latest/release.json"
+    json=$(cat "$tmp")
+    rm -f "$tmp"
+
     if [[ -z "$json" ]]; then
         log "ERROR Nightly: release.json unreachable"
         echo "STATUS_NIGHTLY=ERREUR" >> "$STATUS_FILE"
@@ -680,7 +728,7 @@ update_nightly() {
     url="${base}/${release}/Eden-Linux-${short}-amd64-gcc-standard.AppImage"
 
     # Vérification d'existence (HEAD)
-    if ! curl -fsLI "$url" >/dev/null 2>>"$LOG_FILE"; then
+    if ! curl_step "eden-nightly" /dev/null -fsLI --connect-timeout 5 --max-time 15 "$url"; then
         log "ERROR Nightly: AppImage not reachable ($url)"
         echo "STATUS_NIGHTLY=ERREUR" >> "$STATUS_FILE"
         return
@@ -703,14 +751,18 @@ update_nightly() {
 # UPDATE EDEN
 # ===============================
 update_eden() {
-    local json release base url dest
+    local json release base url dest tmp
 
     log ""
     log ""
     log "!!!!START Eden AppImage update!!!!"
     log "Checking Eden latest release"
 
-    json=$(curl -fsL "https://stable.eden-emu.dev/latest/release.json" 2>>"$LOG_FILE")
+    tmp=$(mktemp)
+    curl_step "eden-emu" "$tmp" -fsL --connect-timeout 5 --max-time 15 "https://stable.eden-emu.dev/latest/release.json"
+    json=$(cat "$tmp")
+    rm -f "$tmp"
+
     if [[ -z "$json" ]]; then
         log "ERROR Eden: release.json unreachable"
         echo "STATUS_EDEN=ERREUR" >> "$STATUS_FILE"
@@ -733,7 +785,7 @@ update_eden() {
 
     url="${base}/${release}/Eden-Linux-${release}-amd64-gcc-standard.AppImage"
 
-    if ! curl -fsLI "$url" >/dev/null 2>>"$LOG_FILE"; then
+    if ! curl_step "eden-emu" /dev/null -fsLI --connect-timeout 5 --max-time 15 "$url"; then
         log "ERROR Eden: AppImage not reachable ($url)"
         echo "STATUS_EDEN=ERREUR" >> "$STATUS_FILE"
         return
@@ -771,7 +823,7 @@ update_eden_pgo() {
 
     url="https://stable.eden-emu.dev/${release}/Eden-Linux-${release}-amd64-clang-pgo.AppImage"
 
-    if ! curl -fsLI "$url" >/dev/null 2>>"$LOG_FILE"; then
+    if ! curl_step "eden-pgo" /dev/null -fsLI --connect-timeout 5 --max-time 15 "$url"; then
         log "ERROR Eden-PGO: AppImage not reachable ($url)"
         echo "STATUS_EDEN_PGO=ERREUR" >> "$STATUS_FILE"
         return
@@ -793,7 +845,7 @@ update_eden_pgo() {
 # UPDATE RYUJINX
 # ===============================
 update_ryujinx() {
-    local html release url dest product_name sys_vendor is_steamdeck
+    local html release url dest product_name sys_vendor is_steamdeck tmp
 
     log "  "
     log "  "
@@ -857,7 +909,10 @@ update_ryujinx() {
 
     log "Non-Steam Deck device — checking Ryujinx Canary latest release"
 
-    html=$(curl -fsL "https://git.ryujinx.app/Ryubing/Canary/releases" 2>>"$LOG_FILE")
+    tmp=$(mktemp)
+    curl_step "ryujinx" "$tmp" -fsL --connect-timeout 5 --max-time 15 "https://git.ryujinx.app/Ryubing/Canary/releases"
+    html=$(cat "$tmp")
+    rm -f "$tmp"
 
     if [[ -z "$html" ]]; then
         log "ERROR Ryujinx: unable to fetch releases page"
@@ -961,7 +1016,7 @@ GLOBAL_PERCENT=0
 
     [[ "$STATUS_RYUJINX" == "OK" ]] \
         && RYUJINX_LINE="Ryujinx        : OK ---->(${RYUJINX_VERSION})" \
-        || RYUJINX_LINE="Ryujinx        : $(tr ERROR) ryujinx-emu.AppImage $(tr ERROR_EMU)"
+        || RYUJINX_LINE="Ryujinx        : $(tr ERROR)"
     curl http://127.0.0.1:1234/reloadgames
     dialog --backtitle "$BACKTITLE" \
            --title "$(tr FINAL_TITLE)" \
