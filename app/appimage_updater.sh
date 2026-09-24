@@ -844,98 +844,79 @@ update_eden_pgo() {
 # ===============================
 # UPDATE RYUJINX
 # ===============================
-update_ryujinx() {
-    local html release url dest product_name sys_vendor is_steamdeck tmp
-
-    log "  "
-    log "  "
-    log "!!!!START Ryujinx AppImage update!!!!"
-
-    # Détection Steam Deck
-    product_name=$(cat /sys/class/dmi/id/product_name 2>/dev/null)
-    sys_vendor=$(cat /sys/class/dmi/id/sys_vendor 2>/dev/null)
-    log "DEBUG dmi raw product_name='$product_name' sys_vendor='$sys_vendor'"
-
-    product_name="${product_name,,}"
-    sys_vendor="${sys_vendor,,}"
-
-    is_steamdeck=0
-    if [[ "$product_name" == "jupiter" || "$product_name" == "galileo" || "$product_name" == *"steam deck"* ]]; then
-        is_steamdeck=1
-    elif [[ "$sys_vendor" == "valve" ]]; then
-        is_steamdeck=1
-    fi
-
-    if [[ "$is_steamdeck" -eq 1 ]]; then
-        log "Steam Deck detected (product_name: $product_name) — using custom patched Ryujinx build"
-
-        release="Canary-1.3.351-steamdeck-patched"
-        archive_url="https://foclabroc.freeboxos.fr:55973/share/C_RhYyewjbV-1wMa/ryujinx-1.3.351-steamdeck.tar.gz"
-        dest="$SWITCH_APPIMAGES/ryujinx-patched.tar.gz"
-
-        log "Detected Ryujinx version: $release"
-
-        # Supprime la DB de mapping périmée pour forcer le mapping custom Batocera
-        rm -f "/userdata/system/configs/Ryujinx/gamecontrollerdb.txt"
-        rm -f "/userdata/system/configs/Ryujinx/SDL_GameControllerDB.txt"
-        log "Ancien gamecontrollerdb.txt supprimé (si présent)"
-
-        if wget_step "$archive_url" "$dest" "ryujinx-emu" && deploy_if_valid "$dest"; then
-            log "Extraction du build patché Ryujinx..."
-            cd "$SWITCH_APPIMAGES_FINAL"
-            rm -rf ryujinx-extracted ryujinx-extracted-tmp
-            mkdir -p ryujinx-extracted-tmp
-            tar -xzf ryujinx-patched.tar.gz -C ryujinx-extracted-tmp 2>>"$LOG_FILE"
-
-            if [ -d "ryujinx-extracted-tmp/usr/bin" ]; then
-                mv ryujinx-extracted-tmp ryujinx-extracted
-                rm -f ryujinx-patched.tar.gz
-                chmod +x ryujinx-extracted/usr/bin/Ryujinx
-                log "Extraction du build patché terminée"
-                chmod +x /userdata/system/switch/extra/ryu_wrapper 2>/dev/null
-                echo "STATUS_RYUJINX=OK" >> "$STATUS_FILE"
-                echo "RYUJINX_VERSION=$release" >> "$VERSIONS_FILE"
-            else
-                log "ERROR Ryujinx: structure usr/bin introuvable dans l'archive patchée"
-                rm -rf ryujinx-extracted-tmp
-                echo "STATUS_RYUJINX=ERREUR" >> "$STATUS_FILE"
-            fi
+ 
+# Build de secours (utilisé si la version standard Canary est indisponible)
+RYUJINX_FALLBACK_URL="https://foclabroc.freeboxos.fr:55973/share/zmkgBds8BiTLW3fG/ryujinx-canary-1.3.351.tar.gz"
+RYUJINX_FALLBACK_VERSION="1.3.351"
+ 
+# Télécharge et extrait un build Ryujinx au format tar.gz
+# $1 = URL de l'archive, $2 = version (pour le fichier de versions), $3 = nom local de l'archive
+install_ryujinx_tarball() {
+    local archive_url="$1" release="$2" archive_name="$3" dest
+ 
+    dest="$SWITCH_APPIMAGES/$archive_name"
+    log "Detected Ryujinx version: $release"
+ 
+    if wget_step "$archive_url" "$dest" "ryujinx-emu" && deploy_if_valid "$dest"; then
+        log "Extraction du build Ryujinx (tar.gz)..."
+        cd "$SWITCH_APPIMAGES_FINAL"
+        rm -rf ryujinx-extracted ryujinx-extracted-tmp
+        mkdir -p ryujinx-extracted-tmp
+        tar -xzf "$archive_name" -C ryujinx-extracted-tmp 2>>"$LOG_FILE"
+ 
+        if [ -d "ryujinx-extracted-tmp/usr/bin" ]; then
+            mv ryujinx-extracted-tmp ryujinx-extracted
+            rm -f "$archive_name"
+            chmod +x ryujinx-extracted/usr/bin/Ryujinx
+            log "Extraction du build Ryujinx terminée"
+            chmod +x /userdata/system/switch/extra/ryu_wrapper 2>/dev/null
+            echo "STATUS_RYUJINX=OK" >> "$STATUS_FILE"
+            echo "RYUJINX_VERSION=$release" >> "$VERSIONS_FILE"
+            return 0
         else
-            log "ERROR Ryujinx: téléchargement ou déploiement de l'archive patchée échoué"
+            log "ERROR Ryujinx: structure usr/bin introuvable dans l'archive"
+            rm -rf ryujinx-extracted-tmp
+            rm -f "$archive_name"
             echo "STATUS_RYUJINX=ERREUR" >> "$STATUS_FILE"
+            return 1
         fi
-        return
+    else
+        log "ERROR Ryujinx: téléchargement ou déploiement de l'archive échoué"
+        echo "STATUS_RYUJINX=ERREUR" >> "$STATUS_FILE"
+        return 1
     fi
-
-    log "Non-Steam Deck device — checking Ryujinx Canary latest release"
-
+}
+ 
+# Version standard (AppImage Canary). Retourne 1 en cas d'échec, sans écrire de statut
+# (le fallback s'en charge).
+update_ryujinx_standard() {
+    local html release url dest tmp
+ 
     tmp=$(mktemp)
     curl_step "ryujinx" "$tmp" -fsL --connect-timeout 5 --max-time 15 "https://git.ryujinx.app/Ryubing/Canary/releases"
     html=$(cat "$tmp")
     rm -f "$tmp"
-
+ 
     if [[ -z "$html" ]]; then
         log "ERROR Ryujinx: unable to fetch releases page"
-        echo "STATUS_RYUJINX=ERREUR" >> "$STATUS_FILE"
-        return
+        return 1
     fi
-
+ 
     release=$(echo "$html" \
         | grep -oP 'releases/download/\K[0-9.]+' \
         | head -n1)
-
+ 
     if [[ -z "$release" ]]; then
         log "ERROR Ryujinx: version parsing failed"
-        echo "STATUS_RYUJINX=ERREUR" >> "$STATUS_FILE"
-        return
+        return 1
     fi
-
+ 
     url="https://git.ryujinx.app/Ryubing/Canary/releases/download/${release}/ryujinx-canary-${release}-x64.AppImage"
     dest="$SWITCH_APPIMAGES/ryujinx-emu.AppImage"
-
+ 
     log "Detected Ryujinx version: $release"
     log "Downloading: $url"
-
+ 
     if wget_step "$url" "$dest" "ryujinx-emu" && deploy_if_valid "$dest"; then
         log "Extraction Ryujinx AppImage..."
         cd "$SWITCH_APPIMAGES_FINAL"
@@ -948,14 +929,63 @@ update_ryujinx() {
         else
             log "WARN: Extraction échouée, AppImage conservée"
         fi
-
+ 
         chmod +x /userdata/system/switch/extra/ryu_wrapper 2>/dev/null
-
+ 
         echo "STATUS_RYUJINX=OK" >> "$STATUS_FILE"
         echo "RYUJINX_VERSION=$release" >> "$VERSIONS_FILE"
-    else
-        echo "STATUS_RYUJINX=ERREUR" >> "$STATUS_FILE"
+        return 0
     fi
+ 
+    log "ERROR Ryujinx: téléchargement de l'AppImage standard échoué"
+    return 1
+}
+ 
+update_ryujinx() {
+    local release archive_url product_name sys_vendor is_steamdeck
+ 
+    log "  "
+    log "  "
+    log "!!!!START Ryujinx AppImage update!!!!"
+ 
+    # Détection Steam Deck
+    product_name=$(cat /sys/class/dmi/id/product_name 2>/dev/null)
+    sys_vendor=$(cat /sys/class/dmi/id/sys_vendor 2>/dev/null)
+    log "DEBUG dmi raw product_name='$product_name' sys_vendor='$sys_vendor'"
+ 
+    product_name="${product_name,,}"
+    sys_vendor="${sys_vendor,,}"
+ 
+    is_steamdeck=0
+    if [[ "$product_name" == "jupiter" || "$product_name" == "galileo" || "$product_name" == *"steam deck"* ]]; then
+        is_steamdeck=1
+    elif [[ "$sys_vendor" == "valve" ]]; then
+        is_steamdeck=1
+    fi
+ 
+    if [[ "$is_steamdeck" -eq 1 ]]; then
+        log "Steam Deck detected (product_name: $product_name) — using custom patched Ryujinx build"
+ 
+        release="Canary-1.3.351-steamdeck-patched"
+        archive_url="https://foclabroc.freeboxos.fr:55973/share/C_RhYyewjbV-1wMa/ryujinx-1.3.351-steamdeck.tar.gz"
+ 
+        # Supprime la DB de mapping périmée pour forcer le mapping custom Batocera
+        rm -f "/userdata/system/configs/Ryujinx/gamecontrollerdb.txt"
+        rm -f "/userdata/system/configs/Ryujinx/SDL_GameControllerDB.txt"
+        log "Ancien gamecontrollerdb.txt supprimé (si présent)"
+ 
+        install_ryujinx_tarball "$archive_url" "$release" "ryujinx-patched.tar.gz"
+        return
+    fi
+ 
+    log "Non-Steam Deck device — checking Ryujinx Canary latest release"
+ 
+    if update_ryujinx_standard; then
+        return
+    fi
+ 
+    log "WARN Ryujinx: version standard indisponible — fallback vers le build $RYUJINX_FALLBACK_VERSION (tar.gz)"
+    install_ryujinx_tarball "$RYUJINX_FALLBACK_URL" "$RYUJINX_FALLBACK_VERSION" "ryujinx-fallback.tar.gz"
 }
 
 # ===============================
