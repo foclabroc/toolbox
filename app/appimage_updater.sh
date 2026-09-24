@@ -151,7 +151,7 @@ wget_step() {
         echo "$(tr GAUGE_TEXT)"
         echo "======================="
         echo " "
-        echo "-->[${label}.AppImage]"
+        echo "-->[${label}-emu]"
         echo "--> ${spinner[$i]} $(tr PROGRESS)"
         echo "XXX"
 
@@ -759,7 +759,7 @@ update_eden() {
     log "Checking Eden latest release"
 
     tmp=$(mktemp)
-    curl_step "eden-emu" "$tmp" -fsL --connect-timeout 5 --max-time 15 "https://stable.eden-emu.dev/latest/release.json"
+    curl_step "eden" "$tmp" -fsL --connect-timeout 5 --max-time 15 "https://stable.eden-emu.dev/latest/release.json"
     json=$(cat "$tmp")
     rm -f "$tmp"
 
@@ -857,7 +857,7 @@ install_ryujinx_tarball() {
     dest="$SWITCH_APPIMAGES/$archive_name"
     log "Detected Ryujinx version: $release"
  
-    if wget_step "$archive_url" "$dest" "ryujinx-emu" && deploy_if_valid "$dest"; then
+    if wget_step "$archive_url" "$dest" "ryujinx" && deploy_if_valid "$dest"; then
         log "Extraction du build Ryujinx (tar.gz)..."
         cd "$SWITCH_APPIMAGES_FINAL"
         rm -rf ryujinx-extracted ryujinx-extracted-tmp
@@ -893,7 +893,7 @@ update_ryujinx_standard() {
     local html release url dest tmp
  
     tmp=$(mktemp)
-    curl_step "ryujinx-emu" "$tmp" -fsL --connect-timeout 5 --max-time 15 "https://git.ryujinx.app/Ryubing/Canary/releases"
+    curl_step "ryujinx" "$tmp" -fsL --connect-timeout 5 --max-time 15 "https://git.ryujinx.app/Ryubing/Canary/releases"
     html=$(cat "$tmp")
     rm -f "$tmp"
  
