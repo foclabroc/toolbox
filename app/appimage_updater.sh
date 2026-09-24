@@ -847,7 +847,7 @@ update_eden_pgo() {
  
 # Build de secours (utilisé si la version standard Canary est indisponible)
 RYUJINX_FALLBACK_URL="https://foclabroc.freeboxos.fr:55973/share/zmkgBds8BiTLW3fG/ryujinx-canary-1.3.351.tar.gz"
-RYUJINX_FALLBACK_VERSION="canary-1.3.351-(Last)"
+RYUJINX_FALLBACK_VERSION="Canary-1.3.351-Last"
  
 # Télécharge et extrait un build Ryujinx au format tar.gz
 # $1 = URL de l'archive, $2 = version (pour le fichier de versions), $3 = nom local de l'archive
@@ -966,7 +966,7 @@ update_ryujinx() {
     if [[ "$is_steamdeck" -eq 1 ]]; then
         log "Steam Deck detected (product_name: $product_name) — using custom patched Ryujinx build"
  
-        release="Canary-1.3.351-steamdeck-patched-(Last)"
+        release="Canary-1.3.351-steamdeck-patched-Last"
         archive_url="https://foclabroc.freeboxos.fr:55973/share/C_RhYyewjbV-1wMa/ryujinx-1.3.351-steamdeck.tar.gz"
  
         # Supprime la DB de mapping périmée pour forcer le mapping custom Batocera
