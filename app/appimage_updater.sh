@@ -785,7 +785,7 @@ update_eden() {
 
     url="${base}/${release}/Eden-Linux-${release}-amd64-gcc-standard.AppImage"
 
-    if ! curl_step "eden-emu" /dev/null -fsLI --connect-timeout 5 --max-time 15 "$url"; then
+    if ! curl_step "eden" /dev/null -fsLI --connect-timeout 5 --max-time 15 "$url"; then
         log "ERROR Eden: AppImage not reachable ($url)"
         echo "STATUS_EDEN=ERREUR" >> "$STATUS_FILE"
         return
@@ -795,7 +795,7 @@ update_eden() {
     log "Detected Eden version: $release"
     log "Downloading: $url"
 
-    if wget_step "$url" "$dest" "eden-emu" && deploy_if_valid "$dest"; then
+    if wget_step "$url" "$dest" "eden" && deploy_if_valid "$dest"; then
         echo "STATUS_EDEN=OK" >> "$STATUS_FILE"
         echo "EDEN_VERSION=$release" >> "$VERSIONS_FILE"
     else
