@@ -188,7 +188,7 @@ curl_step() {
         echo "$(tr GAUGE_TEXT)"
         echo "======================="
         echo " "
-        echo "-->[${label}.AppImage]"
+        echo "-->[${label}-emu]"
         echo "--> ${spinner[$i]} $(tr PROGRESS)"
         echo "XXX"
 
