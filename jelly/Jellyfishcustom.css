@@ -5047,4 +5047,63 @@ button.btnPlay.detailButton.emby-button:hover {
 .emby-button.cardOverlayButton[data-action="resume"] {
     background: #000 !important;
 }
+
+/* Bouton play mediabar */
+.play-button .play-text {
+    font-size: 0 !important;
+}
+.play-button .play-text::after {
+    content: "LIRE";
+    font-size: 1.2rem;
+}
+.play-button {
+    background-color: #00ACE7 !important;
+    color: #000 !important;
+    transition: box-shadow 0.25s ease, transform 0.25s ease, filter 0.25s ease !important;
+}
+
+.play-button:hover,
+.play-button:focus {
+    background-color: #00ACE7 !important; /* même couleur */
+    box-shadow: 0 0 12px 3px rgba(0, 172, 231, 0.9),
+                0 0 30px 8px rgba(0, 172, 231, 0.5) !important;
+    filter: brightness(1.1);
+    transform: scale(1.05);
+}
+.button-container {
+    overflow: visible !important;
+    padding: 30px !important;
+    margin: -30px !important; /* compense le padding pour ne pas décaler la mise en page */
+}
+.slide-content,
+.slide.active {
+    overflow: visible !important;
+}
+/* Bouton play mediabar */
+
+/* Bouton ▶ pages Films / Séries : même style que l'accueil */
+.cardOverlayContainer .cardOverlayFab-primary[data-action="play"] {
+    background: #000 !important;
+    background-color: #000 !important;
+    color: #fff !important;
+    border-radius: 50% !important;
+    box-shadow: 0 0 8px rgba(0,0,0,0.4);
+    transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease !important;
+}
+
+/* Triangle blanc (SVG) */
+.cardOverlayContainer .cardOverlayFab-primary[data-action="play"] .MuiSvgIcon-root {
+    width: 2.4rem !important;
+    height: 2.4rem !important;
+    fill: currentColor !important;
+}
+
+/* Survol : fond accent + triangle noir */
+.cardOverlayContainer .cardOverlayFab-primary[data-action="play"]:hover:not(:disabled) {
+    background: var(--primary-accent-color, #ffcc00) !important;
+    background-color: var(--primary-accent-color, #ffcc00) !important;
+    color: #000 !important;
+    transform: scale(1.07);
+    filter: brightness(1.05);
+}
 /* Bouton ▶ Play (état normal — fond noir forcé) */
