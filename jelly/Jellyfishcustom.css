@@ -5057,23 +5057,22 @@ button.btnPlay.detailButton.emby-button:hover {
     font-size: 1.2rem;
 }
 .play-button {
-    background-color: #00ACE7 !important;
+    background-color: var(--primary-accent-color) !important;
     color: #000 !important;
     transition: box-shadow 0.25s ease, transform 0.25s ease, filter 0.25s ease !important;
 }
-
 .play-button:hover,
-.play-button:focus {
-    background-color: #00ACE7 !important; /* même couleur */
-    box-shadow: 0 0 12px 3px rgba(0, 172, 231, 0.9),
-                0 0 30px 8px rgba(0, 172, 231, 0.5) !important;
+.play-button:focus-visible {
+    background-color: var(--primary-accent-color) !important;
+    box-shadow: 0 0 12px 3px rgba(var(--primary-r), var(--primary-g), var(--primary-b), 0.9),
+                0 0 30px 8px rgba(var(--primary-r), var(--primary-g), var(--primary-b), 0.5) !important;
     filter: brightness(1.1);
     transform: scale(1.05);
 }
 .button-container {
     overflow: visible !important;
     padding: 30px !important;
-    margin: -30px !important; /* compense le padding pour ne pas décaler la mise en page */
+    margin: -30px !important;
 }
 .slide-content,
 .slide.active {
@@ -5107,3 +5106,14 @@ button.btnPlay.detailButton.emby-button:hover {
     filter: brightness(1.05);
 }
 /* Bouton ▶ Play (état normal — fond noir forcé) */
+
+/* Barre du haut transparente */
+header.MuiAppBar-root.MuiAppBar-root.MuiAppBar-root,
+header.MuiAppBar-root.MuiAppBar-colorTransparent.MuiAppBar-colorTransparent,
+header.MuiAppBar-root.MuiAppBar-colorDefault.MuiAppBar-colorDefault {
+    background-color: transparent !important;
+    background-image: linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0)) !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+}
+/* Barre du haut transparente */
