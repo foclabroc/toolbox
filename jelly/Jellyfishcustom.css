@@ -5156,3 +5156,25 @@ header.MuiAppBar-root.MuiAppBar-colorDefault.MuiAppBar-colorDefault {
     min-height: 0 !important;
 }
 /* Barre de titre des pages de liste (Films, Séries...) : retour à la ligne */
+
+/* Menu latéral : même fond que la barre du haut */
+body .MuiDrawer-root .MuiPaper-root.MuiPaper-elevation.MuiPaper-elevation16.MuiDrawer-paper.MuiDrawer-paperAnchorLeft,
+body:not(.dashboardDocument) .MuiDrawer-paper.MuiDrawer-paper.MuiDrawer-paper.MuiDrawer-paper {
+    background-color: rgba(24, 24, 24, 0.55) !important;
+    background-image: none !important;
+    backdrop-filter: blur(12px) !important;
+}
+/* Menu latéral : même fond que la barre du haut */
+
+/* Random button */
+#random-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 0;
+    border-radius: 50%;
+    cursor: pointer;
+}
+/* Random button */
