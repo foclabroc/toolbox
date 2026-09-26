@@ -5117,3 +5117,34 @@ header.MuiAppBar-root.MuiAppBar-colorDefault.MuiAppBar-colorDefault {
     backdrop-filter: none !important;
 }
 /* Barre du haut transparente */
+
+/* Cache la MediaBar sur mobile / tablette */
+.layout-mobile #slides-container {
+    display: none !important;
+}
+@media (pointer: coarse), (max-width: 900px) {
+    #slides-container,
+    #slides-container ~ .slides-spacer,
+    .slides-container {
+        display: none !important;
+        height: 0 !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    /* remonte le contenu d'accueil */
+    #indexPage .homeSectionsContainer,
+    .sections.homeSectionsContainer {
+        margin-top: 0 !important;
+        padding-top: 1.5em !important; /* laisse la place à la barre du haut, ajuste */
+    }
+}
+@media (orientation: portrait) {
+    .layout-mobile #indexPage .homeSectionsContainer,
+    .layout-mobile .sections.homeSectionsContainer {
+        margin-top: -10em !important;
+    }
+}
+.layout-mobile .libraryPage:not(.noSecondaryNavPage):not(#indexPage) {
+    padding-top: 3em !important;
+}
