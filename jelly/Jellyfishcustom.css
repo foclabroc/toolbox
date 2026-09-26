@@ -5107,16 +5107,16 @@ button.btnPlay.detailButton.emby-button:hover {
 }
 /* Bouton ▶ Play (état normal — fond noir forcé) */
 
-/* Barre du haut transparente */
+/* Barre du haut : légère transparence partout */
 header.MuiAppBar-root.MuiAppBar-root.MuiAppBar-root,
 header.MuiAppBar-root.MuiAppBar-colorTransparent.MuiAppBar-colorTransparent,
 header.MuiAppBar-root.MuiAppBar-colorDefault.MuiAppBar-colorDefault {
-    background-color: transparent !important;
-    background-image: linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0)) !important;
+    background-color: rgba(24, 24, 24, 0.55) !important;
+    background-image: none !important;
+    backdrop-filter: blur(12px) !important;
     box-shadow: none !important;
-    backdrop-filter: none !important;
 }
-/* Barre du haut transparente */
+/* Barre du haut : légère transparence partout */
 
 /* Cache la MediaBar sur mobile / tablette */
 .layout-mobile #slides-container {
@@ -5148,3 +5148,11 @@ header.MuiAppBar-root.MuiAppBar-colorDefault.MuiAppBar-colorDefault {
 .layout-mobile .libraryPage:not(.noSecondaryNavPage):not(#indexPage) {
     padding-top: 3em !important;
 }
+
+/* Barre de titre des pages de liste (Films, Séries...) : retour à la ligne */
+.MuiToolbar-root:has([aria-controls="library-view-menu"]) {
+    flex-wrap: wrap !important;
+    height: auto !important;
+    min-height: 0 !important;
+}
+/* Barre de titre des pages de liste (Films, Séries...) : retour à la ligne */
