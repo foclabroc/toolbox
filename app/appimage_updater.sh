@@ -491,7 +491,7 @@ install_new_pack() {
 
         read -r -d '' SERVICE_BLOCK <<'SVCEOF'
 # >>> FOCLABROC LABWC WINDOW RULES >>>
-ln -sf /userdata/system/pro/extra/xmlstarlet /usr/bin/xmlstarlet
+ln -sf /userdata/system/switch/extra/xmlstarlet /usr/bin/xmlstarlet
 
 RC_XML="/userdata/system/.config/labwc/rc.xml"
 
@@ -501,7 +501,7 @@ fi
 
 add_rule() {
     local id="$1"
-    if ! grep -q "identifier=\"${id}\"" "$RC_XML"; then
+    if ! grep -qF "identifier=\"${id}\"" "$RC_XML"; then
         xmlstarlet ed -L \
             -s "/labwc_config/windowRules" -t elem -n "windowRule" -v "" \
             -s "/labwc_config/windowRules/windowRule[last()]" -t attr -n "identifier" -v "${id}" \
@@ -513,7 +513,7 @@ add_rule() {
 if [ -f "$RC_XML" ]; then
     add_rule "eden"
     add_rule "Ryujinx"
-    add_rule "citron"
+    add_rule "*citron*"
 
     LABWC_PID=$(pgrep -o -x labwc)
     if [ -n "$LABWC_PID" ]; then
