@@ -837,6 +837,7 @@ SVCEOF
     fi
 
     rm -rf "/userdata/README.md"
+    rm -rf "/userdata/system/switch/configgen/compat"
     mark_step_done "install"
 }
 

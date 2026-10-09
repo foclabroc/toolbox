@@ -478,6 +478,7 @@ install_new_pack() {
     rm -f "/userdata/README.md"
     rm -rf "/userdata/tmpf"
     rm -f "/userdata/system/services/foclaswitch"
+    rm -rf "/userdata/system/switch/configgen/compat"
 
     # --- CUSTOM SERVICE (labwc window decorations, x86-64-v3 only) ---
     ARCH_LEVEL=$(batocera-info | grep '^Board:' | awk '{print $2}')
