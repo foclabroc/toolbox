@@ -61,6 +61,30 @@ tr() {
         fr:NO_LABEL) echo "Non" ;;
         en:NO_LABEL) echo "No" ;;
 
+        fr:UPDATE_MENU) echo "Choisissez une mise à jour :" ;;
+        en:UPDATE_MENU) echo "Choose an update:" ;;
+
+        fr:SYSTEM_EMULATORS) echo "Système et émulateurs" ;;
+        en:SYSTEM_EMULATORS) echo "System and emulators" ;;
+
+        fr:FIRMWARE) echo "Mise à jour du firmware" ;;
+        en:FIRMWARE) echo "Firmware update" ;;
+
+        fr:FIRMWARE_CONFIRM) echo "Mettre à jour firmware/keys en 22.5.0 ?" ;;
+        en:FIRMWARE_CONFIRM) echo "Update firmware/keys to 22.5.0?" ;;
+
+        fr:FIRMWARE_DONE) echo "Firmware mis à jour en 22.5.0 avec succès." ;;
+        en:FIRMWARE_DONE) echo "Firmware successfully updated to 22.5.0." ;;
+
+        fr:MAIN_MENU) echo "Menu principal" ;;
+        en:MAIN_MENU) echo "Main menu" ;;
+
+        fr:QUIT) echo "Quitter" ;;
+        en:QUIT) echo "Quit" ;;
+
+        fr:FIRMWARE_FAIL) echo "Échec de la mise à jour du firmware. Consultez le journal :" ;;
+        en:FIRMWARE_FAIL) echo "Firmware update failed. See the log:" ;;
+
         fr:PROGRESS) echo "Téléchargement en cours..." ;;
         en:PROGRESS) echo "Download in progress..." ;;
 
@@ -990,6 +1014,181 @@ update_ryujinx() {
 }
 
 # ===============================
+# UPDATE FIRMWARE
+# ===============================
+install_firmware() (
+    local url="https://foclabroc.freeboxos.fr:55973/share/fr9GbmOyd3MOLKab/firmware_22.5.0.zip"
+    local work zip appimage appimages extracted
+    local nca_dir="/userdata/bios/switch/firmware"
+    local keys_dir="/userdata/bios/switch/keys"
+    local system_dir="/userdata/system/configs/Ryujinx/system"
+    local registered="/userdata/system/configs/Ryujinx/bis/system/Contents/registered"
+    local checksum_file="/userdata/system/configs/Ryujinx/checksum_firmware.txt"
+    local checksum stored="" stage f needs_copy=0
+    local -a keys ncas
+
+    mkdir -p /userdata/tmp || return 1
+    work=$(mktemp -d /userdata/tmp/firmware-updater.XXXXXXXX) || return 1
+    trap 'rm -rf "$work"' EXIT
+    zip="$work/firmware.zip"
+
+    GLOBAL_PERCENT=0
+    if ! wget_step "$url" "$zip" "firmware" || [[ ! -s "$zip" ]]; then
+        log "ERROR firmware: download failed"
+        return 1
+    fi
+
+    GLOBAL_PERCENT=30
+    echo "XXX"
+    echo "$GLOBAL_PERCENT"
+    echo "$(tr FIRMWARE)"
+    echo "XXX"
+    if ! unzip -tq "$zip" >>"$LOG_FILE" 2>&1; then
+        log "ERROR firmware: archive validation failed"
+        return 1
+    fi
+    if ! rm -rf "$nca_dir" "$keys_dir"; then
+        log "ERROR firmware: failed to remove old firmware or keys"
+        return 1
+    fi
+    if ! unzip -q -o "$zip" -d /userdata/ >>"$LOG_FILE" 2>&1; then
+        log "ERROR firmware: archive extraction failed"
+        return 1
+    fi
+
+    appimages="/userdata/system/switch/appimages"
+    appimage="$appimages/ryujinx-emu.AppImage"
+    if [[ -f "$appimage" ]]; then
+        extracted="$work/appimage"
+        mkdir -p "$extracted" || return 1
+        if ! chmod +x "$appimage" ||
+           ! (cd "$extracted" && "$appimage" --appimage-extract >>"$LOG_FILE" 2>&1) ||
+           [[ ! -d "$extracted/squashfs-root/usr/bin" ]]; then
+            log "ERROR firmware: Ryujinx AppImage extraction failed"
+            return 1
+        fi
+        if ! replace_directory "$extracted/squashfs-root" "$appimages/ryujinx-extracted"; then
+            log "ERROR firmware: Ryujinx deployment failed"
+            return 1
+        fi
+        rm -f "$appimage" || return 1
+        if [[ -f /userdata/system/switch/extra/ryu_wrapper ]]; then
+            chmod +x /userdata/system/switch/extra/ryu_wrapper || return 1
+        fi
+    fi
+
+    GLOBAL_PERCENT=60
+    echo "XXX"
+    echo "$GLOBAL_PERCENT"
+    echo "$(tr FIRMWARE)"
+    echo "XXX"
+    if [[ ! -d "$nca_dir" || ! -d "$keys_dir" ]]; then
+        log "ERROR firmware: firmware or keys directory missing"
+        return 1
+    fi
+    shopt -s nullglob
+    keys=("$keys_dir"/*)
+    ncas=("$nca_dir"/*.nca)
+    if (( ${#keys[@]} == 0 || ${#ncas[@]} == 0 )); then
+        log "ERROR firmware: no keys or NCA files found"
+        return 1
+    fi
+    mkdir -p "$system_dir" "$(dirname "$registered")" || return 1
+    if ! cp -p "${keys[@]}" "$system_dir/"; then
+        log "ERROR firmware: failed to copy keys"
+        return 1
+    fi
+
+    checksum=$(cd "$nca_dir" && set -o pipefail &&
+        find . -type f -exec sha256sum {} + | sort | sha256sum | awk '{print $1}') || {
+        log "ERROR firmware: checksum calculation failed"
+        return 1
+    }
+    [[ -f "$checksum_file" ]] && stored=$(cat "$checksum_file")
+
+    if [[ "$checksum" != "$stored" || ! -d "$registered" ]]; then
+        needs_copy=1
+    else
+        for f in "${ncas[@]}"; do
+            if ! cmp -s "$f" "$registered/$(basename "$f")/00"; then
+                needs_copy=1
+                break
+            fi
+        done
+    fi
+
+    if (( needs_copy )); then
+        stage=$(mktemp -d "$(dirname "$registered")/registered.new.XXXXXXXX") || return 1
+        for f in "${ncas[@]}"; do
+            if ! mkdir -p "$stage/$(basename "$f")" ||
+               ! cp -p "$f" "$stage/$(basename "$f")/00"; then
+                log "ERROR firmware: failed to copy $(basename "$f")"
+                rm -rf "$stage"
+                return 1
+            fi
+        done
+        if ! replace_directory "$stage" "$registered"; then
+            log "ERROR firmware: failed to deploy registered firmware"
+            rm -rf "$stage"
+            return 1
+        fi
+        if ! printf '%s\n' "$checksum" > "$checksum_file"; then
+            log "ERROR firmware: failed to save checksum"
+            return 1
+        fi
+    fi
+
+    log "Firmware update finished"
+    GLOBAL_PERCENT=100
+    echo 100
+)
+
+replace_directory() {
+    local source="$1" destination="$2" backup
+    backup=$(mktemp -d "${destination}.backup.XXXXXXXX") || return 1
+    rmdir "$backup" || return 1
+    if [[ -e "$destination" ]]; then
+        mv "$destination" "$backup" || return 1
+    fi
+    if ! mv "$source" "$destination"; then
+        if [[ -e "$backup" ]]; then
+            mv "$backup" "$destination" || log "ERROR: restore failed; backup retained at $backup"
+        fi
+        return 1
+    fi
+    [[ ! -e "$backup" ]] || rm -rf "$backup"
+}
+
+run_firmware_update() {
+    local result="$TEMP_DIR/firmware-status"
+    (
+        if install_firmware; then
+            echo OK > "$result"
+        else
+            echo ERROR > "$result"
+        fi
+    ) | dialog --backtitle "$BACKTITLE" \
+               --title "$(tr FIRMWARE)" \
+               --gauge "\n$(tr GAUGE_TEXT)" 12 60 0
+
+    if [[ -f "$result" && "$(cat "$result")" == "OK" ]]; then
+        dialog --backtitle "$BACKTITLE" \
+               --title "$(tr FIRMWARE)" \
+               --yes-label "$(tr MAIN_MENU)" \
+               --no-label "$(tr QUIT)" \
+               --yesno "$(tr FIRMWARE_DONE)" 8 65
+        if [[ $? -eq 0 ]]; then
+            return 0
+        fi
+    else
+        dialog --backtitle "$BACKTITLE" --ok-label "$(tr OK_LABEL)" \
+               --msgbox "$(tr FIRMWARE_FAIL)\n$LOG_FILE" 8 70
+    fi
+    clear
+    return 1
+}
+
+# ===============================
 # RUN UPDATE
 # ===============================
 run_update() {
@@ -1076,13 +1275,53 @@ exit 0
 # ===============================
 # CONFIRMATION
 # ===============================
-dialog --backtitle "$BACKTITLE" \
-       --title "$(tr CONFIRM_TITLE)" \
-       --yes-label "$(tr YES_LABEL)" \
-       --no-label "$(tr NO_LABEL)" \
-       --yesno "$(tr CONFIRM_TEXT)" 14 60
+while true; do
+    choice_file=$(mktemp) || exit 1
+    dialog --backtitle "$BACKTITLE" \
+           --title "$(tr CONFIRM_TITLE)" \
+           --ok-label "$(tr OK_LABEL)" \
+           --cancel-label "$(tr CANCEL_LABEL)" \
+           --menu "$(tr UPDATE_MENU)" 12 65 2 \
+           system "$(tr SYSTEM_EMULATORS)" \
+           firmware "$(tr FIRMWARE)" 2>"$choice_file"
+    choice_status=$?
+    choice=$(cat "$choice_file")
+    rm -f "$choice_file"
 
-case $? in
-    0) run_update ;;
-    *) clear; exit 0;;
-esac
+    if [[ "$choice_status" -ne 0 ]]; then
+        clear
+        exit 0
+    fi
+
+    case "$choice" in
+        firmware)
+            dialog --backtitle "$BACKTITLE" \
+                   --title "$(tr FIRMWARE)" \
+                   --yes-label "$(tr YES_LABEL)" \
+                   --no-label "$(tr NO_LABEL)" \
+                   --yesno "$(tr FIRMWARE_CONFIRM)" 8 65
+            if [[ $? -eq 0 ]]; then
+                if run_firmware_update; then
+                    continue
+                fi
+                exit 0
+            fi
+            ;;
+        system)
+            dialog --backtitle "$BACKTITLE" \
+                   --title "$(tr CONFIRM_TITLE)" \
+                   --yes-label "$(tr YES_LABEL)" \
+                   --no-label "$(tr NO_LABEL)" \
+                   --yesno "$(tr CONFIRM_TEXT)" 14 60
+            if [[ $? -eq 0 ]]; then
+                run_update
+            fi
+            clear
+            exit 0
+            ;;
+        *)
+            clear
+            exit 1
+            ;;
+    esac
+done

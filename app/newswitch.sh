@@ -71,8 +71,8 @@ case "$LANGUE:$1" in
 1:postinstall_title) echo "Additional installation";;
 2:postinstall_title) echo "Installation complémentaire";;
 
-1:postinstall_text) echo "Do you want to install emulator AppImages and firmware + keys 21.1.0 ?";;
-2:postinstall_text) echo "Voulez-vous installer les AppImages des émulateurs et le firmware + keys 21.1.0 ?";;
+1:postinstall_text) echo "Do you want to install emulator AppImages and firmware + keys 22.0.0 ?";;
+2:postinstall_text) echo "Voulez-vous installer les AppImages des émulateurs et le firmware + keys 22.5.0 ?";;
 
 1:extracting) echo "Extracting files...";;
 2:extracting) echo "Extraction en cours...";;
@@ -986,8 +986,10 @@ post_install_prompt() {
 
 install_emulators_pack() {
 
-    ZIP_URL="https://foclabroc.freeboxos.fr:55973/share/j4HRYFkF_tq5IV_A/firmware_appimage_21.1.zip"
+    ZIP_URL="https://foclabroc.freeboxos.fr:55973/share/KgLREgo46K45hXVR/firmware_appimage_22.5.0.zip"
     ZIP_FILE="/userdata/tmp/firmware_appimage.zip"
+    NCA_SRC_DIR="/userdata/bios/switch/firmware"
+    KEYS_SRC_DIR="/userdata/bios/switch/keys"
 
     mkdir -p /userdata/tmp
     rm -rf "$ZIP_FILE"
@@ -995,6 +997,16 @@ install_emulators_pack() {
     download_with_gauge "$ZIP_URL" "$ZIP_FILE"
 
     if [[ ! -s "$ZIP_FILE" ]]; then
+        dialog --msgbox "\n$(TXT error)" 7 40
+        return 1
+    fi
+
+    if ! unzip -tq "$ZIP_FILE" >/dev/null 2>&1; then
+        dialog --msgbox "\n$(TXT error)" 7 40
+        return 1
+    fi
+
+    if ! rm -rf "$NCA_SRC_DIR" "$KEYS_SRC_DIR"; then
         dialog --msgbox "\n$(TXT error)" 7 40
         return 1
     fi
@@ -1015,8 +1027,6 @@ install_emulators_pack() {
         chmod +x /userdata/system/switch/extra/ryu_wrapper 2>/dev/null
     fi
 
-	NCA_SRC_DIR="/userdata/bios/switch/firmware"
-	KEYS_SRC_DIR="/userdata/bios/switch/keys"
 	RYUJINX_SYSTEM_DIR="/userdata/system/configs/Ryujinx/system"
 	REGISTERED_DIR="/userdata/system/configs/Ryujinx/bis/system/Contents/registered"
 	CHECKSUM_FILE="/userdata/system/configs/Ryujinx/checksum_firmware.txt"
@@ -1240,6 +1250,5 @@ curl http://127.0.0.1:1234/reloadgames
 clear
 reset
 exit 0
-
 
 
