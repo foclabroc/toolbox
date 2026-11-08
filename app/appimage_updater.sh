@@ -85,6 +85,9 @@ tr() {
         fr:FIRMWARE_FAIL) echo "Échec de la mise à jour du firmware. Consultez le journal :" ;;
         en:FIRMWARE_FAIL) echo "Firmware update failed. See the log:" ;;
 
+        fr:TEMP_CLEANUP_FAIL) echo "Impossible de supprimer /userdata/tmp. Consultez le journal :" ;;
+        en:TEMP_CLEANUP_FAIL) echo "Unable to remove /userdata/tmp. See the log:" ;;
+
         fr:PROGRESS) echo "Téléchargement en cours..." ;;
         en:PROGRESS) echo "Download in progress..." ;;
 
@@ -1217,6 +1220,12 @@ GLOBAL_PERCENT=0
 ) | dialog --backtitle "$BACKTITLE" \
            --title "$(tr GAUGE_TITLE)" \
            --gauge "\n$(tr GAUGE_TEXT)" 12 60 0
+
+    if ! rm -rf /userdata/tmp; then
+        log "ERROR: failed to remove /userdata/tmp after emulator update"
+        dialog --backtitle "$BACKTITLE" --ok-label "$(tr OK_LABEL)" \
+               --msgbox "$(tr TEMP_CLEANUP_FAIL)\n$LOG_FILE" 8 70
+    fi
 
     touch "$STATUS_FILE" "$VERSIONS_FILE"
     set -a
