@@ -613,25 +613,30 @@ SVCEOF
 # UPDATE CITRON
 # ===============================
 update_citron() {
-    local assets_page tag_page appimage_path appimage_url file_name commit build_date dest tmp1 tmp2
+    local tag_page appimage_path appimage_url file_name commit build_date dest tmp1
 
     log "  "
     log "  "
     log "!!!!START Citron AppImage update!!!!"
-    log "Checking latest Citron nightly-linux release on GitHub"
+    log "Checking latest Citron nightly-linux release on git.nextendo.network"
 
     tmp1=$(mktemp)
-    curl_step "citron" "$tmp1" -Ls --connect-timeout 5 --max-time 15 "https://github.com/NextendoNetwork/citron-nextendo/releases/expanded_assets/nightly-linux"
-    assets_page=$(cat "$tmp1")
+    if ! curl_step "citron" "$tmp1" -fsL --connect-timeout 5 --max-time 15 "https://git.nextendo.network/NextendoNetwork/citron-nextendo/releases/tag/nightly-linux"; then
+        log "ERROR Citron: unable to fetch release page"
+        rm -f "$tmp1"
+        echo "STATUS_CITRON=ERREUR" >> "$STATUS_FILE"
+        return
+    fi
+    tag_page=$(cat "$tmp1")
     rm -f "$tmp1"
 
-    if [[ -z "$assets_page" ]]; then
-        log "ERROR Citron: unable to fetch expanded assets page"
+    if [[ -z "$tag_page" ]]; then
+        log "ERROR Citron: release page is empty"
         echo "STATUS_CITRON=ERREUR" >> "$STATUS_FILE"
         return
     fi
 
-    appimage_path=$(echo "$assets_page" \
+    appimage_path=$(echo "$tag_page" \
         | grep -Eo '/NextendoNetwork/citron-nextendo/releases/download/nightly-linux/citron_nightly-[0-9a-f]+-linux-x86_64_v3\.AppImage' \
         | head -n1)
 
@@ -641,14 +646,9 @@ update_citron() {
         return
     fi
 
-    appimage_url="https://github.com${appimage_path}"
+    appimage_url="https://git.nextendo.network${appimage_path}"
     file_name="${appimage_url##*/}"
     commit=$(echo "$file_name" | sed -E 's/^citron_nightly-([0-9a-f]+)-linux.*/\1/')
-
-    tmp2=$(mktemp)
-    curl_step "citron" "$tmp2" -Ls --connect-timeout 5 --max-time 15 "https://github.com/NextendoNetwork/citron-nextendo/releases/tag/nightly-linux"
-    tag_page=$(cat "$tmp2")
-    rm -f "$tmp2"
 
     build_date=$(echo "$tag_page" | grep -Eo 'Date: [0-9]{4}-[0-9]{2}-[0-9]{2}' | head -n1 | sed 's/Date: //')
 
@@ -1017,7 +1017,7 @@ update_ryujinx() {
 # UPDATE FIRMWARE
 # ===============================
 install_firmware() (
-    local url="https://foclabroc.freeboxos.fr:55973/share/fr9GbmOyd3MOLKab/firmware_22.5.0.zip"
+    local url="https://foclabroc.freeboxos.fr:55973/share/KgLREgo46K45hXVR/firmware_appimage_22.5.0.zip"
     local work zip appimage appimages extracted
     local nca_dir="/userdata/bios/switch/firmware"
     local keys_dir="/userdata/bios/switch/keys"
@@ -1028,8 +1028,8 @@ install_firmware() (
     local -a keys ncas
 
     mkdir -p /userdata/tmp || return 1
+    trap 'rm -rf /userdata/tmp || log "ERROR firmware: failed to remove /userdata/tmp"' EXIT
     work=$(mktemp -d /userdata/tmp/firmware-updater.XXXXXXXX) || return 1
-    trap 'rm -rf "$work"' EXIT
     zip="$work/firmware.zip"
 
     GLOBAL_PERCENT=0
