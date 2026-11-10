@@ -13,6 +13,8 @@ Il gère aussi :
   - Hotkey + Start : quitter (commande passée avec --quit)
   - stick droit : souris, R3 : clic gauche
   - Select seul (appui court) : touche F9
+  - Steam Deck : pad droit = souris (clic du pad = clic gauche), pad gauche = molette
+  - DS4 / DualSense : pavé tactile = souris (2 doigts = molette, clic = clic gauche)
 Les vraies manettes sont capturées en exclusif pendant le jeu (Chromium et evmapy
 ne les voient plus), puis relâchées à la sortie.
 """
@@ -135,8 +137,112 @@ def make_keyboard():
 
 
 def make_mouse():
-    caps = {e.EV_KEY: [e.BTN_LEFT, e.BTN_RIGHT], e.EV_REL: [e.REL_X, e.REL_Y]}
+    caps = {e.EV_KEY: [e.BTN_LEFT, e.BTN_RIGHT], e.EV_REL: [e.REL_X, e.REL_Y, e.REL_WHEEL]}
     return UInput(caps, name="NFSU2 virtual mouse", vendor=0x1234, product=0x5678, version=1)
+
+
+# --------------------------------------------------------------- trackpads
+class TrackpadMotion:
+    """Position absolue d'un pavé tactile -> déplacement relatif (comme un touchpad)."""
+
+    def __init__(self, scale):
+        self.scale = scale
+        self.last = None
+        self.acc = [0.0, 0.0]
+
+    def update(self, x, y, touching):
+        if not touching:
+            self.last = None
+            return 0, 0
+        if self.last is None:
+            self.last = (x, y)
+            return 0, 0
+        self.acc[0] += (x - self.last[0]) * self.scale
+        self.acc[1] += (y - self.last[1]) * self.scale
+        self.last = (x, y)
+        ix, iy = int(self.acc[0]), int(self.acc[1])
+        self.acc[0] -= ix
+        self.acc[1] -= iy
+        return ix, iy
+
+
+def mouse_move(mouse, dx, dy, wheel=0):
+    if not mouse or not (dx or dy or wheel):
+        return
+    if dx:
+        mouse.write(e.EV_REL, e.REL_X, dx)
+    if dy:
+        mouse.write(e.EV_REL, e.REL_Y, dy)
+    if wheel:
+        mouse.write(e.EV_REL, e.REL_WHEEL, wheel)
+    mouse.syn()
+
+
+def mouse_button(mouse, code, pressed):
+    if mouse:
+        mouse.write(e.EV_KEY, code, 1 if pressed else 0)
+        mouse.syn()
+
+
+# Steam Deck (hid-steam) : pads sur ABS_HAT0 (gauche) / ABS_HAT1 (droit), 0 quand
+# le pad n'est pas touché ; clic pad gauche = BTN_THUMB, clic pad droit = BTN_THUMB2.
+DECK_PAD_SCALE = 0.02      # unités pad (-32767..32767) -> pixels
+DECK_SCROLL_STEP = 2500    # unités pad par cran de molette
+DECK_INVERT_Y = False      # mettre True si le haut/bas du pad est inversé
+
+
+class SonyTouchpad:
+    """Pavé tactile DS4 / DualSense (périphérique "... Touchpad" de hid-playstation).
+    1 doigt = souris, 2 doigts = molette, clic du pavé = clic gauche."""
+
+    def __init__(self, dev, mouse):
+        self.dev = dev
+        self.mouse = mouse
+        self.x = self.y = 0
+        self.touch = False
+        self.fingers = 1
+        self.motion = TrackpadMotion(1.0)
+        self.scroll_acc = 0.0
+        self.last_y = None
+
+    def handle(self, ev):
+        if ev.type == e.EV_ABS:
+            if ev.code == e.ABS_X:
+                self.x = ev.value
+            elif ev.code == e.ABS_Y:
+                self.y = ev.value
+        elif ev.type == e.EV_KEY:
+            if ev.code == e.BTN_TOUCH:
+                self.touch = bool(ev.value)
+            elif ev.code == e.BTN_TOOL_DOUBLETAP:
+                self.fingers = 2 if ev.value else 1
+            elif ev.code == e.BTN_LEFT:
+                mouse_button(self.mouse, e.BTN_LEFT, ev.value)
+        elif ev.type == e.EV_SYN:
+            if self.touch and self.fingers == 2:
+                self.motion.update(0, 0, False)
+                if self.last_y is not None:
+                    self.scroll_acc += (self.last_y - self.y) / 40.0
+                    notch = int(self.scroll_acc)
+                    self.scroll_acc -= notch
+                    mouse_move(self.mouse, 0, 0, notch)
+                self.last_y = self.y
+            else:
+                self.last_y = None
+                dx, dy = self.motion.update(self.x, self.y, self.touch)
+                mouse_move(self.mouse, dx, dy)
+
+    def close(self):
+        try:
+            self.dev.ungrab()
+        except Exception:
+            pass
+
+
+def is_sony_touchpad(dev):
+    caps = dev.capabilities(absinfo=False)
+    return (dev.info.vendor == 0x054C and "Touchpad" in dev.name
+            and e.ABS_X in caps.get(e.EV_ABS, []) and e.BTN_TOUCH in caps.get(e.EV_KEY, []))
 
 
 # --------------------------------------------------------------- une manette
@@ -154,6 +260,11 @@ class Pad:
         self.keyboard = keyboard
         self.select_code = self._map_button("back")
         self.select_tap = False
+        # Trackpads du Steam Deck
+        self.deck = dev.info.vendor == 0x28DE and e.ABS_HAT1X in self.absinfo
+        self.rpad = TrackpadMotion(DECK_PAD_SCALE)
+        self.lpad_last = None
+        self.lpad_acc = 0.0
 
     def _map_button(self, name):
         src = self.map.get(name, "")
@@ -254,10 +365,32 @@ class Pad:
                     self.keyboard.write(e.EV_KEY, e.KEY_F9, 0)
                     self.keyboard.syn()
             if ev.code == self.rightstick_code() and self.mouse:
-                self.mouse.write(e.EV_KEY, e.BTN_LEFT, 1 if ev.value else 0)
-                self.mouse.syn()
+                mouse_button(self.mouse, e.BTN_LEFT, ev.value)
+            if self.deck and ev.code == e.BTN_THUMB2 and ev.value != 2:
+                mouse_button(self.mouse, e.BTN_LEFT, ev.value)
         elif ev.type == e.EV_ABS:
             self.state_abs[ev.code] = ev.value
+        elif ev.type == e.EV_SYN and self.deck and self.mouse:
+            self._deck_trackpads()
+
+    def _deck_trackpads(self):
+        sign = -1 if DECK_INVERT_Y else 1
+        # Pad droit : souris
+        x, y = self.state_abs.get(e.ABS_HAT1X, 0), self.state_abs.get(e.ABS_HAT1Y, 0)
+        dx, dy = self.rpad.update(x, sign * y, (x, y) != (0, 0))
+        mouse_move(self.mouse, dx, dy)
+        # Pad gauche : molette (glisser vers le haut = défiler vers le haut)
+        lx, ly = self.state_abs.get(e.ABS_HAT0X, 0), sign * self.state_abs.get(e.ABS_HAT0Y, 0)
+        if (lx, ly) == (0, 0):
+            self.lpad_last = None
+            self.lpad_acc = 0.0
+            return
+        if self.lpad_last is not None:
+            self.lpad_acc += (self.lpad_last - ly) / DECK_SCROLL_STEP
+            notch = int(self.lpad_acc)
+            self.lpad_acc -= notch
+            mouse_move(self.mouse, 0, 0, notch)
+        self.lpad_last = ly
 
     def rightstick_code(self):
         src = self.map.get("rightstick", "")
@@ -435,10 +568,20 @@ def main():
     mouse = None if args.no_mouse else make_mouse()
     keyboard = make_keyboard()
     pads = {}
+    touchpads = {}
     for path in evdev.list_devices():
         try:
             dev = InputDevice(path)
         except OSError:
+            continue
+        if mouse and is_sony_touchpad(dev):
+            try:
+                dev.grab()
+                touchpads[dev.fd] = SonyTouchpad(dev, mouse)
+                log(f"Pavé tactile {dev.name} ({path}) -> souris")
+            except OSError as err:
+                log(f"Capture impossible pour {dev.name} ({path}) : {err}")
+                dev.close()
             continue
         guid, mapping = find_mapping(dev, configs)
         if not mapping or not is_gamepad(dev):
@@ -485,8 +628,17 @@ def main():
     parent = os.getppid()
     try:
         while running[0]:
-            r, _, _ = select.select(list(pads.keys()), [], [], 0.008)
+            r, _, _ = select.select(list(pads.keys()) + list(touchpads.keys()), [], [], 0.008)
             for fd in r:
+                if fd in touchpads:
+                    tp = touchpads[fd]
+                    try:
+                        for ev in tp.dev.read():
+                            tp.handle(ev)
+                    except OSError:
+                        tp.close()
+                        del touchpads[fd]
+                    continue
                 pad = pads[fd]
                 try:
                     for ev in pad.dev.read():
@@ -545,6 +697,8 @@ def main():
     finally:
         for pad in list(pads.values()):
             pad.close()
+        for tp in list(touchpads.values()):
+            tp.close()
         if mouse:
             mouse.close()
         keyboard.close()
