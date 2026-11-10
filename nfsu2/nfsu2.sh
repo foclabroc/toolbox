@@ -30,6 +30,8 @@ GAMELIST="/userdata/roms/ports/gamelist.xml"
 GAME_PATH="./${PORT_NAME}.sh"
 MEDIA_URL="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/nfsu2/extra"
 MEDIA_FILES="NFSU2-screenshot.jpg NFSU2-wheel.png NFSU2-cartridge.jpg"
+OSK_URL="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/nfsu2/osk"
+OSK_FILES="manifest.json main_world.js padmap.js osk.js"
 XMLSTARLET_BIN="/userdata/system/pro/extra/xmlstarlet"
 XMLSTARLET_URL="https://github.com/foclabroc/toolbox/raw/refs/heads/main/app/xmlstarlet"
 # ========================================
@@ -558,6 +560,13 @@ CUPS_STUB
     MISSING=$(LD_LIBRARY_PATH="$LIB_PATH" ldd "$CHROME_BIN" 2>/dev/null | grep "not found" | awk '{print $1}' | tr '\n' ' ')
     [ -n "$MISSING" ] && WARN="${WARN}\n- Libs manquantes : $MISSING"
 
+    # Clavier virtuel manette (extension Chromium chargée au lancement)
+    d_info "Installation du clavier virtuel manette..."
+    mkdir -p "$APP_DIR/osk"
+    for F in $OSK_FILES; do
+        curl -sL --fail -o "$APP_DIR/osk/$F" "$OSK_URL/$F" || WARN="${WARN}\n- Clavier virtuel : $F non téléchargé."
+    done
+
     # Lanceur : séparé du port pour pouvoir le mettre à jour
     cat > "$APP_DIR/launch.sh" <<EOF
 #!/bin/bash
@@ -567,6 +576,10 @@ export DISPLAY="\${DISPLAY:-:0.0}"
 export HOME=/userdata/system
 export LD_LIBRARY_PATH="$LIB_PATH"
 export CHROME_WRAPPER="$APP_DIR/launch.sh"
+
+# Mapping manette de Batocera transmis au clavier virtuel (manettes non standard)
+SDLMAP=\$(printf '%s' "\$SDL_GAMECONTROLLERCONFIG" | head -n1 | sed 's/\\\\/\\\\\\\\/g; s/"/\\\\"/g')
+printf 'window.__NFSU2_SDLMAP = "%s";\n' "\$SDLMAP" > "$APP_DIR/osk/padmap.js"
 
 # Flags ajoutables sans toucher au script : $APP_DIR/extra_flags.txt
 EXTRA=""
@@ -584,7 +597,8 @@ EXTRA=""
     --no-first-run --no-default-browser-check \\
     --noerrdialogs --disable-infobars \\
     --hide-crash-restore-bubble --disable-session-crashed-bubble \\
-    --disable-features=Translate \\
+    --load-extension="$APP_DIR/osk" \\
+    --disable-features=Translate,DisableLoadExtensionCommandLineSwitch \\
     --disable-print-preview \\
     \$EXTRA > "\$LOG" 2>&1
 EOF
@@ -614,7 +628,7 @@ EOF
     d_info "Ajout des médias et de l'entrée gamelist..."
     add_gamelist_entry
 
-    local FIN="Installation terminée !\n\nJeu dispo dans : PORTS > $PORT_NAME\nQuitter : Hotkey + Start\nLogs : $LOG_FILE"
+    local FIN="Installation terminée !\n\nJeu dispo dans : PORTS > $PORT_NAME\nQuitter : Hotkey + Start\nClavier virtuel : R3 (ou sélectionner un champ)\nLogs : $LOG_FILE"
     [ -n "$GAMELIST_DEFERRED" ] && FIN="${FIN}\n\nLa fiche du jeu (jaquette, vidéo, description) sera ajoutée dans quelques secondes, une fois la toolbox fermée."
     if [ -n "$WARN" ]; then
         d_msg "$FIN\n\nAttention :$WARN" "Installation terminée" 19
