@@ -32,6 +32,7 @@ MEDIA_URL="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/n
 MEDIA_FILES="NFSU2-screenshot.jpg NFSU2-wheel.png NFSU2-cartridge.jpg"
 OSK_URL="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/nfsu2/osk"
 OSK_FILES="manifest.json main_world.js padmap.js osk.js bg.js"
+DS4EMU_URL="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/nfsu2/ds4emu.py"
 XMLSTARLET_BIN="/userdata/system/pro/extra/xmlstarlet"
 XMLSTARLET_URL="https://github.com/foclabroc/toolbox/raw/refs/heads/main/app/xmlstarlet"
 # ========================================
@@ -567,6 +568,9 @@ CUPS_STUB
         curl -sL --fail -o "$APP_DIR/osk/$F" "$OSK_URL/$F" || WARN="${WARN}\n- Clavier virtuel : $F non téléchargé."
     done
 
+    # Émulation DualShock 4 pour toutes les manettes
+    curl -sL --fail -o "$APP_DIR/ds4emu.py" "$DS4EMU_URL" || WARN="${WARN}\n- Émulation DS4 non téléchargée."
+
     # Lanceur : séparé du port pour pouvoir le mettre à jour
     cat > "$APP_DIR/launch.sh" <<EOF
 #!/bin/bash
@@ -586,6 +590,16 @@ printf 'window.__NFSU2_SDLMAP = "%s";\n' "\$SDLMAP" > "$APP_DIR/osk/padmap.js"
 # clavier virtuel). Pour l'autoriser quand même : touch $APP_DIR/enable_webhid
 WEBHID_FLAG="--disable-blink-features=WebHID"
 [ -f "$APP_DIR/enable_webhid" ] && WEBHID_FLAG=""
+
+# Émulation DS4 : chaque manette Batocera devient une DualShock 4 virtuelle
+# (désactivable : touch $APP_DIR/disable_ds4). Log : $APP_DIR/ds4emu.log
+EMU_PID=""
+if [ ! -f "$APP_DIR/disable_ds4" ] && [ -f "$APP_DIR/ds4emu.py" ]; then
+    python3 "$APP_DIR/ds4emu.py" --quit "pkill -f $PROFILE_DIR" > "$APP_DIR/ds4emu.log" 2>&1 &
+    EMU_PID=\$!
+    sleep 1
+fi
+trap '[ -n "\$EMU_PID" ] && kill \$EMU_PID 2>/dev/null' EXIT
 
 # Flags ajoutables sans toucher au script : $APP_DIR/extra_flags.txt
 EXTRA=""
@@ -644,7 +658,7 @@ EOF
     d_info "Ajout des médias et de l'entrée gamelist..."
     add_gamelist_entry
 
-    local FIN="Installation terminée !\n\nJeu dispo dans : PORTS > $PORT_NAME\nQuitter : Hotkey + Start (ou Select + Start)\nSouris : stick droit, clic : R3\nClavier virtuel : L3 (ou sélectionner un champ)\nLogs : $LOG_FILE"
+    local FIN="Installation terminée !\n\nJeu dispo dans : PORTS > $PORT_NAME\nQuitter : Hotkey + Start (ou Select + Start)\nSouris : stick droit, clic : R3\nClavier virtuel : L3 (ou sélectionner un champ)\nManettes émulées en DualShock 4\nLogs : $LOG_FILE"
     [ -n "$GAMELIST_DEFERRED" ] && FIN="${FIN}\n\nLa fiche du jeu (jaquette, vidéo, description) sera ajoutée dans quelques secondes, une fois la toolbox fermée."
     if [ -n "$WARN" ]; then
         d_msg "$FIN\n\nAttention :$WARN" "Installation terminée" 19
