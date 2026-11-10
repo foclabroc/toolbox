@@ -232,7 +232,7 @@ main_menu() {
     while true; do
         main_menu=$(dialog --clear --backtitle "Foclabroc Toolbox" \
             --title "Menu Principal" \
-            --menu "\nSélectionnez une option :\n " 24 100 15 \
+            --menu "\nSélectionnez une option :\n " 25 100 16 \
             1 "[Nintendo Switch]  -> Installer l'émulation Switch sur Batocera" \
             2 "[Rgsx]             -> Installer RGSX l'outils de telechargement de jeux pour Batocera" \
             3 "[Fpinball]         -> Installer le launcher Future Pinball pour V42 only" \
@@ -247,7 +247,8 @@ main_menu() {
             12 "[Update/Downgrade] -> Mise à jour et Downgrade de Batocera..." \
             13 "[Tools]            -> Outils pour Batocera version light. (Plus d'options dispo via ssh)" \
             14 "[Underground]      -> !!!Mot de passe nécessaire !!!" \
-            15 "[Exit]             -> Quitter le script" \
+            15 "[NFS Underground 2]-> Installer NFSU2 Revived (version navigateur WebGPU) en Port" \
+            16 "[Exit]             -> Quitter le script" \
             2>&1 >/dev/tty)
         clear
 
@@ -315,7 +316,12 @@ main_menu() {
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/underground.sh | bash"
                 ;;
-            15)# Afficher un message de remerciement
+            15)
+                confirm_install "NFS Underground 2 Revived" || continue
+                clear
+                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/nfsu2/nfsu2.sh | bash"
+                ;;
+            16)# Afficher un message de remerciement
                 dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --textbox "$tmpfile1" 20 78 2>&1 >/dev/tty
                 killall -9 xterm
                 clear
