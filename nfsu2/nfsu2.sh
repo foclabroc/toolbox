@@ -74,25 +74,36 @@ add_gamelist_entry() {
 
     [ -f "$GAMELIST" ] || echo '<?xml version="1.0" encoding="UTF-8"?><gameList></gameList>' > "$GAMELIST"
     ensure_xmlstarlet
-    remove_gamelist_entry
-    xmlstarlet ed -L \
-        -s "/gameList" -t elem -n "game" -v "" \
-        -s "/gameList/game[last()]" -t elem -n "path" -v "$GAME_PATH" \
-        -s "/gameList/game[last()]" -t elem -n "name" -v "Need for Speed Underground 2 Revived" \
-        -s "/gameList/game[last()]" -t elem -n "desc" -v "Need for Speed: Underground 2 (2004) dans sa version Revived, le code du jeu PC recompilé pour le navigateur (WebGPU) par un projet fan. Course de rue nocturne dans la ville de Bayview : tuning poussé, free roam, drift, drag, URL et Street X. Jusqu'à 120 fps en écran large, support manette et volant, sauvegardes en ligne et courses Online en free roam avec tes amis et ton crew. Connexion Internet obligatoire. Quitter : Hotkey + Start. Projet fan non affilié à Electronic Arts." \
-        -s "/gameList/game[last()]" -t elem -n "developer" -v "EA Black Box" \
-        -s "/gameList/game[last()]" -t elem -n "publisher" -v "Electronic Arts" \
-        -s "/gameList/game[last()]" -t elem -n "genre" -v "Course" \
-        -s "/gameList/game[last()]" -t elem -n "players" -v "4+" \
-        -s "/gameList/game[last()]" -t elem -n "releasedate" -v "20041109T000000" \
-        -s "/gameList/game[last()]" -t elem -n "rating" -v "0.90" \
-        -s "/gameList/game[last()]" -t elem -n "region" -v "eu" \
-        -s "/gameList/game[last()]" -t elem -n "lang" -v "fr" \
-        -s "/gameList/game[last()]" -t elem -n "image" -v "./images/NFSU2-screenshot.jpg" \
-        -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/NFSU2-wheel.png" \
-        -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/NFSU2-cartridge.jpg" \
-        -s "/gameList/game[last()]" -t elem -n "video" -v "./videos/NFSU2-video.mp4" \
-        "$GAMELIST"
+
+    # ES garde le gamelist en mémoire : on le laisse sauvegarder avant d'éditer
+    reload_es; sleep 2
+
+    local G="/gameList/game[path=\"$GAME_PATH\"]"
+    # Mise à jour sur place : l'entrée créée par ES (playcount, gametime...) est conservée
+    if [ "$(xmlstarlet sel -t -v "count($G)" "$GAMELIST" 2>/dev/null)" = "0" ]; then
+        xmlstarlet ed -L -s "/gameList" -t elem -n "game" -v "" \
+            -s "/gameList/game[last()]" -t elem -n "path" -v "$GAME_PATH" "$GAMELIST"
+    fi
+
+    set_field() {
+        xmlstarlet ed -L -d "$G/$1" -s "$G" -t elem -n "$1" -v "$2" "$GAMELIST"
+    }
+    set_field name "Need for Speed Underground 2 Revived"
+    set_field desc "Need for Speed: Underground 2 (2004) dans sa version Revived, le code du jeu PC recompilé pour le navigateur (WebGPU) par un projet fan. Course de rue nocturne dans la ville de Bayview : tuning poussé, free roam, drift, drag, URL et Street X. Jusqu'à 120 fps en écran large, support manette et volant, sauvegardes en ligne et courses Online en free roam avec tes amis et ton crew. Connexion Internet obligatoire. Quitter : Hotkey + Start. Projet fan non affilié à Electronic Arts."
+    set_field developer "EA Black Box"
+    set_field publisher "Electronic Arts"
+    set_field genre "Course"
+    set_field players "4+"
+    set_field releasedate "20041109T000000"
+    set_field rating "0.90"
+    set_field region "eu"
+    set_field lang "fr"
+    set_field image "./images/NFSU2-screenshot.jpg"
+    set_field wheel "./images/NFSU2-wheel.png"
+    set_field thumbnail "./images/NFSU2-cartridge.jpg"
+    set_field video "./videos/NFSU2-video.mp4"
+
+    reload_es
 }
 
 # ---------------------------------------------------------------------
@@ -578,9 +589,7 @@ EOF
 EOF
 
     d_info "Ajout des médias et de l'entrée gamelist..."
-    reload_es
     add_gamelist_entry
-    reload_es
 
     local FIN="Installation terminée !\n\nJeu dispo dans : PORTS > $PORT_NAME\nQuitter : Hotkey + Start\nLogs : $LOG_FILE"
     if [ -n "$WARN" ]; then
