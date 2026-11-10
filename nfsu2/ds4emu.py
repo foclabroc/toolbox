@@ -12,6 +12,7 @@ WebSocket local (127.0.0.1). L'extension présente ces manettes au site.
 Il gère aussi :
   - Hotkey + Start : quitter (commande passée avec --quit)
   - stick droit : souris, R3 : clic gauche
+  - Select seul (appui court) : touche F9
 Les vraies manettes sont capturées en exclusif pendant le jeu (Chromium et evmapy
 ne les voient plus), puis relâchées à la sortie.
 """
@@ -129,6 +130,10 @@ STANDARD_BUTTONS = [
 STANDARD_AXES = ["leftx", "lefty", "rightx", "righty"]
 
 
+def make_keyboard():
+    return UInput({e.EV_KEY: [e.KEY_F9]}, name="NFSU2 virtual keyboard", vendor=0x1234, product=0x5679, version=1)
+
+
 def make_mouse():
     caps = {e.EV_KEY: [e.BTN_LEFT, e.BTN_RIGHT], e.EV_REL: [e.REL_X, e.REL_Y]}
     return UInput(caps, name="NFSU2 virtual mouse", vendor=0x1234, product=0x5678, version=1)
@@ -136,7 +141,7 @@ def make_mouse():
 
 # --------------------------------------------------------------- une manette
 class Pad:
-    def __init__(self, dev, mapping, hotkey_idx, start_idx, mouse):
+    def __init__(self, dev, mapping, hotkey_idx, start_idx, mouse, keyboard=None):
         self.dev = dev
         self.map = mapping
         self.buttons, self.axes, self.hats, self.absinfo = sdl_layout(dev)
@@ -146,6 +151,15 @@ class Pad:
         self.hotkey_code = self._button_code(hotkey_idx)
         self.start_code = self._button_code(start_idx)
         self.quit_armed = True
+        self.keyboard = keyboard
+        self.select_code = self._map_button("back")
+        self.select_tap = False
+
+    def _map_button(self, name):
+        src = self.map.get(name, "")
+        if src.startswith("b") and src[1:].isdigit() and int(src[1:]) < len(self.buttons):
+            return self.buttons[int(src[1:])]
+        return None
 
     def _button_code(self, idx):
         if idx is None or not (0 <= idx < len(self.buttons)):
@@ -226,6 +240,19 @@ class Pad:
                 self.state_keys.add(ev.code)
             else:
                 self.state_keys.discard(ev.code)
+            # Select seul (appui court) = F9. Si un autre bouton est pressé pendant
+            # que Select est maintenu (ex. Hotkey + Start), pas de F9.
+            if self.keyboard and self.select_code:
+                if ev.code == self.select_code and ev.value == 1:
+                    self.select_tap = True
+                elif ev.code != self.select_code and ev.value == 1:
+                    self.select_tap = False
+                elif ev.code == self.select_code and ev.value == 0 and self.select_tap:
+                    self.select_tap = False
+                    self.keyboard.write(e.EV_KEY, e.KEY_F9, 1)
+                    self.keyboard.syn()
+                    self.keyboard.write(e.EV_KEY, e.KEY_F9, 0)
+                    self.keyboard.syn()
             if ev.code == self.rightstick_code() and self.mouse:
                 self.mouse.write(e.EV_KEY, e.BTN_LEFT, 1 if ev.value else 0)
                 self.mouse.syn()
@@ -406,6 +433,7 @@ def main():
         return 1
 
     mouse = None if args.no_mouse else make_mouse()
+    keyboard = make_keyboard()
     pads = {}
     for path in evdev.list_devices():
         try:
@@ -423,7 +451,7 @@ def main():
             log(f"Capture impossible pour {dev.name} ({path}) : {err}")
             dev.close()
             continue
-        pad = Pad(dev, mapping, hk, st, mouse)
+        pad = Pad(dev, mapping, hk, st, mouse, keyboard)
         pads[dev.fd] = pad
         log(f"{dev.name} ({path}, GUID {guid}) | hotkey={hk} start={st}"
             f" | {len(pad.buttons)} boutons, {len(pad.axes)} axes, {len(pad.hats)} hats")
@@ -519,6 +547,7 @@ def main():
             pad.close()
         if mouse:
             mouse.close()
+        keyboard.close()
         bridge.close()
         log("Arrêt du pont manette.")
     return 0
