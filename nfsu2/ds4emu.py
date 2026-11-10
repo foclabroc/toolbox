@@ -346,6 +346,17 @@ def udev_restore(parents):
         udev_retrigger(parents)
 
 
+def cleanup_stale_rule():
+    """Règle restée d'une session tuée brutalement : on la retire et on redétecte tout."""
+    if not os.path.exists(UDEV_RULE):
+        return
+    log("Règle udev d'une session précédente trouvée : nettoyage.")
+    os.remove(UDEV_RULE)
+    subprocess.run(["udevadm", "control", "--reload"], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+    udev_retrigger([d for d in os.listdir("/sys/class/input") if d.startswith("input")])
+    subprocess.run(["udevadm", "settle", "--timeout=3"], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+
+
 # --------------------------------------------------------------- boucle
 def main():
     ap = argparse.ArgumentParser()
@@ -354,6 +365,7 @@ def main():
     ap.add_argument("--mouse-speed", type=float, default=14.0)
     args = ap.parse_args()
 
+    cleanup_stale_rule()
     configs = parse_sdl_configs(os.environ.get("SDL_GAMECONTROLLERCONFIG", ""))
     if not configs:
         log("Pas de SDL_GAMECONTROLLERCONFIG : rien à émuler.")
@@ -390,7 +402,6 @@ def main():
             mouse.close()
         return 1
 
-    udev_hide(parents)
 
     running = [True]
 
@@ -399,13 +410,13 @@ def main():
     signal.signal(signal.SIGTERM, stop)
     signal.signal(signal.SIGINT, stop)
 
-    for pad in pads.values():
-        pad.sync()
-
     rx_acc = ry_acc = 0.0
     last_t = time.monotonic()
     parent = os.getppid()
     try:
+        udev_hide(parents)
+        for pad in pads.values():
+            pad.sync()
         while running[0]:
             r, _, _ = select.select(list(pads.keys()), [], [], 0.01)
             for fd in r:
