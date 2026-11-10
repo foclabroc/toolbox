@@ -612,7 +612,7 @@ exec "$APP_DIR/launch.sh"
 EOF
     chmod +x "$PORT_SH"
 
-    # Hotkey + Start = quitter (evmapy)
+    # evmapy : Hotkey + Start = quitter, stick droit = souris, R3 = clic gauche
     cat > "$PORT_KEYS" <<EOF
 {
     "actions_player1": [
@@ -620,6 +620,15 @@ EOF
             "trigger": ["hotkey", "start"],
             "type": "exec",
             "target": "pkill -f $PROFILE_DIR"
+        },
+        {
+            "trigger": "joystick2",
+            "type": "mouse"
+        },
+        {
+            "trigger": "r3",
+            "type": "key",
+            "target": "BTN_LEFT"
         }
     ]
 }
@@ -628,7 +637,7 @@ EOF
     d_info "Ajout des médias et de l'entrée gamelist..."
     add_gamelist_entry
 
-    local FIN="Installation terminée !\n\nJeu dispo dans : PORTS > $PORT_NAME\nQuitter : Hotkey + Start\nClavier virtuel : R3 (ou sélectionner un champ)\nLogs : $LOG_FILE"
+    local FIN="Installation terminée !\n\nJeu dispo dans : PORTS > $PORT_NAME\nQuitter : Hotkey + Start\nSouris : stick droit, clic : R3\nClavier virtuel : L3 (ou sélectionner un champ)\nLogs : $LOG_FILE"
     [ -n "$GAMELIST_DEFERRED" ] && FIN="${FIN}\n\nLa fiche du jeu (jaquette, vidéo, description) sera ajoutée dans quelques secondes, une fois la toolbox fermée."
     if [ -n "$WARN" ]; then
         d_msg "$FIN\n\nAttention :$WARN" "Installation terminée" 19

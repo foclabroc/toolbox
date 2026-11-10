@@ -1,8 +1,8 @@
 // Clavier virtuel NFSU2 (Foclabroc Toolbox)
 // S'ouvre quand un champ texte du site prend le focus (si une manette est branchée
-// ou au tactile), ou avec R3 (clic stick droit).
+// ou au tactile), ou avec L3 (clic stick gauche). R3 = clic souris (evmapy).
 // Manette : croix/stick = se déplacer, A = taper, B = effacer, X = espace,
-//           Y = majuscules, Start = valider, R3 = ouvrir/fermer.
+//           Y = majuscules, Start = valider, L3 = ouvrir/fermer.
 (() => {
   'use strict';
   if (window.__nfsu2OskLoaded) return;
@@ -122,7 +122,7 @@
 <div class="kb">
   <div class="preview"></div>
   <div class="keys"></div>
-  <div class="help">A taper · B effacer · X espace · Y majuscules · Start valider · R3 fermer</div>
+  <div class="help">A taper · B effacer · X espace · Y majuscules · Start valider · L3 fermer</div>
 </div>`;
   const preview = shadow.querySelector('.preview');
   const keysBox = shadow.querySelector('.keys');
@@ -268,7 +268,7 @@
     const m = tok.match(/^(\w+):b(\d+)$/);
     if (m) sdl[m[1]] = +m[2];
   });
-  const STD = { a: 0, b: 1, x: 2, y: 3, start: 9, rightstick: 11, dpup: 12, dpdown: 13, dpleft: 14, dpright: 15 };
+  const STD = { a: 0, b: 1, x: 2, y: 3, start: 9, leftstick: 10, dpup: 12, dpdown: 13, dpleft: 14, dpright: 15 };
 
   const read = (gp) => {
     const map = gp.mapping === 'standard' ? STD : sdl;
@@ -283,7 +283,7 @@
       left: btn('dpleft') || ax(0) < -0.6,
       right: btn('dpright') || ax(0) > 0.6,
       a: btn('a'), b: btn('b'), x: btn('x'), y: btn('y'),
-      start: btn('start'), r3: btn('rightstick'),
+      start: btn('start'), l3: btn('leftstick'),
     };
   };
 
@@ -304,13 +304,13 @@
   const loop = (now) => {
     const pads = navigator.getGamepads ? [...navigator.getGamepads()].filter(Boolean) : [];
     // Fusionne toutes les manettes : n'importe laquelle peut taper
-    const s = { up: false, down: false, left: false, right: false, a: false, b: false, x: false, y: false, start: false, r3: false };
+    const s = { up: false, down: false, left: false, right: false, a: false, b: false, x: false, y: false, start: false, l3: false };
     for (const gp of pads) {
       const r = read(gp);
       for (const k in s) s[k] = s[k] || r[k];
     }
 
-    if (edge('r3', now, s.r3, false)) {
+    if (edge('l3', now, s.l3, false)) {
       if (state.open) close(); else open(findField());
     }
 
