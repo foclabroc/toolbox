@@ -186,9 +186,9 @@ def mouse_button(mouse, code, pressed):
 
 # Steam Deck (hid-steam) : pads sur ABS_HAT0 (gauche) / ABS_HAT1 (droit), 0 quand
 # le pad n'est pas touché ; clic pad gauche = BTN_THUMB, clic pad droit = BTN_THUMB2.
-DECK_PAD_SCALE = 0.02      # unités pad (-32767..32767) -> pixels
+DECK_PAD_SCALE = 0.012     # unités pad (-32767..32767) -> pixels
 DECK_SCROLL_STEP = 2500    # unités pad par cran de molette
-DECK_INVERT_Y = False      # mettre True si le haut/bas du pad est inversé
+DECK_INVERT_Y = True       # hid-steam : Y du pad vers le haut = positif
 
 
 class SonyTouchpad:
