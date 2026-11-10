@@ -242,7 +242,44 @@
     delete document.documentElement.dataset.nfsu2Osk;
   };
 
-  const padConnected = () => navigator.getGamepads && [...navigator.getGamepads()].some((g) => g && g.connected);
+  // ---------------------------------------------------------------- pont manette
+  // ds4emu.py envoie l'état des manettes (ordre Standard Gamepad) au script de fond
+  // (bg.js), qui le transmet ici. On le relaie à la page (main_world.js) et on s'en
+  // sert pour le clavier virtuel.
+  const bridge = { pads: null, time: 0, connected: false };
+  if (window.top === window) {
+    const connectPort = () => {
+      let port;
+      try { port = chrome.runtime.connect({ name: 'nfsu2pad' }); } catch (err) { setTimeout(connectPort, 1000); return; }
+      port.onMessage.addListener((msg) => {
+        if ('status' in msg) bridge.connected = msg.status;
+        if (msg.state) {
+          let d;
+          try { d = JSON.parse(msg.state); } catch (err) { return; }
+          bridge.connected = true;
+          bridge.pads = d.pads || [];
+          bridge.time = performance.now();
+          window.postMessage({ __nfsu2pad: d }, '*');
+        }
+      });
+      // Le script de fond peut être recyclé par Chromium : on se reconnecte
+      port.onDisconnect.addListener(() => { bridge.connected = false; setTimeout(connectPort, 500); });
+    };
+    connectPort();
+  }
+  const bridgeFresh = () => bridge.pads && performance.now() - bridge.time < 1500;
+  // Manettes au format Standard Gamepad, depuis le pont si actif, sinon Chromium
+  const currentPads = () => {
+    if (bridgeFresh()) {
+      return bridge.pads.map((p) => ({
+        connected: true, mapping: 'standard', axes: p.axes,
+        buttons: p.buttons.map((v) => ({ pressed: v > 0.12, value: v })),
+      }));
+    }
+    return navigator.getGamepads ? [...navigator.getGamepads()].filter(Boolean) : [];
+  };
+
+  const padConnected = () => currentPads().some((g) => g && g.connected);
 
   document.addEventListener('pointerdown', (e) => { state.lastInputWasTouch = e.pointerType === 'touch'; }, true);
 
@@ -303,7 +340,7 @@
   };
 
   const loop = (now) => {
-    const pads = navigator.getGamepads ? [...navigator.getGamepads()].filter(Boolean) : [];
+    const pads = currentPads();
     // Fusionne toutes les manettes : n'importe laquelle peut taper
     const s = { up: false, down: false, left: false, right: false, a: false, b: false, x: false, y: false, start: false, l3: false, back: false, guide: false };
     for (const gp of pads) {
@@ -348,7 +385,15 @@
     attach();
     const dbg = () => {
       const pads = navigator.getGamepads ? [...navigator.getGamepads()] : [];
-      const lines = ['Manettes vues par Chromium : ' + pads.filter(Boolean).length];
+      const lines = [
+        'Pont manette : ' + (bridge.connected ? 'connecté' : 'non connecté') +
+          (bridgeFresh() ? ' (' + bridge.pads.length + ' manette(s))' : ''),
+      ];
+      (bridgeFresh() ? bridge.pads : []).forEach((p, i) => {
+        const on = p.buttons.map((v, j) => (v > 0.12 ? j + (v < 1 ? '=' + v.toFixed(2) : '') : null)).filter((x) => x !== null);
+        lines.push(`  pont[${i}] appuyés=[${on}] axes=${p.axes.map((a) => a.toFixed(1)).join(' ')}`);
+      });
+      lines.push('Manettes vues par Chromium : ' + pads.filter(Boolean).length);
       pads.forEach((gp, i) => {
         if (!gp) { lines.push(`[${i}] (vide)`); return; }
         const pressed = gp.buttons.map((b, j) => (b.pressed ? j : null)).filter((j) => j !== null);

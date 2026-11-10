@@ -1,32 +1,43 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Manette DualShock 4 virtuelle pour NFSU2 Revived (Foclabroc Toolbox).
+Pont manette pour NFSU2 Revived (Foclabroc Toolbox).
 
-Chaque manette configurée dans Batocera (mapping SDL de SDL_GAMECONTROLLERCONFIG)
-est capturée en exclusif et rejouée sous forme de DS4 (054c:09cc), reconnue par
-Chromium avec son mapping standard. Le script gère aussi :
+Chromium ignore les manettes virtuelles (uinput) créées pendant le jeu. Ce script
+lit donc lui-même chaque manette configurée dans Batocera (mapping SDL de
+SDL_GAMECONTROLLERCONFIG), la traduit en manette "standard" (17 boutons dont
+gâchettes analogiques, 4 axes) et envoie son état à l'extension du navigateur par
+WebSocket local (127.0.0.1). L'extension présente ces manettes au site.
+
+Il gère aussi :
   - Hotkey + Start : quitter (commande passée avec --quit)
   - stick droit : souris, R3 : clic gauche
-Les manettes réelles sont masquées à Chromium (udev) pendant le jeu.
+Les vraies manettes sont capturées en exclusif pendant le jeu (Chromium et evmapy
+ne les voient plus), puis relâchées à la sortie.
 """
 import argparse
+import base64
+import hashlib
+import json
 import os
 import select
 import signal
+import socket
 import struct
 import subprocess
 import sys
+import threading
 import time
 import xml.etree.ElementTree as ET
 
 import evdev
-from evdev import AbsInfo, InputDevice, UInput
+from evdev import InputDevice, UInput
 from evdev import ecodes as e
 
 ES_INPUT = "/userdata/system/configs/emulationstation/es_input.cfg"
-UDEV_RULE = "/run/udev/rules.d/99-nfsu2-hide.rules"
-DS4_NAME = "Sony Interactive Entertainment Wireless Controller"
+UDEV_RULE = "/run/udev/rules.d/99-nfsu2-hide.rules"   # anciennes versions : nettoyage
+WS_PORT = 47820
+WS_GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 
 
 def log(*a):
@@ -96,56 +107,26 @@ def sdl_layout(dev):
     return buttons, axes, hats, absinfo
 
 
-# --------------------------------------------------------------- manettes virtuelles
-# Deux identités possibles :
-#  - ds4  : DualShock 4 (disposition hid-playstation, 054c:09cc)
-#  - xbox : Xbox 360 (disposition xpad, 045e:028e), celle de Steam Input
-PROFILES = {
-    "ds4": {
-        "name": DS4_NAME, "vendor": 0x054C, "product": 0x09CC, "version": 0x8111,
-        # Carré = BTN_WEST, triangle = BTN_NORTH (hid-playstation)
-        "buttons": {"a": e.BTN_SOUTH, "b": e.BTN_EAST, "x": e.BTN_WEST, "y": e.BTN_NORTH,
-                    "leftshoulder": e.BTN_TL, "rightshoulder": e.BTN_TR,
-                    "back": e.BTN_SELECT, "start": e.BTN_START, "guide": e.BTN_MODE,
-                    "leftstick": e.BTN_THUMBL, "rightstick": e.BTN_THUMBR},
-        "stick": (0, 255),
-        "triggers": {"lefttrigger": (e.ABS_Z, e.BTN_TL2), "righttrigger": (e.ABS_RZ, e.BTN_TR2)},
-    },
-    "xbox": {
-        "name": "Microsoft X-Box 360 pad", "vendor": 0x045E, "product": 0x028E, "version": 0x0114,
-        # xpad : X (gauche) = 0x133, Y (haut) = 0x134
-        "buttons": {"a": e.BTN_SOUTH, "b": e.BTN_EAST, "x": 0x133, "y": 0x134,
-                    "leftshoulder": e.BTN_TL, "rightshoulder": e.BTN_TR,
-                    "back": e.BTN_SELECT, "start": e.BTN_START, "guide": e.BTN_MODE,
-                    "leftstick": e.BTN_THUMBL, "rightstick": e.BTN_THUMBR},
-        "stick": (-32768, 32767),
-        "triggers": {"lefttrigger": (e.ABS_Z, None), "righttrigger": (e.ABS_RZ, None)},
-    },
-}
-STICKS = {"leftx": e.ABS_X, "lefty": e.ABS_Y, "rightx": e.ABS_RX, "righty": e.ABS_RY}
-DPAD = ("dpup", "dpdown", "dpleft", "dpright")
-IDENTITY = "ds4"
+def is_gamepad(dev):
+    """Vrai gamepad : sticks (ABS_X/ABS_Y) + boutons de manette.
+    Écarte le clavier et la souris virtuels des trackpads (hid-steam) et les capteurs."""
+    caps = dev.capabilities(absinfo=False)
+    absc = set(caps.get(e.EV_ABS, []))
+    keys = set(caps.get(e.EV_KEY, []))
+    if e.ABS_X not in absc or e.ABS_Y not in absc:
+        return False
+    if e.INPUT_PROP_ACCELEROMETER in dev.input_props():
+        return False
+    pad_buttons = set(range(e.BTN_JOYSTICK, e.BTN_THUMBR + 1)) | set(range(e.BTN_DPAD_UP, e.BTN_DPAD_RIGHT + 1))
+    return bool(keys & pad_buttons)
 
 
-def make_virtual():
-    p = PROFILES[IDENTITY]
-    lo, hi = p["stick"]
-    stick = AbsInfo(value=(lo + hi + 1) // 2, min=lo, max=hi, fuzz=0, flat=0, resolution=0)
-    trig = AbsInfo(value=0, min=0, max=255, fuzz=0, flat=0, resolution=0)
-    hat = AbsInfo(value=0, min=-1, max=1, fuzz=0, flat=0, resolution=0)
-    keys = list(p["buttons"].values()) + [b for _, b in p["triggers"].values() if b]
-    caps = {
-        e.EV_KEY: sorted(set(keys)),
-        e.EV_ABS: [(e.ABS_X, stick), (e.ABS_Y, stick), (e.ABS_Z, trig),
-                   (e.ABS_RX, stick), (e.ABS_RY, stick), (e.ABS_RZ, trig),
-                   (e.ABS_HAT0X, hat), (e.ABS_HAT0Y, hat)],
-    }
-    return UInput(caps, name=p["name"], vendor=p["vendor"], product=p["product"],
-                  version=p["version"], bustype=e.BUS_USB)
-
-
-def make_ds4():
-    return make_virtual()
+# Ordre de la "Standard Gamepad" du W3C (navigator.getGamepads, mapping="standard")
+STANDARD_BUTTONS = [
+    "a", "b", "x", "y", "leftshoulder", "rightshoulder", "lefttrigger", "righttrigger",
+    "back", "start", "leftstick", "rightstick", "dpup", "dpdown", "dpleft", "dpright", "guide",
+]
+STANDARD_AXES = ["leftx", "lefty", "rightx", "righty"]
 
 
 def make_mouse():
@@ -161,11 +142,9 @@ class Pad:
         self.buttons, self.axes, self.hats, self.absinfo = sdl_layout(dev)
         self.state_keys = set()
         self.state_abs = {c: ai.value for c, ai in self.absinfo.items()}
-        self.ds4 = make_ds4()
         self.mouse = mouse
         self.hotkey_code = self._button_code(hotkey_idx)
         self.start_code = self._button_code(start_idx)
-        self.last = {}
         self.quit_armed = True
 
     def _button_code(self, idx):
@@ -229,33 +208,17 @@ class Pad:
             v = (v + 1.0) / 2.0
         return max(0.0, min(1.0, v))
 
-    # --- émission
-    def _emit(self, etype, code, value):
-        if self.last.get((etype, code)) != value:
-            self.last[(etype, code)] = value
-            self.ds4.write(etype, code, value)
-            return True
-        return False
-
-    def sync(self):
-        p = PROFILES[IDENTITY]
-        lo, hi = p["stick"]
-        changed = False
-        for name, code in p["buttons"].items():
-            changed |= self._emit(e.EV_KEY, code, 1 if self.target(name) > 0.5 else 0)
-        for name, code in STICKS.items():
-            v = max(-1.0, min(1.0, self.target(name)))
-            changed |= self._emit(e.EV_ABS, code, int(round(lo + (v + 1.0) / 2.0 * (hi - lo))))
-        for name, (acode, bcode) in p["triggers"].items():
-            v = self.trigger(name)
-            changed |= self._emit(e.EV_ABS, acode, int(round(v * 255)))
-            if bcode:
-                changed |= self._emit(e.EV_KEY, bcode, 1 if v > 0.1 else 0)
-        up, down, left, right = (self.target(d) > 0.5 for d in DPAD)
-        changed |= self._emit(e.EV_ABS, e.ABS_HAT0X, int(right) - int(left))
-        changed |= self._emit(e.EV_ABS, e.ABS_HAT0Y, int(down) - int(up))
-        if changed:
-            self.ds4.syn()
+    def standard_state(self):
+        """Boutons (0..1) et axes (-1..1) dans l'ordre de la Standard Gamepad."""
+        buttons = []
+        for name in STANDARD_BUTTONS:
+            if name in ("lefttrigger", "righttrigger"):
+                v = self.trigger(name)
+            else:
+                v = 1.0 if self.target(name) > 0.5 else 0.0
+            buttons.append(round(v, 3))
+        axes = [round(max(-1.0, min(1.0, self.target(n))), 3) for n in STANDARD_AXES]
+        return buttons, axes
 
     def handle(self, ev):
         if ev.type == e.EV_KEY:
@@ -268,8 +231,6 @@ class Pad:
                 self.mouse.syn()
         elif ev.type == e.EV_ABS:
             self.state_abs[ev.code] = ev.value
-        elif ev.type == e.EV_SYN:
-            self.sync()
 
     def rightstick_code(self):
         src = self.map.get("rightstick", "")
@@ -291,27 +252,101 @@ class Pad:
             self.dev.ungrab()
         except Exception:
             pass
+
+
+# --------------------------------------------------------------- WebSocket local
+class Bridge:
+    """Mini serveur WebSocket (envoi seul) sur 127.0.0.1 pour l'extension."""
+
+    def __init__(self, port):
+        self.clients = []
+        self.lock = threading.Lock()
+        self.srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.srv.bind(("127.0.0.1", port))
+        self.srv.listen(4)
+        self.last_msg = None
+        threading.Thread(target=self._accept, daemon=True).start()
+
+    def _accept(self):
+        while True:
+            try:
+                conn, _ = self.srv.accept()
+            except OSError:
+                return
+            threading.Thread(target=self._handshake, args=(conn,), daemon=True).start()
+
+    def _handshake(self, conn):
         try:
-            self.ds4.close()
-        except Exception:
+            conn.settimeout(3)
+            data = b""
+            while b"\r\n\r\n" not in data and len(data) < 8192:
+                chunk = conn.recv(1024)
+                if not chunk:
+                    raise OSError("fermé")
+                data += chunk
+            key = None
+            for line in data.decode("latin-1").split("\r\n"):
+                if line.lower().startswith("sec-websocket-key:"):
+                    key = line.split(":", 1)[1].strip()
+            if not key:
+                raise OSError("pas de clé WebSocket")
+            accept = base64.b64encode(hashlib.sha1((key + WS_GUID).encode()).digest()).decode()
+            conn.sendall(("HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\n"
+                          "Connection: Upgrade\r\nSec-WebSocket-Accept: " + accept + "\r\n\r\n").encode())
+            conn.settimeout(None)
+            conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+            with self.lock:
+                self.clients.append(conn)
+                last = self.last_msg
+            log("Extension connectée au pont manette.")
+            if last:
+                self._send(conn, last)
+        except OSError:
+            conn.close()
+
+    @staticmethod
+    def _frame(payload):
+        n = len(payload)
+        if n < 126:
+            head = struct.pack("!BB", 0x81, n)
+        elif n < 65536:
+            head = struct.pack("!BBH", 0x81, 126, n)
+        else:
+            head = struct.pack("!BBQ", 0x81, 127, n)
+        return head + payload
+
+    def _send(self, conn, payload):
+        try:
+            conn.sendall(self._frame(payload))
+            return True
+        except OSError:
+            return False
+
+    def broadcast(self, obj):
+        payload = json.dumps(obj, separators=(",", ":")).encode()
+        with self.lock:
+            self.last_msg = payload
+            alive = []
+            for c in self.clients:
+                if self._send(c, payload):
+                    alive.append(c)
+                else:
+                    c.close()
+            self.clients = alive
+
+    def close(self):
+        try:
+            self.srv.close()
+        except OSError:
             pass
+        with self.lock:
+            for c in self.clients:
+                c.close()
+            self.clients = []
 
 
 # --------------------------------------------------------------- ES / udev
-def is_gamepad(dev):
-    """Vrai gamepad : sticks (ABS_X/ABS_Y) + boutons de manette.
-    Écarte le clavier et la souris virtuels des trackpads (hid-steam) et les capteurs."""
-    caps = dev.capabilities(absinfo=False)
-    absc = set(caps.get(e.EV_ABS, []))
-    keys = set(caps.get(e.EV_KEY, []))
-    if e.ABS_X not in absc or e.ABS_Y not in absc:
-        return False
-    if e.INPUT_PROP_ACCELEROMETER in dev.input_props():
-        return False
-    pad_buttons = set(range(e.BTN_JOYSTICK, e.BTN_THUMBR + 1)) | set(range(e.BTN_DPAD_UP, e.BTN_DPAD_RIGHT + 1))
-    return bool(keys & pad_buttons)
-
-
 def es_buttons(guid, name):
     """Index SDL des boutons hotkey et start déclarés dans es_input.cfg."""
     try:
@@ -336,53 +371,21 @@ def es_buttons(guid, name):
     return found.get("hotkey"), found.get("start")
 
 
-def input_parent(dev_path):
-    ev = os.path.basename(dev_path)
-    return os.path.basename(os.path.realpath(f"/sys/class/input/{ev}/device"))
-
-
-def udev_retrigger(parents):
-    for p in parents:
-        base = f"/sys/class/input/{p}"
-        for child in os.listdir(base) if os.path.isdir(base) else []:
-            uevent = os.path.join(base, child, "uevent")
-            if child.startswith(("event", "js")) and os.path.exists(uevent):
-                try:
-                    with open(uevent, "w") as f:
-                        f.write("change")
-                except OSError:
-                    pass
-
-
-def udev_hide(parents):
-    """Retire ID_INPUT_JOYSTICK des vraies manettes pour que Chromium ne les liste pas."""
-    if not parents:
-        return
-    os.makedirs(os.path.dirname(UDEV_RULE), exist_ok=True)
-    with open(UDEV_RULE, "w") as f:
-        for p in parents:
-            f.write(f'SUBSYSTEM=="input", KERNELS=="{p}", ENV{{ID_INPUT_JOYSTICK}}=""\n')
-    subprocess.run(["udevadm", "control", "--reload"], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
-    udev_retrigger(parents)
-    subprocess.run(["udevadm", "settle", "--timeout=3"], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
-
-
-def udev_restore(parents):
-    if os.path.exists(UDEV_RULE):
-        os.remove(UDEV_RULE)
-        subprocess.run(["udevadm", "control", "--reload"], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
-        udev_retrigger(parents)
-
-
 def cleanup_stale_rule():
-    """Règle restée d'une session tuée brutalement : on la retire et on redétecte tout."""
+    """Règle de masquage laissée par une ancienne version : on la retire."""
     if not os.path.exists(UDEV_RULE):
         return
-    log("Règle udev d'une session précédente trouvée : nettoyage.")
+    log("Ancienne règle udev trouvée : nettoyage.")
     os.remove(UDEV_RULE)
     subprocess.run(["udevadm", "control", "--reload"], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
-    udev_retrigger([d for d in os.listdir("/sys/class/input") if d.startswith("input")])
-    subprocess.run(["udevadm", "settle", "--timeout=3"], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+    for d in os.listdir("/sys/class/input"):
+        uevent = os.path.join("/sys/class/input", d, "uevent")
+        if d.startswith(("event", "js")) and os.path.exists(uevent):
+            try:
+                with open(uevent, "w") as f:
+                    f.write("change")
+            except OSError:
+                pass
 
 
 # --------------------------------------------------------------- boucle
@@ -391,21 +394,19 @@ def main():
     ap.add_argument("--quit", default="", help="commande lancée sur Hotkey + Start")
     ap.add_argument("--no-mouse", action="store_true")
     ap.add_argument("--mouse-speed", type=float, default=14.0)
-    ap.add_argument("--identity", choices=sorted(PROFILES), default="ds4")
+    ap.add_argument("--identity", choices=["ds4", "xbox"], default="ds4",
+                    help="manette annoncée au site")
+    ap.add_argument("--port", type=int, default=WS_PORT)
     args = ap.parse_args()
-    global IDENTITY
-    IDENTITY = args.identity
-    log(f"Identité des manettes virtuelles : {PROFILES[IDENTITY]['name']}")
 
     cleanup_stale_rule()
     configs = parse_sdl_configs(os.environ.get("SDL_GAMECONTROLLERCONFIG", ""))
     if not configs:
-        log("Pas de SDL_GAMECONTROLLERCONFIG : rien à émuler.")
+        log("Pas de SDL_GAMECONTROLLERCONFIG : rien à faire.")
         return 1
 
     mouse = None if args.no_mouse else make_mouse()
     pads = {}
-    parents = []
     for path in evdev.list_devices():
         try:
             dev = InputDevice(path)
@@ -424,9 +425,8 @@ def main():
             continue
         pad = Pad(dev, mapping, hk, st, mouse)
         pads[dev.fd] = pad
-        parents.append(input_parent(path))
-        log(f"{dev.name} ({path}, GUID {guid}) -> virtuelle {pad.ds4.device.path}"
-            f" | hotkey={hk} start={st} | {len(pad.buttons)} boutons, {len(pad.axes)} axes, {len(pad.hats)} hats")
+        log(f"{dev.name} ({path}, GUID {guid}) | hotkey={hk} start={st}"
+            f" | {len(pad.buttons)} boutons, {len(pad.axes)} axes, {len(pad.hats)} hats")
 
     if not pads:
         log("Aucune manette correspondant au mapping Batocera trouvée.")
@@ -434,6 +434,14 @@ def main():
             mouse.close()
         return 1
 
+    try:
+        bridge = Bridge(args.port)
+    except OSError as err:
+        log(f"Port {args.port} indisponible : {err}")
+        for pad in pads.values():
+            pad.close()
+        return 1
+    log(f"Pont manette sur ws://127.0.0.1:{args.port} (identité {args.identity})")
 
     running = [True]
 
@@ -444,13 +452,12 @@ def main():
 
     rx_acc = ry_acc = 0.0
     last_t = time.monotonic()
+    last_sent = 0.0
+    last_payload = None
     parent = os.getppid()
     try:
-        udev_hide(parents)
-        for pad in pads.values():
-            pad.sync()
         while running[0]:
-            r, _, _ = select.select(list(pads.keys()), [], [], 0.01)
+            r, _, _ = select.select(list(pads.keys()), [], [], 0.008)
             for fd in r:
                 pad = pads[fd]
                 try:
@@ -471,15 +478,24 @@ def main():
                 log("Lanceur arrêté : relâche des manettes.")
                 break
 
-            # Souris : stick droit de toutes les manettes (vitesse en px par 10 ms)
+            # État des manettes vers l'extension (à chaque changement, sinon 5 fois/s)
             now = time.monotonic()
+            state = [pad.standard_state() for pad in pads.values()]
+            if state != last_payload or now - last_sent > 0.2:
+                bridge.broadcast({
+                    "identity": args.identity,
+                    "pads": [{"buttons": b, "axes": a} for b, a in state],
+                })
+                last_payload = state
+                last_sent = now
+
+            # Souris : stick droit de toutes les manettes (vitesse en px par 10 ms)
             dt = min(0.05, now - last_t) / 0.01
             last_t = now
             if mouse:
                 dx = dy = 0.0
                 for pad in pads.values():
-                    x, y = pad.target("rightx"), pad.target("righty")
-                    for v, axis in ((x, "x"), (y, "y")):
+                    for v, axis in ((pad.target("rightx"), "x"), (pad.target("righty"), "y")):
                         if abs(v) > 0.2:
                             s = (abs(v) - 0.2) / 0.8
                             step = (s ** 2) * args.mouse_speed * dt * (1 if v > 0 else -1)
@@ -503,8 +519,8 @@ def main():
             pad.close()
         if mouse:
             mouse.close()
-        udev_restore(parents)
-        log("Arrêt de l'émulation DS4.")
+        bridge.close()
+        log("Arrêt du pont manette.")
     return 0
 
 

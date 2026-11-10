@@ -623,7 +623,7 @@ EXTRA=""
     --noerrdialogs --disable-infobars \\
     --hide-crash-restore-bubble --disable-session-crashed-bubble \\
     --load-extension="$APP_DIR/osk" \\
-    --disable-features=Translate,DisableLoadExtensionCommandLineSwitch \\
+    --disable-features=Translate,DisableLoadExtensionCommandLineSwitch,LocalNetworkAccessChecks,BlockInsecurePrivateNetworkRequests \\
     --disable-print-preview \\
     \$WEBHID_FLAG \\
     \$EXTRA > "\$LOG" 2>&1
