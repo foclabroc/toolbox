@@ -66,44 +66,67 @@ remove_gamelist_entry() {
 }
 
 add_gamelist_entry() {
-    mkdir -p /userdata/roms/ports/images /userdata/roms/ports/videos
+    mkdir -p /userdata/roms/ports/images /userdata/roms/ports/videos "$APP_DIR"
     for F in $MEDIA_FILES; do
         curl -sL --fail -o "/userdata/roms/ports/images/$F" "$MEDIA_URL/$F"
     done
     curl -sL --fail -o "/userdata/roms/ports/videos/NFSU2-video.mp4" "$MEDIA_URL/NFSU2-video.mp4"
-
-    [ -f "$GAMELIST" ] || echo '<?xml version="1.0" encoding="UTF-8"?><gameList></gameList>' > "$GAMELIST"
     ensure_xmlstarlet
 
-    # ES garde le gamelist en mémoire : on le laisse sauvegarder avant d'éditer
-    reload_es; sleep 2
+    # Script séparé : ES réécrit gamelist.xml depuis sa mémoire à la fin de chaque
+    # port (toolbox comprise). Il faut donc éditer quand plus rien ne tourne.
+    cat > "$APP_DIR/gamelist.sh" <<EOF
+#!/bin/bash
+# Ajoute/complète la fiche NFSU2 dans le gamelist des ports (Foclabroc Toolbox)
+# --wait : attend la fin du port en cours (lancé depuis ES)
+GAMELIST="$GAMELIST"
+G='/gameList/game[path="$GAME_PATH"]'
 
-    local G="/gameList/game[path=\"$GAME_PATH\"]"
-    # Mise à jour sur place : l'entrée créée par ES (playcount, gametime...) est conservée
-    if [ "$(xmlstarlet sel -t -v "count($G)" "$GAMELIST" 2>/dev/null)" = "0" ]; then
-        xmlstarlet ed -L -s "/gameList" -t elem -n "game" -v "" \
-            -s "/gameList/game[last()]" -t elem -n "path" -v "$GAME_PATH" "$GAMELIST"
+if [ "\$1" = "--wait" ]; then
+    for i in \$(seq 1 900); do
+        pgrep -f "emulatorlauncher|batocera-launch" >/dev/null || break
+        sleep 2
+    done
+    sleep 5   # laisse ES finir de sauvegarder ses stats
+fi
+
+[ -f "\$GAMELIST" ] || echo '<?xml version="1.0" encoding="UTF-8"?><gameList></gameList>' > "\$GAMELIST"
+
+# Mise à jour sur place : l'entrée créée par ES (playcount, gametime...) est conservée
+if [ "\$(xmlstarlet sel -t -v "count(\$G)" "\$GAMELIST" 2>/dev/null)" = "0" ]; then
+    xmlstarlet ed -L -s "/gameList" -t elem -n "game" -v "" \\
+        -s "/gameList/game[last()]" -t elem -n "path" -v "$GAME_PATH" "\$GAMELIST"
+fi
+
+set_field() {
+    xmlstarlet ed -L -d "\$G/\$1" -s "\$G" -t elem -n "\$1" -v "\$2" "\$GAMELIST"
+}
+set_field name "Need for Speed Underground 2 Revived"
+set_field desc "Need for Speed: Underground 2 (2004) dans sa version Revived, le code du jeu PC recompilé pour le navigateur (WebGPU) par un projet fan. Course de rue nocturne dans la ville de Bayview : tuning poussé, free roam, drift, drag, URL et Street X. Jusqu'à 120 fps en écran large, support manette et volant, sauvegardes en ligne et courses Online en free roam avec tes amis et ton crew. Connexion Internet obligatoire. Quitter : Hotkey + Start. Projet fan non affilié à Electronic Arts."
+set_field developer "EA Black Box"
+set_field publisher "Electronic Arts"
+set_field genre "Course"
+set_field players "4+"
+set_field releasedate "20041109T000000"
+set_field rating "0.90"
+set_field region "eu"
+set_field lang "fr"
+set_field image "./images/NFSU2-screenshot.jpg"
+set_field wheel "./images/NFSU2-wheel.png"
+set_field thumbnail "./images/NFSU2-cartridge.jpg"
+set_field video "./videos/NFSU2-video.mp4"
+
+curl -s -m3 http://127.0.0.1:1234/reloadgames >/dev/null 2>&1
+EOF
+    chmod +x "$APP_DIR/gamelist.sh"
+
+    if pgrep -f "emulatorlauncher|batocera-launch" >/dev/null; then
+        # Lancé depuis la toolbox (port) : édition différée, détachée de l'xterm
+        setsid nohup bash "$APP_DIR/gamelist.sh" --wait >/dev/null 2>&1 < /dev/null &
+        GAMELIST_DEFERRED=1
+    else
+        bash "$APP_DIR/gamelist.sh"
     fi
-
-    set_field() {
-        xmlstarlet ed -L -d "$G/$1" -s "$G" -t elem -n "$1" -v "$2" "$GAMELIST"
-    }
-    set_field name "Need for Speed Underground 2 Revived"
-    set_field desc "Need for Speed: Underground 2 (2004) dans sa version Revived, le code du jeu PC recompilé pour le navigateur (WebGPU) par un projet fan. Course de rue nocturne dans la ville de Bayview : tuning poussé, free roam, drift, drag, URL et Street X. Jusqu'à 120 fps en écran large, support manette et volant, sauvegardes en ligne et courses Online en free roam avec tes amis et ton crew. Connexion Internet obligatoire. Quitter : Hotkey + Start. Projet fan non affilié à Electronic Arts."
-    set_field developer "EA Black Box"
-    set_field publisher "Electronic Arts"
-    set_field genre "Course"
-    set_field players "4+"
-    set_field releasedate "20041109T000000"
-    set_field rating "0.90"
-    set_field region "eu"
-    set_field lang "fr"
-    set_field image "./images/NFSU2-screenshot.jpg"
-    set_field wheel "./images/NFSU2-wheel.png"
-    set_field thumbnail "./images/NFSU2-cartridge.jpg"
-    set_field video "./videos/NFSU2-video.mp4"
-
-    reload_es
 }
 
 # ---------------------------------------------------------------------
@@ -592,10 +615,11 @@ EOF
     add_gamelist_entry
 
     local FIN="Installation terminée !\n\nJeu dispo dans : PORTS > $PORT_NAME\nQuitter : Hotkey + Start\nLogs : $LOG_FILE"
+    [ -n "$GAMELIST_DEFERRED" ] && FIN="${FIN}\n\nLa fiche du jeu (jaquette, vidéo, description) sera ajoutée dans quelques secondes, une fois la toolbox fermée."
     if [ -n "$WARN" ]; then
-        d_msg "$FIN\n\nAttention :$WARN" "Installation terminée" 16
+        d_msg "$FIN\n\nAttention :$WARN" "Installation terminée" 19
     else
-        d_msg "$FIN" "Installation terminée" 12
+        d_msg "$FIN" "Installation terminée" 15
     fi
 }
 
