@@ -270,6 +270,20 @@ class Pad:
 
 
 # --------------------------------------------------------------- ES / udev
+def is_gamepad(dev):
+    """Vrai gamepad : sticks (ABS_X/ABS_Y) + boutons de manette.
+    Écarte le clavier et la souris virtuels des trackpads (hid-steam) et les capteurs."""
+    caps = dev.capabilities()
+    absc = set(caps.get(e.EV_ABS, []))
+    keys = set(caps.get(e.EV_KEY, []))
+    if e.ABS_X not in absc or e.ABS_Y not in absc:
+        return False
+    if e.INPUT_PROP_ACCELEROMETER in dev.input_props():
+        return False
+    pad_buttons = set(range(e.BTN_JOYSTICK, e.BTN_THUMBR + 1)) | set(range(e.BTN_DPAD_UP, e.BTN_DPAD_RIGHT + 1))
+    return bool(keys & pad_buttons)
+
+
 def es_buttons(guid, name):
     """Index SDL des boutons hotkey et start déclarés dans es_input.cfg."""
     try:
@@ -354,7 +368,7 @@ def main():
         except OSError:
             continue
         guid, mapping = find_mapping(dev, configs)
-        if not mapping or "Motion Sensors" in dev.name:
+        if not mapping or not is_gamepad(dev):
             dev.close()
             continue
         hk, st = es_buttons(guid, dev.name)

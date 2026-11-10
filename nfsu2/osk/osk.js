@@ -337,4 +337,28 @@
     requestAnimationFrame(loop);
   };
   requestAnimationFrame(loop);
+
+  // ---------------------------------------------------------------- diagnostic
+  // Activé par launch.sh si le fichier debug_pad existe : affiche ce que Chromium voit.
+  if (window.__NFSU2_DEBUG && window.top === window) {
+    const box = document.createElement('pre');
+    box.style.cssText = 'position:fixed;top:4px;left:4px;z-index:2147483647;margin:0;padding:6px 8px;' +
+      'background:rgba(0,0,0,.8);color:#7CFC00;font:12px/1.35 monospace;pointer-events:none;max-width:60vw;white-space:pre-wrap;';
+    const attach = () => (document.body || document.documentElement).appendChild(box);
+    attach();
+    const dbg = () => {
+      const pads = navigator.getGamepads ? [...navigator.getGamepads()] : [];
+      const lines = ['Manettes vues par Chromium : ' + pads.filter(Boolean).length];
+      pads.forEach((gp, i) => {
+        if (!gp) { lines.push(`[${i}] (vide)`); return; }
+        const pressed = gp.buttons.map((b, j) => (b.pressed ? j : null)).filter((j) => j !== null);
+        const axes = gp.axes.map((a) => a.toFixed(1)).join(' ');
+        lines.push(`[${i}] ${gp.id}\n    mapping=${gp.mapping || '(aucun)'}  boutons=${gp.buttons.length} appuyés=[${pressed}]\n    axes=${axes}`);
+      });
+      box.textContent = lines.join('\n');
+      if (!box.isConnected) attach();
+      setTimeout(dbg, 100);
+    };
+    dbg();
+  }
 })();

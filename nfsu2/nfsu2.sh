@@ -584,6 +584,8 @@ export CHROME_WRAPPER="$APP_DIR/launch.sh"
 # Mapping manette de Batocera transmis au clavier virtuel (manettes non standard)
 SDLMAP=\$(printf '%s' "\$SDL_GAMECONTROLLERCONFIG" | head -n1 | sed 's/\\\\/\\\\\\\\/g; s/"/\\\\"/g')
 printf 'window.__NFSU2_SDLMAP = "%s";\n' "\$SDLMAP" > "$APP_DIR/osk/padmap.js"
+# Diagnostic manettes à l'écran : touch $APP_DIR/debug_pad
+[ -f "$APP_DIR/debug_pad" ] && echo 'window.__NFSU2_DEBUG = true;' >> "$APP_DIR/osk/padmap.js"
 
 # WebHID coupé par défaut : le bouton "connecter Steam Deck" du site prend la manette
 # en accès direct, hid-steam la retire alors du système (plus de Hotkey+Start, souris,
