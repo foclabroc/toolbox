@@ -12,7 +12,7 @@ WebSocket local (127.0.0.1). L'extension présente ces manettes au site.
 Il gère aussi :
   - Hotkey + Start : quitter (commande passée avec --quit)
   - stick droit : souris, R3 : clic gauche
-  - Select seul (appui court) : touche F9
+  - Select seul (appui court) : touche F9, Start seul : touche Entrée
   - Steam Deck : pad droit = souris (clic du pad = clic gauche), pad gauche = molette
   - DS4 / DualSense : pavé tactile = souris (2 doigts = molette, clic = clic gauche)
 Les vraies manettes sont capturées en exclusif pendant le jeu (Chromium et evmapy
@@ -133,7 +133,7 @@ STANDARD_AXES = ["leftx", "lefty", "rightx", "righty"]
 
 
 def make_keyboard():
-    return UInput({e.EV_KEY: [e.KEY_F9]}, name="NFSU2 virtual keyboard", vendor=0x1234, product=0x5679, version=1)
+    return UInput({e.EV_KEY: [e.KEY_F9, e.KEY_ENTER]}, name="NFSU2 virtual keyboard", vendor=0x1234, product=0x5679, version=1)
 
 
 def make_mouse():
@@ -258,8 +258,13 @@ class Pad:
         self.start_code = self._button_code(start_idx)
         self.quit_armed = True
         self.keyboard = keyboard
-        self.select_code = self._map_button("back")
-        self.select_tap = False
+        # Appui court seul -> touche clavier (Select = F9, Start = Entrée)
+        self.taps = {}
+        for name, key in (("back", e.KEY_F9), ("start", e.KEY_ENTER)):
+            code = self._map_button(name)
+            if code:
+                self.taps[code] = key
+        self.tap_armed = {}
         # Trackpads du Steam Deck
         self.deck = dev.info.vendor == 0x28DE and e.ABS_HAT1X in self.absinfo
         self.rpad = TrackpadMotion(DECK_PAD_SCALE)
@@ -351,18 +356,20 @@ class Pad:
                 self.state_keys.add(ev.code)
             else:
                 self.state_keys.discard(ev.code)
-            # Select seul (appui court) = F9. Si un autre bouton est pressé pendant
-            # que Select est maintenu (ex. Hotkey + Start), pas de F9.
-            if self.keyboard and self.select_code:
-                if ev.code == self.select_code and ev.value == 1:
-                    self.select_tap = True
-                elif ev.code != self.select_code and ev.value == 1:
-                    self.select_tap = False
-                elif ev.code == self.select_code and ev.value == 0 and self.select_tap:
-                    self.select_tap = False
-                    self.keyboard.write(e.EV_KEY, e.KEY_F9, 1)
+            # Select seul (appui court) = F9, Start seul = Entrée. Si un autre bouton
+            # est pressé pendant l'appui (ex. Hotkey + Start), aucune touche n'est envoyée.
+            if self.keyboard and self.taps:
+                if ev.value == 1:
+                    for code in self.tap_armed:
+                        self.tap_armed[code] = False
+                    if ev.code in self.taps:
+                        self.tap_armed[ev.code] = not any(
+                            c in self.state_keys for c in self.taps if c != ev.code)
+                elif ev.value == 0 and self.tap_armed.pop(ev.code, False):
+                    key = self.taps[ev.code]
+                    self.keyboard.write(e.EV_KEY, key, 1)
                     self.keyboard.syn()
-                    self.keyboard.write(e.EV_KEY, e.KEY_F9, 0)
+                    self.keyboard.write(e.EV_KEY, key, 0)
                     self.keyboard.syn()
             if ev.code == self.rightstick_code() and self.mouse:
                 mouse_button(self.mouse, e.BTN_LEFT, ev.value)
