@@ -581,6 +581,12 @@ export CHROME_WRAPPER="$APP_DIR/launch.sh"
 SDLMAP=\$(printf '%s' "\$SDL_GAMECONTROLLERCONFIG" | head -n1 | sed 's/\\\\/\\\\\\\\/g; s/"/\\\\"/g')
 printf 'window.__NFSU2_SDLMAP = "%s";\n' "\$SDLMAP" > "$APP_DIR/osk/padmap.js"
 
+# WebHID coupé par défaut : le bouton "connecter Steam Deck" du site prend la manette
+# en accès direct, hid-steam la retire alors du système (plus de Hotkey+Start, souris,
+# clavier virtuel). Pour l'autoriser quand même : touch $APP_DIR/enable_webhid
+WEBHID_FLAG="--disable-blink-features=WebHID"
+[ -f "$APP_DIR/enable_webhid" ] && WEBHID_FLAG=""
+
 # Flags ajoutables sans toucher au script : $APP_DIR/extra_flags.txt
 EXTRA=""
 [ -f "$APP_DIR/extra_flags.txt" ] && EXTRA=\$(grep -v '^#' "$APP_DIR/extra_flags.txt" | tr '\n' ' ')
@@ -600,6 +606,7 @@ EXTRA=""
     --load-extension="$APP_DIR/osk" \\
     --disable-features=Translate,DisableLoadExtensionCommandLineSwitch \\
     --disable-print-preview \\
+    \$WEBHID_FLAG \\
     \$EXTRA > "\$LOG" 2>&1
 EOF
     chmod +x "$APP_DIR/launch.sh"
