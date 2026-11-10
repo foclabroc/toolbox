@@ -234,20 +234,20 @@ main_menu() {
             --title "Menu Principal" \
             --menu "\nSélectionnez une option :\n " 25 100 16 \
             1 "[Nintendo Switch]  -> Installer l'émulation Switch sur Batocera" \
-            2 "[Rgsx]             -> Installer RGSX l'outils de telechargement de jeux pour Batocera" \
-            3 "[Fpinball]         -> Installer le launcher Future Pinball pour V42 only" \
-            4 "[Youtube TV]       -> Installer Youtube TV" \
-            5 "[Gparted]          -> Installer Gparted" \
-            6 "[Pack Kodi]        -> Installer le pack streaming/iptv kodi" \
-            7 "[Pack Nes3D]       -> Installer le pack Nintendo Nes 3D" \
-            8 "[Pack OpenLara]    -> Installer le pack OpenLara Batocera V38 à V41 seulement" \
-            9 "[Pack Music]       -> Installer le pack Music pour ES" \
-            10 "[Jeux Pc]          -> Téléchargement de Jeux Windows..." \
-            11 "[Wine Toolbox]     -> Téléchargement de Runner Wine et outils wsquash..." \
-            12 "[Update/Downgrade] -> Mise à jour et Downgrade de Batocera..." \
-            13 "[Tools]            -> Outils pour Batocera version light. (Plus d'options dispo via ssh)" \
-            14 "[Underground]      -> !!!Mot de passe nécessaire !!!" \
-            15 "[NFS Underground 2]-> Installer NFSU2 Revived (version navigateur WebGPU) en Port" \
+            2 "[NFS Underground 2]-> Installer NFSU2 Revived (version navigateur WebGPU) en Port" \
+            3 "[Rgsx]             -> Installer RGSX l'outils de telechargement de jeux pour Batocera" \
+            4 "[Fpinball]         -> Installer le launcher Future Pinball pour V42 only" \
+            5 "[Youtube TV]       -> Installer Youtube TV" \
+            6 "[Gparted]          -> Installer Gparted" \
+            7 "[Pack Kodi]        -> Installer le pack streaming/iptv kodi" \
+            8 "[Pack Nes3D]       -> Installer le pack Nintendo Nes 3D" \
+            9 "[Pack OpenLara]    -> Installer le pack OpenLara Batocera V38 à V41 seulement" \
+            10 "[Pack Music]       -> Installer le pack Music pour ES" \
+            11 "[Jeux Pc]          -> Téléchargement de Jeux Windows..." \
+            12 "[Wine Toolbox]     -> Téléchargement de Runner Wine et outils wsquash..." \
+            13 "[Update/Downgrade] -> Mise à jour et Downgrade de Batocera..." \
+            14 "[Tools]            -> Outils pour Batocera version light. (Plus d'options dispo via ssh)" \
+            15 "[Underground]      -> !!!Mot de passe nécessaire !!!" \
             16 "[Exit]             -> Quitter le script" \
             2>&1 >/dev/tty)
         clear
@@ -259,67 +259,67 @@ main_menu() {
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/batocera-switch/refs/heads/main/system/switch/extra/switch-install.sh | bash" 
                 ;;
             2)
+                confirm_install "NFS Underground 2 Revived" || continue
+                clear
+                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/nfsu2/nfsu2.sh | bash"
+                ;;
+            3)
                 confirm_install "Rgsx" || continue
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -L bit.ly/rgsx-install | sh" 
                 ;;
-            3)
+            4)
                 confirm_install "Fpinball" || continue
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/fpinball/fpinball.sh | bash" 
                 ;;
-            4)
+            5)
                 confirm_install "Youtube TV" || continue
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/youtubetv/youtubetv.sh | bash" 
                 ;;
-            5)
+            6)
                 confirm_install "Gparted" || continue
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/gparted/gparted.sh | bash" 
                 ;;
-            6)
+            7)
                 confirm_install "Pack Kodi" || continue
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/kodi/pack_kodi.sh | bash"
                 ;;
-            7)
+            8)
                 confirm_install "Pack Nes 3D" || continue
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/3d/pack_3d.sh | bash"
                 ;;
-            8)  #Pack openlara
+            9)  #Pack openlara
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/openlara/pack_lara.sh | bash"
                 ;;
-            9)  #Pack Music
+            10)  #Pack Music
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/music/music.sh | bash"
                 ;;
-            10)  #Jeux windows et linux
+            11)  #Jeux windows et linux
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/_win-game.sh | bash"
                 ;;
-            11)  #wine tools
+            12)  #wine tools
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash"
                 ;;
-            12)  #update tools
+            13)  #update tools
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/updatebat/updatebat.sh | bash"
                 ;;
-            13)  #record tools
+            14)  #record tools
                 clear
                 tools_options
                 ;;
-            14)  #Underground
+            15)  #Underground
                 clear
                 DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/underground.sh | bash"
-                ;;
-            15)
-                confirm_install "NFS Underground 2 Revived" || continue
-                clear
-                DISPLAY=:0.0 xterm -fs 12 -maximized -fg white -bg black -fa "DejaVuSansMono" -en UTF-8 -e bash -c "DISPLAY=:0.0  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/nfsu2/nfsu2.sh | bash"
                 ;;
             16)# Afficher un message de remerciement
                 dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --textbox "$tmpfile1" 20 78 2>&1 >/dev/tty

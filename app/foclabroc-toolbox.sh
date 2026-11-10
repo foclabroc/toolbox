@@ -246,21 +246,21 @@ main_menu() {
             --title "Menu Principal" \
             --menu "\nSélectionnez une option :\n " 25 90 17 \
             1 "[Nintendo Switch]     -> Installer l'émulation Switch sur Batocera" \
-            2 "[Rgsx]                -> Installer RGSX l'outils de telechargement de jeux pour Batocera" \
-            3 "[Fpinball]            -> Installer le launcher Future Pinball pour V42 only" \
-            4 "[Youtube TV]          -> Installer Youtube TV" \
-            5 "[Gparted]             -> Installer Gparted" \
-            6 "[Pack Kodi]           -> Installer le pack streaming/iptv kodi" \
-            7 "[Pack Nes3D]          -> Installer le pack Nintendo Nes 3D" \
-            8 "[Pack OpenLara]       -> Installer le pack OpenLara Batocera V38 à V41 seulement" \
-            9 "[Pack Music]          -> Installer le pack Music pour ES" \
-            10 "[Jeux Pc]             -> Téléchargement de Jeux Windows..." \
-            11 "[Wine Toolbox]        -> Téléchargement de Runner Wine et outils wsquash..." \
-            12 "[Update/Downgrade]    -> Mise à jour et Downgrade de Batocera..." \
-            13 "[Tools]               -> Outils pour Batocera. Screenshot, Records..." \
-            14 "[Install dans Ports]  -> Ajoute ce menu aux ports Batocera" \
-            15 "[Underground]         -> !!!Mot de passe nécessaire !!!" \
-            16 "[NFS Underground 2]   -> Installer NFSU2 Revived (version navigateur WebGPU) en Port" \
+            2 "[NFS Underground 2]   -> Installer NFSU2 Revived (version navigateur WebGPU) en Port" \
+            3 "[Rgsx]                -> Installer RGSX l'outils de telechargement de jeux pour Batocera" \
+            4 "[Fpinball]            -> Installer le launcher Future Pinball pour V42 only" \
+            5 "[Youtube TV]          -> Installer Youtube TV" \
+            6 "[Gparted]             -> Installer Gparted" \
+            7 "[Pack Kodi]           -> Installer le pack streaming/iptv kodi" \
+            8 "[Pack Nes3D]          -> Installer le pack Nintendo Nes 3D" \
+            9 "[Pack OpenLara]       -> Installer le pack OpenLara Batocera V38 à V41 seulement" \
+            10 "[Pack Music]          -> Installer le pack Music pour ES" \
+            11 "[Jeux Pc]             -> Téléchargement de Jeux Windows..." \
+            12 "[Wine Toolbox]        -> Téléchargement de Runner Wine et outils wsquash..." \
+            13 "[Update/Downgrade]    -> Mise à jour et Downgrade de Batocera..." \
+            14 "[Tools]               -> Outils pour Batocera. Screenshot, Records..." \
+            15 "[Install dans Ports]  -> Ajoute ce menu aux ports Batocera" \
+            16 "[Underground]         -> !!!Mot de passe nécessaire !!!" \
             17 "[Exit]                -> Quitter le script" \
             2>&1 >/dev/tty)
         clear
@@ -272,72 +272,72 @@ main_menu() {
                 curl -Ls https://raw.githubusercontent.com/foclabroc/batocera-switch/refs/heads/main/system/switch/extra/switch-install.sh | bash
                 ;;
             2)
+                confirm_install "NFS Underground 2 Revived" || continue
+                clear
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/nfsu2/nfsu2.sh | bash
+                ;;
+            3)
                 confirm_install "Rgsx" || continue
                 clear
                 curl -L bit.ly/rgsx-install | sh
                 ;;
-            3)
+            4)
                 confirm_install "Fpinball" || continue
                 clear
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/fpinball/fpinball.sh | bash
                 ;;
-            4)
+            5)
                 confirm_install "Youtube TV" || continue
                 clear
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/youtubetv/youtubetv.sh | bash
                 ;;
-            5)
+            6)
                 confirm_install "Gparted" || continue
                 clear
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/gparted/gparted.sh | bash
                 ;;
-            6)
+            7)
                 confirm_install "Pack Kodi" || continue
                 clear
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/kodi/pack_kodi.sh | bash
                 ;;
-            7)
+            8)
                 confirm_install "Pack Nes3D" || continue
                 clear
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/3d/pack_3d.sh | bash
                 ;;
-            8)  #Pack openlara
+            9)  #Pack openlara
                 clear
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/openlara/pack_lara.sh | bash
                 ;;
-            9)  #Pack Music
+            10)  #Pack Music
                 clear
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/music/music.sh | bash
                 ;;
-            10)  #Jeux windows et linux
+            11)  #Jeux windows et linux
                 clear
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/windows/_win-game.sh | bash
                 ;;
-            11)  #wine tools
+            12)  #wine tools
                 clear
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/wine-tools/wine.sh | bash
                 ;;
-            12)  #update tools
+            13)  #update tools
                 clear
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/updatebat/updatebat.sh | bash
                 ;;
-            13)
+            14)
                 clear
                 tools_options
                 ;;
-            14)
+            15)
                 confirm_install "Ports Installer" || continue 
                 clear
                 wget -q --tries=30 --no-check-certificate -O /tmp/runner https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/install-to-port.sh && chmod +x /tmp/runner && bash /tmp/runner
                 ;;
-            15)  #Underground
+            16)  #Underground
                 clear
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/underground.sh | bash
-                ;;
-            16)
-                confirm_install "NFS Underground 2 Revived" || continue
-                clear
-                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/nfsu2/nfsu2.sh | bash
                 ;;
             17)
                 # Afficher un message de remerciement
