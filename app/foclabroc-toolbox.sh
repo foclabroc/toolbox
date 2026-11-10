@@ -272,7 +272,6 @@ main_menu() {
                 curl -Ls https://raw.githubusercontent.com/foclabroc/batocera-switch/refs/heads/main/system/switch/extra/switch-install.sh | bash
                 ;;
             2)
-                confirm_install "NFS Underground 2 Revived" || continue
                 clear
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/nfsu2/nfsu2.sh | bash
                 ;;

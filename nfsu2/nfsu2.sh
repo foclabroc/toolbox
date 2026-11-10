@@ -4,11 +4,14 @@
 #  Installe un Chromium portable (ungoogled-chromium AppImage, extrait)
 #  + un port lancé en mode kiosk avec WebGPU (Vulkan).
 #
-#  Install / mise à jour :  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/nfsu2/nfsu2.sh | bash
-#  Désinstallation        :  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/nfsu2/nfsu2.sh | bash -s uninstall
+#  Menu          :  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/nfsu2/nfsu2.sh | bash
+#  Désinstaller  :  curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/nfsu2/nfsu2.sh | bash -s uninstall
 #  by foclabroc
 # =====================================================================
 
+# ========== Variables globales ==========
+NOM_PACK="NFS Underground 2 Revived"
+DIALOG_BACKTITLE="Foclabroc Toolbox"
 # Dossier caché dans ports : le "." empêche ES de lister le contenu de Chromium
 APP_DIR="/userdata/roms/ports/.nfsu2"
 OLD_DIRS="/userdata/roms/ports/nfsu2 /userdata/system/pro/nfsu2"
@@ -21,28 +24,38 @@ PORT_KEYS="${PORT_SH}.keys"
 GAME_URL="https://nfsu2.xyz/"
 GH_API="https://api.github.com/repos/ungoogled-software/ungoogled-chromium-portablelinux/releases/latest"
 TMP_DIR="/userdata/roms/ports/.nfsu2_tmp"
+LOG_FILE="/userdata/system/logs/nfsu2.log"
 
-msg()  { echo -e "\e[1;36m[NFSU2]\e[0m $*"; }
-err()  { echo -e "\e[1;31m[NFSU2] ERREUR :\e[0m $*" >&2; }
-
-reload_es() {
-    curl -s -m3 http://127.0.0.1:1234/reloadgames >/dev/null 2>&1
-}
-
-# ---------------------------------------------------------------------
-# Gamelist (même méthode que les autres paquets de la toolbox)
 GAMELIST="/userdata/roms/ports/gamelist.xml"
 GAME_PATH="./${PORT_NAME}.sh"
 MEDIA_URL="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/nfsu2/extra"
 MEDIA_FILES="NFSU2-screenshot.jpg NFSU2-wheel.png NFSU2-cartridge.jpg"
 XMLSTARLET_BIN="/userdata/system/pro/extra/xmlstarlet"
 XMLSTARLET_URL="https://github.com/foclabroc/toolbox/raw/refs/heads/main/app/xmlstarlet"
+# ========================================
 
+[ -f /userdata/system/pro/extra/.dialogrc ] && export DIALOGRC=/userdata/system/pro/extra/.dialogrc
+
+# ---------------------------------------------------------------------
+# Helpers dialog
+d_info() { dialog --backtitle "$DIALOG_BACKTITLE" --title "$NOM_PACK" --infobox "\n$1" 7 60 2>&1 >/dev/tty; }
+d_msg()  { dialog --backtitle "$DIALOG_BACKTITLE" --title "${2:-$NOM_PACK}" --msgbox "\n$1" "${3:-10}" 64 2>&1 >/dev/tty; }
+d_fail() {
+    rm -rf "$TMP_DIR"
+    d_msg "$1" "Erreur" 9
+    clear; exit 1
+}
+
+reload_es() { curl -s -m3 http://127.0.0.1:1234/reloadgames >/dev/null 2>&1; }
+
+is_installed() { [ -f "$PORT_SH" ] && [ -d "$APP_DIR" ]; }
+
+# ---------------------------------------------------------------------
+# Gamelist (même méthode que les autres paquets de la toolbox)
 ensure_xmlstarlet() {
     if [ ! -f "$XMLSTARLET_BIN" ]; then
-        msg "Installation de XMLStarlet (pour l'édition du gamelist)..."
         mkdir -p "$(dirname "$XMLSTARLET_BIN")"
-        curl -# -L "$XMLSTARLET_URL" -o "$XMLSTARLET_BIN"
+        curl -sL "$XMLSTARLET_URL" -o "$XMLSTARLET_BIN"
         chmod +x "$XMLSTARLET_BIN"
     fi
     ln -sf "$XMLSTARLET_BIN" /usr/bin/xmlstarlet
@@ -53,7 +66,6 @@ remove_gamelist_entry() {
 }
 
 add_gamelist_entry() {
-    msg "Ajout des médias et de l'entrée gamelist..."
     mkdir -p /userdata/roms/ports/images /userdata/roms/ports/videos
     for F in $MEDIA_FILES; do
         curl -sL --fail -o "/userdata/roms/ports/images/$F" "$MEDIA_URL/$F"
@@ -84,8 +96,43 @@ add_gamelist_entry() {
 }
 
 # ---------------------------------------------------------------------
+# Téléchargement avec jauge (même principe que le Pack Music)
+telechargement() {
+    local URL="$1" FILE_PATH="$2" LABEL="$3"
+    local FILE_SIZE START_TIME PID_CURL
+    FILE_SIZE=$(curl -sIL "$URL" | grep -i '^content-length' | tail -1 | awk '{print $2}' | tr -d '\r')
+    [ -z "$FILE_SIZE" ] && FILE_SIZE=0
+    START_TIME=$(date +%s)
+
+    curl -sL --fail -o "$FILE_PATH" "$URL" &
+    PID_CURL=$!
+
+    (
+        while kill -0 $PID_CURL 2>/dev/null; do
+            if [ -f "$FILE_PATH" ] && [ "$FILE_SIZE" -gt 0 ]; then
+                CURRENT_SIZE=$(stat -c%s "$FILE_PATH" 2>/dev/null)
+                ELAPSED=$(( $(date +%s) - START_TIME )); [ "$ELAPSED" -eq 0 ] && ELAPSED=1
+                SPEED_MO=$(awk -v s="$CURRENT_SIZE" -v t="$ELAPSED" 'BEGIN{printf "%.2f", s/t/1048576}')
+                PROGRESS=$((CURRENT_SIZE * 100 / FILE_SIZE)); [ "$PROGRESS" -gt 100 ] && PROGRESS=100
+                echo "XXX"
+                echo "$PROGRESS"
+                echo -e "\nTéléchargement de $LABEL..."
+                echo -e "\nVitesse : ${SPEED_MO} Mo/s | Progression : $((CURRENT_SIZE / 1048576)) / $((FILE_SIZE / 1048576)) Mo"
+                echo "XXX"
+            fi
+            sleep 0.3
+        done
+    ) | dialog --backtitle "$DIALOG_BACKTITLE" --title "Téléchargement" --gauge "\nConnexion..." 10 64 0 2>&1 >/dev/tty
+
+    wait $PID_CURL
+}
+
+# ---------------------------------------------------------------------
 uninstall() {
-    msg "Désinstallation..."
+    dialog --backtitle "$DIALOG_BACKTITLE" --title "Désinstallation" --yesno \
+"\nSupprimer $NOM_PACK ?\n\nLe navigateur, le port, les médias et l'entrée gamelist seront retirés.\n\nAttention : les sauvegardes locales du profil navigateur seront perdues (pense à « Download backup » dans le menu du jeu avant)." 14 64 2>&1 >/dev/tty || return
+
+    d_info "Désinstallation en cours..."
     pkill -f "$PROFILE_DIR" 2>/dev/null
     rm -rf "$APP_DIR" "$TMP_DIR"
     rm -f "$PORT_SH" "$PORT_KEYS"
@@ -94,89 +141,69 @@ uninstall() {
     command -v xmlstarlet >/dev/null 2>&1 || ensure_xmlstarlet
     remove_gamelist_entry
     reload_es
-    msg "Terminé (les saves stockées dans le profil navigateur ont été supprimées)."
-    sleep 5
-    exit 0
+    d_msg "$NOM_PACK a été désinstallé." "Désinstallation terminée" 8
 }
 
-[ "$1" = "uninstall" ] && uninstall
-
 # ---------------------------------------------------------------------
-# Vérifications
-if [ "$(uname -m)" != "x86_64" ]; then
-    err "Batocera x86_64 uniquement (WebGPU nécessite un GPU Vulkan desktop)."
-    exit 1
-fi
+install() {
+    local WARN=""
 
-BATO_VER=$(batocera-es-swissknife --version 2>/dev/null | grep -oE '^[0-9]+')
-msg "Batocera v${BATO_VER:-?} détecté."
-
-if command -v batocera-vulkan >/dev/null 2>&1; then
-    if ! batocera-vulkan hasVulkan 2>/dev/null | grep -qi true; then
-        msg "Attention : Vulkan ne semble pas dispo sur ce GPU, WebGPU risque de ne pas démarrer."
-    fi
-fi
-
-# ---------------------------------------------------------------------
-# Migration d'une ancienne install (évite de retélécharger Chromium)
-if [ ! -d "$APP_DIR" ]; then
-    for OLD in $OLD_DIRS; do
-        if [ -d "$OLD/chromium" ]; then
-            msg "Ancienne install trouvée dans $OLD, déplacement vers $APP_DIR..."
-            mv "$OLD" "$APP_DIR"
-            break
+    # Vérifications
+    if command -v batocera-vulkan >/dev/null 2>&1; then
+        if ! batocera-vulkan hasVulkan 2>/dev/null | grep -qi true; then
+            WARN="${WARN}\n- Vulkan ne semble pas dispo sur ce GPU : WebGPU risque de ne pas démarrer."
         fi
-    done
-fi
-
-# ---------------------------------------------------------------------
-# Téléchargement de Chromium (AppImage) — dernière release
-msg "Recherche de la dernière version de ungoogled-chromium..."
-RELEASE_JSON=$(curl -sL "$GH_API")
-APPIMAGE_URL=$(echo "$RELEASE_JSON" \
-    | grep -oE '"browser_download_url": *"[^"]*x86_64[^"]*\.AppImage"' \
-    | head -n1 | sed -E 's/.*"(https[^"]+)"/\1/')
-VERSION=$(echo "$RELEASE_JSON" | grep -oE '"tag_name": *"[^"]+"' | head -n1 | sed -E 's/.*"([^"]+)"$/\1/')
-
-if [ -z "$APPIMAGE_URL" ]; then
-    err "Impossible de trouver l'AppImage Chromium (limite API GitHub ?). Réessaie plus tard."
-    exit 1
-fi
-
-if [ -f "$APP_DIR/version.txt" ] && [ "$(cat "$APP_DIR/version.txt")" = "$VERSION" ] && [ -x "$BROWSER_DIR/AppRun" ]; then
-    msg "Chromium $VERSION déjà à jour."
-else
-    msg "Téléchargement de Chromium $VERSION..."
-    rm -rf "$TMP_DIR" && mkdir -p "$TMP_DIR"
-    if ! curl -L --fail --progress-bar -o "$TMP_DIR/chromium.AppImage" "$APPIMAGE_URL"; then
-        err "Échec du téléchargement."
-        rm -rf "$TMP_DIR"; exit 1
-    fi
-    chmod +x "$TMP_DIR/chromium.AppImage"
-
-    # Extraction une fois pour toutes : pas de FUSE, lancement plus rapide
-    msg "Extraction..."
-    ( cd "$TMP_DIR" && ./chromium.AppImage --appimage-extract >/dev/null 2>&1 )
-    if [ ! -x "$TMP_DIR/squashfs-root/AppRun" ]; then
-        err "Extraction de l'AppImage ratée."
-        rm -rf "$TMP_DIR"; exit 1
     fi
 
-    mkdir -p "$APP_DIR"
-    rm -rf "$BROWSER_DIR"
-    mv "$TMP_DIR/squashfs-root" "$BROWSER_DIR"
-    echo "$VERSION" > "$APP_DIR/version.txt"
-    rm -rf "$TMP_DIR"
-fi
+    # Migration d'une ancienne install (évite de retélécharger Chromium)
+    if [ ! -d "$APP_DIR" ]; then
+        for OLD in $OLD_DIRS; do
+            if [ -d "$OLD/chromium" ]; then
+                d_info "Ancienne installation trouvée :\n$OLD\n\nDéplacement vers le nouveau dossier..."
+                mv "$OLD" "$APP_DIR"
+                break
+            fi
+        done
+    fi
 
-mkdir -p "$PROFILE_DIR"
+    # Dernière version de ungoogled-chromium
+    d_info "Recherche de la dernière version de Chromium..."
+    RELEASE_JSON=$(curl -sL "$GH_API")
+    APPIMAGE_URL=$(echo "$RELEASE_JSON" \
+        | grep -oE '"browser_download_url": *"[^"]*x86_64[^"]*\.AppImage"' \
+        | head -n1 | sed -E 's/.*"(https[^"]+)"/\1/')
+    VERSION=$(echo "$RELEASE_JSON" | grep -oE '"tag_name": *"[^"]+"' | head -n1 | sed -E 's/.*"([^"]+)"$/\1/')
+    [ -z "$APPIMAGE_URL" ] && d_fail "Impossible de trouver l'AppImage Chromium.\n(Limite de l'API GitHub ? Réessaie dans quelques minutes.)"
 
-# ---------------------------------------------------------------------
-# Libs absentes de Batocera
-# libcups.so.2 : stub sans dépendance (594 fonctions CUPS qui renvoient 0).
-# Chromium est lié à CUPS uniquement pour l'impression, inutile ici.
-mkdir -p "$LIBS_DIR"
-base64 -d > "$LIBS_DIR/libcups.so.2.gz" <<'CUPS_STUB'
+    if [ -f "$APP_DIR/version.txt" ] && [ "$(cat "$APP_DIR/version.txt")" = "$VERSION" ] && [ -d "$BROWSER_DIR" ]; then
+        d_info "Chromium $VERSION déjà à jour."
+        sleep 1
+    else
+        rm -rf "$TMP_DIR" && mkdir -p "$TMP_DIR"
+        telechargement "$APPIMAGE_URL" "$TMP_DIR/chromium.AppImage" "Chromium $VERSION"
+        [ -s "$TMP_DIR/chromium.AppImage" ] || d_fail "Le téléchargement de Chromium a échoué."
+        chmod +x "$TMP_DIR/chromium.AppImage"
+
+        # Extraction une fois pour toutes : pas de FUSE, lancement plus rapide
+        d_info "Extraction de Chromium...\n\nÇa peut prendre une minute."
+        ( cd "$TMP_DIR" && ./chromium.AppImage --appimage-extract >/dev/null 2>&1 )
+        [ -d "$TMP_DIR/squashfs-root" ] || d_fail "L'extraction de l'AppImage a échoué."
+
+        mkdir -p "$APP_DIR"
+        rm -rf "$BROWSER_DIR"
+        mv "$TMP_DIR/squashfs-root" "$BROWSER_DIR"
+        echo "$VERSION" > "$APP_DIR/version.txt"
+        rm -rf "$TMP_DIR"
+    fi
+
+    mkdir -p "$PROFILE_DIR"
+
+    # Libs absentes de Batocera
+    # libcups.so.2 : stub sans dépendance (594 fonctions CUPS qui renvoient 0).
+    # Chromium est lié à CUPS uniquement pour l'impression, inutile ici.
+    d_info "Configuration du navigateur..."
+    mkdir -p "$LIBS_DIR"
+    base64 -d > "$LIBS_DIR/libcups.so.2.gz" <<'CUPS_STUB'
 H4sICKTZ8moCA2xpYmN1cHMuc28uMgCcWwl8TNf3fxOJJARjKamtY1e0HbFryUSCxBIjCbE2M5IJ
 IZkZMxNElUmIpZaMWGsdkVqLsbW11aAURVNLW0uJraqqorXUVv97Z75v5s0Rv//v/8/nc917zrvv
 3nPPfs8bk7r26uYnkwniXxmhs+CFBEGFfp1cJsG1F8qzfysIIa65/sLr/xpN8e0Fubvj7wXwgQ14
@@ -486,34 +513,28 @@ ydp9etiknD4q4+fl/MdPD5uS00dk/LnudeFpub4EPnrv8PUlKj/H/Pco//nkyWJw/uD6FWiO1f1+
 fPf8wfItd1jzf1j+oPX/mpy/8d1ha+M/ePsvdC/7M92x/eHOb2g/29Gzhm/fUfk9lrrLt/WKGe+c
 /wXr+6+/QZ/5PtfrF7rn/xXrB6///wF0/Xfy6BMBAA==
 CUPS_STUB
-gunzip -f "$LIBS_DIR/libcups.so.2.gz"
-if [ "$(md5sum "$LIBS_DIR/libcups.so.2" | cut -d' ' -f1)" != "c1fb903802b4d1f4619b841e61acf42e" ]; then
-    err "Stub libcups corrompu."; exit 1
-fi
+    gunzip -f "$LIBS_DIR/libcups.so.2.gz"
+    [ "$(md5sum "$LIBS_DIR/libcups.so.2" | cut -d' ' -f1)" = "c1fb903802b4d1f4619b841e61acf42e" ] || d_fail "Le stub libcups est corrompu."
 
-CHROME_BIN=$(find "$BROWSER_DIR" -type f -name chrome -perm -u+x | head -n1)
-if [ -z "$CHROME_BIN" ]; then
-    err "Binaire chrome introuvable dans $BROWSER_DIR."; exit 1
-fi
-# L'AppRun d'origine écrase LD_LIBRARY_PATH : on lance chrome directement
-LIB_PATH="$LIBS_DIR:$BROWSER_DIR/usr/lib"
-MISSING=$(LD_LIBRARY_PATH="$LIB_PATH" ldd "$CHROME_BIN" 2>/dev/null | grep "not found")
-if [ -n "$MISSING" ]; then
-    err "Libs encore manquantes :"; echo "$MISSING"
-fi
+    CHROME_BIN=$(find "$BROWSER_DIR" -type f -name chrome -perm -u+x | head -n1)
+    [ -n "$CHROME_BIN" ] || d_fail "Binaire chrome introuvable dans :\n$BROWSER_DIR"
 
-# ---------------------------------------------------------------------
-# Lanceur (APP_DIR/launch.sh) : séparé du port pour pouvoir le mettre à jour
-cat > "$APP_DIR/launch.sh" <<EOF
+    # L'AppRun d'origine écrase LD_LIBRARY_PATH : on lance chrome directement
+    LIB_PATH="$LIBS_DIR:$BROWSER_DIR/usr/lib"
+    MISSING=$(LD_LIBRARY_PATH="$LIB_PATH" ldd "$CHROME_BIN" 2>/dev/null | grep "not found" | awk '{print $1}' | tr '\n' ' ')
+    [ -n "$MISSING" ] && WARN="${WARN}\n- Libs manquantes : $MISSING"
+
+    # Lanceur : séparé du port pour pouvoir le mettre à jour
+    cat > "$APP_DIR/launch.sh" <<EOF
 #!/bin/bash
-# Lanceur NFSU2 Revived — généré par nfsu2_installer.sh
-LOG=/userdata/system/logs/nfsu2.log
+# Lanceur NFSU2 Revived — généré par nfsu2.sh (Foclabroc Toolbox)
+LOG=$LOG_FILE
 export DISPLAY="\${DISPLAY:-:0.0}"
 export HOME=/userdata/system
 export LD_LIBRARY_PATH="$LIB_PATH"
 export CHROME_WRAPPER="$APP_DIR/launch.sh"
 
-# Flags ajoutables sans toucher au script : /userdata/system/pro/nfsu2/extra_flags.txt
+# Flags ajoutables sans toucher au script : $APP_DIR/extra_flags.txt
 EXTRA=""
 [ -f "$APP_DIR/extra_flags.txt" ] && EXTRA=\$(grep -v '^#' "$APP_DIR/extra_flags.txt" | tr '\n' ' ')
 
@@ -533,18 +554,18 @@ EXTRA=""
     --disable-print-preview \\
     \$EXTRA > "\$LOG" 2>&1
 EOF
-chmod +x "$APP_DIR/launch.sh"
+    chmod +x "$APP_DIR/launch.sh"
 
-# Port visible dans EmulationStation
-mkdir -p /userdata/roms/ports
-cat > "$PORT_SH" <<EOF
+    # Port visible dans EmulationStation
+    mkdir -p /userdata/roms/ports
+    cat > "$PORT_SH" <<EOF
 #!/bin/bash
 exec "$APP_DIR/launch.sh"
 EOF
-chmod +x "$PORT_SH"
+    chmod +x "$PORT_SH"
 
-# Hotkey + Start = quitter (evmapy)
-cat > "$PORT_KEYS" <<EOF
+    # Hotkey + Start = quitter (evmapy)
+    cat > "$PORT_KEYS" <<EOF
 {
     "actions_player1": [
         {
@@ -556,14 +577,50 @@ cat > "$PORT_KEYS" <<EOF
 }
 EOF
 
-reload_es
-add_gamelist_entry
-reload_es
+    d_info "Ajout des médias et de l'entrée gamelist..."
+    reload_es
+    add_gamelist_entry
+    reload_es
 
-msg "Installation terminée !"
-msg "Jeu dispo dans PORTS > ${PORT_NAME}"
-msg "Quitter : Hotkey + Start"
-msg "Diagnostic WebGPU / logs : /userdata/system/logs/nfsu2.log"
+    local FIN="Installation terminée !\n\nJeu dispo dans : PORTS > $PORT_NAME\nQuitter : Hotkey + Start\nLogs : $LOG_FILE"
+    if [ -n "$WARN" ]; then
+        d_msg "$FIN\n\nAttention :$WARN" "Installation terminée" 16
+    else
+        d_msg "$FIN" "Installation terminée" 12
+    fi
+}
 
-# Laisse le temps de lire avant la fermeture de l'xterm de la toolbox
-sleep 5
+# ---------------------------------------------------------------------
+# Lancement
+if [ "$(uname -m)" != "x86_64" ]; then
+    d_msg "Ce pack ne fonctionne que sur Batocera PC x86_64\n(WebGPU nécessite un GPU Vulkan desktop)." "Architecture $(uname -m)" 9
+    clear; exit 1
+fi
+
+if [ "$1" = "uninstall" ]; then
+    uninstall
+    clear; exit 0
+fi
+
+if is_installed; then
+    ETAT="Installé (Chromium $(cat "$APP_DIR/version.txt" 2>/dev/null))"
+    LABEL_INSTALL="Mettre à jour / réinstaller"
+else
+    ETAT="Non installé"
+    LABEL_INSTALL="Installer"
+fi
+
+CHOIX=$(dialog --backtitle "$DIALOG_BACKTITLE" --title "$NOM_PACK" --menu \
+"\nNeed for Speed Underground 2 en version navigateur (nfsu2.xyz) dans les Ports.\nConnexion Internet obligatoire, GPU Vulkan recommandé.\n\nÉtat : $ETAT\n " 17 70 3 \
+    1 "$LABEL_INSTALL" \
+    2 "Désinstaller" \
+    3 "Retour" \
+    2>&1 >/dev/tty)
+
+case $CHOIX in
+    1) install ;;
+    2) if is_installed; then uninstall; else d_msg "$NOM_PACK n'est pas installé." "Désinstallation" 7; fi ;;
+esac
+
+clear
+exit 0
