@@ -31,7 +31,7 @@ GAME_PATH="./${PORT_NAME}.sh"
 MEDIA_URL="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/nfsu2/extra"
 MEDIA_FILES="NFSU2-screenshot.jpg NFSU2-wheel.png NFSU2-cartridge.jpg"
 OSK_URL="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/nfsu2/osk"
-OSK_FILES="manifest.json main_world.js padmap.js osk.js"
+OSK_FILES="manifest.json main_world.js padmap.js osk.js bg.js"
 XMLSTARLET_BIN="/userdata/system/pro/extra/xmlstarlet"
 XMLSTARLET_URL="https://github.com/foclabroc/toolbox/raw/refs/heads/main/app/xmlstarlet"
 # ========================================
@@ -637,7 +637,7 @@ EOF
     d_info "Ajout des médias et de l'entrée gamelist..."
     add_gamelist_entry
 
-    local FIN="Installation terminée !\n\nJeu dispo dans : PORTS > $PORT_NAME\nQuitter : Hotkey + Start\nSouris : stick droit, clic : R3\nClavier virtuel : L3 (ou sélectionner un champ)\nLogs : $LOG_FILE"
+    local FIN="Installation terminée !\n\nJeu dispo dans : PORTS > $PORT_NAME\nQuitter : Hotkey + Start (ou Select + Start)\nSouris : stick droit, clic : R3\nClavier virtuel : L3 (ou sélectionner un champ)\nLogs : $LOG_FILE"
     [ -n "$GAMELIST_DEFERRED" ] && FIN="${FIN}\n\nLa fiche du jeu (jaquette, vidéo, description) sera ajoutée dans quelques secondes, une fois la toolbox fermée."
     if [ -n "$WARN" ]; then
         d_msg "$FIN\n\nAttention :$WARN" "Installation terminée" 19

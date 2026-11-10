@@ -3,6 +3,7 @@
 // ou au tactile), ou avec L3 (clic stick gauche). R3 = clic souris (evmapy).
 // Manette : croix/stick = se déplacer, A = taper, B = effacer, X = espace,
 //           Y = majuscules, Start = valider, L3 = ouvrir/fermer.
+// Select + Start (ou Guide + Start) = quitter le jeu, même si evmapy ne voit plus la manette.
 (() => {
   'use strict';
   if (window.__nfsu2OskLoaded) return;
@@ -268,7 +269,7 @@
     const m = tok.match(/^(\w+):b(\d+)$/);
     if (m) sdl[m[1]] = +m[2];
   });
-  const STD = { a: 0, b: 1, x: 2, y: 3, start: 9, leftstick: 10, dpup: 12, dpdown: 13, dpleft: 14, dpright: 15 };
+  const STD = { a: 0, b: 1, x: 2, y: 3, back: 8, start: 9, leftstick: 10, guide: 16, dpup: 12, dpdown: 13, dpleft: 14, dpright: 15 };
 
   const read = (gp) => {
     const map = gp.mapping === 'standard' ? STD : sdl;
@@ -283,7 +284,7 @@
       left: btn('dpleft') || ax(0) < -0.6,
       right: btn('dpright') || ax(0) > 0.6,
       a: btn('a'), b: btn('b'), x: btn('x'), y: btn('y'),
-      start: btn('start'), l3: btn('leftstick'),
+      start: btn('start'), l3: btn('leftstick'), back: btn('back'), guide: btn('guide'),
     };
   };
 
@@ -304,10 +305,15 @@
   const loop = (now) => {
     const pads = navigator.getGamepads ? [...navigator.getGamepads()].filter(Boolean) : [];
     // Fusionne toutes les manettes : n'importe laquelle peut taper
-    const s = { up: false, down: false, left: false, right: false, a: false, b: false, x: false, y: false, start: false, l3: false };
+    const s = { up: false, down: false, left: false, right: false, a: false, b: false, x: false, y: false, start: false, l3: false, back: false, guide: false };
     for (const gp of pads) {
       const r = read(gp);
       for (const k in s) s[k] = s[k] || r[k];
+    }
+
+    // Quitter : Select + Start ou Guide + Start
+    if (edge('quit', now, (s.back || s.guide) && s.start, false)) {
+      try { chrome.runtime.sendMessage({ nfsu2Quit: true }); } catch (e) {}
     }
 
     if (edge('l3', now, s.l3, false)) {
