@@ -244,7 +244,7 @@ main_menu() {
     while true; do
         main_menu=$(dialog --clear --backtitle "Foclabroc Toolbox" \
             --title "Menu Principal" \
-            --menu "\nSélectionnez une option :\n " 24 90 16 \
+            --menu "\nSélectionnez une option :\n " 25 90 17 \
             1 "[Nintendo Switch]     -> Installer l'émulation Switch sur Batocera" \
             2 "[Rgsx]                -> Installer RGSX l'outils de telechargement de jeux pour Batocera" \
             3 "[Fpinball]            -> Installer le launcher Future Pinball pour V42 only" \
@@ -260,7 +260,8 @@ main_menu() {
             13 "[Tools]               -> Outils pour Batocera. Screenshot, Records..." \
             14 "[Install dans Ports]  -> Ajoute ce menu aux ports Batocera" \
             15 "[Underground]         -> !!!Mot de passe nécessaire !!!" \
-            16 "[Exit]                -> Quitter le script" \
+            16 "[NFS Underground 2]   -> Installer NFSU2 Revived (version navigateur WebGPU) en Port" \
+            17 "[Exit]                -> Quitter le script" \
             2>&1 >/dev/tty)
         clear
 
@@ -334,6 +335,11 @@ main_menu() {
                 curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/app/underground.sh | bash
                 ;;
             16)
+                confirm_install "NFS Underground 2 Revived" || continue
+                clear
+                curl -Ls https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/nfsu2/nfsu2.sh | bash
+                ;;
+            17)
                 # Afficher un message de remerciement
                 dialog --backtitle "Foclabroc Toolbox" --title "Quitter" --textbox "$tmpfile1" 20 78 2>&1 >/dev/tty
                 killall -9 xterm
