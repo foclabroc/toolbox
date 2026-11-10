@@ -9,6 +9,8 @@ let ws = null;
 let connected = false;
 let last = null;
 let retry = null;
+let attempts = 0;
+let info = 'démarrage';
 
 const send = (msg) => {
   for (const p of ports) {
@@ -19,18 +21,23 @@ const send = (msg) => {
 const connectBridge = () => {
   if (ws && ws.readyState <= 1) return;
   clearTimeout(retry);
+  attempts += 1;
   try {
     ws = new WebSocket(BRIDGE_URL);
   } catch (err) {
+    info = 'WebSocket refusé : ' + err.message;
+    send({ status: false, info });
     retry = setTimeout(connectBridge, 2000);
     return;
   }
-  ws.onopen = () => { connected = true; send({ status: true }); };
+  info = 'tentative ' + attempts;
+  ws.onopen = () => { connected = true; info = 'ouvert (tentative ' + attempts + ')'; send({ status: true, info }); };
   ws.onmessage = (m) => { last = m.data; send({ state: m.data }); };
-  ws.onclose = () => {
+  ws.onclose = (ev) => {
     connected = false;
     ws = null;
-    send({ status: false });
+    info = 'fermé, code ' + ev.code + ' (tentative ' + attempts + ')';
+    send({ status: false, info });
     retry = setTimeout(connectBridge, 2000);
   };
   ws.onerror = () => { try { ws.close(); } catch (err) {} };
@@ -40,7 +47,7 @@ chrome.runtime.onConnect.addListener((port) => {
   if (port.name !== 'nfsu2pad') return;
   ports.add(port);
   port.onDisconnect.addListener(() => ports.delete(port));
-  port.postMessage({ status: connected });
+  port.postMessage({ status: connected, info });
   if (last) port.postMessage({ state: last });
   connectBridge();
 });

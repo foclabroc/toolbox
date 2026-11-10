@@ -246,26 +246,68 @@
   // ds4emu.py envoie l'état des manettes (ordre Standard Gamepad) au script de fond
   // (bg.js), qui le transmet ici. On le relaie à la page (main_world.js) et on s'en
   // sert pour le clavier virtuel.
-  const bridge = { pads: null, time: 0, connected: false };
+  const BRIDGE_URL = 'ws://127.0.0.1:47820';
+  const bridge = {
+    pads: null, time: 0, connected: false, via: '-',
+    bg: 'aucune réponse', bgInfo: '', direct: 'inactif', directInfo: '',
+  };
+  const onState = (raw, via) => {
+    let d;
+    try { d = JSON.parse(raw); } catch (err) { return; }
+    bridge.connected = true;
+    bridge.via = via;
+    bridge.pads = d.pads || [];
+    bridge.time = performance.now();
+    window.postMessage({ __nfsu2pad: d }, '*');
+  };
+  let directWs = null;
   if (window.top === window) {
+    // 1. Par le script de fond (bg.js)
     const connectPort = () => {
       let port;
-      try { port = chrome.runtime.connect({ name: 'nfsu2pad' }); } catch (err) { setTimeout(connectPort, 1000); return; }
+      try {
+        port = chrome.runtime.connect({ name: 'nfsu2pad' });
+      } catch (err) {
+        bridge.bg = 'erreur : ' + err.message;
+        setTimeout(connectPort, 1000);
+        return;
+      }
       port.onMessage.addListener((msg) => {
-        if ('status' in msg) bridge.connected = msg.status;
-        if (msg.state) {
-          let d;
-          try { d = JSON.parse(msg.state); } catch (err) { return; }
-          bridge.connected = true;
-          bridge.pads = d.pads || [];
-          bridge.time = performance.now();
-          window.postMessage({ __nfsu2pad: d }, '*');
-        }
+        if ('status' in msg) { bridge.bg = msg.status ? 'connecté au pont' : 'répond, pont non joint'; }
+        if (msg.info) bridge.bgInfo = msg.info;
+        if (msg.state && !directWs) onState(msg.state, 'script de fond');
       });
       // Le script de fond peut être recyclé par Chromium : on se reconnecte
-      port.onDisconnect.addListener(() => { bridge.connected = false; setTimeout(connectPort, 500); });
+      port.onDisconnect.addListener(() => {
+        const err = chrome.runtime.lastError;
+        bridge.bg = 'déconnecté' + (err ? ' : ' + err.message : '');
+        setTimeout(connectPort, 1000);
+      });
     };
     connectPort();
+
+    // 2. Plan B : connexion directe depuis la page si rien n'arrive par le script de fond
+    const connectDirect = () => {
+      try {
+        directWs = new WebSocket(BRIDGE_URL);
+      } catch (err) {
+        bridge.direct = 'refusé : ' + err.message;
+        directWs = null;
+        return;
+      }
+      bridge.direct = 'connexion...';
+      directWs.onopen = () => { bridge.direct = 'connecté'; };
+      directWs.onmessage = (m) => onState(m.data, 'connexion directe');
+      directWs.onerror = () => { bridge.direct = 'erreur'; };
+      directWs.onclose = (ev) => {
+        bridge.direct = 'fermé (code ' + ev.code + ')';
+        directWs = null;
+      };
+    };
+    setInterval(() => {
+      const stale = performance.now() - bridge.time > 3000;
+      if (stale && !directWs) connectDirect();
+    }, 3000);
   }
   const bridgeFresh = () => bridge.pads && performance.now() - bridge.time < 1500;
   // Manettes au format Standard Gamepad, depuis le pont si actif, sinon Chromium
@@ -386,8 +428,9 @@
     const dbg = () => {
       const pads = navigator.getGamepads ? [...navigator.getGamepads()] : [];
       const lines = [
-        'Pont manette : ' + (bridge.connected ? 'connecté' : 'non connecté') +
-          (bridgeFresh() ? ' (' + bridge.pads.length + ' manette(s))' : ''),
+        'Pont manette : ' + (bridgeFresh() ? 'connecté via ' + bridge.via + ' (' + bridge.pads.length + ' manette(s))' : 'non connecté'),
+        '  script de fond : ' + bridge.bg + (bridge.bgInfo ? ' | ' + bridge.bgInfo : ''),
+        '  connexion directe : ' + bridge.direct,
       ];
       (bridgeFresh() ? bridge.pads : []).forEach((p, i) => {
         const on = p.buttons.map((v, j) => (v > 0.12 ? j + (v < 1 ? '=' + v.toFixed(2) : '') : null)).filter((x) => x !== null);
