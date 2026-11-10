@@ -96,31 +96,56 @@ def sdl_layout(dev):
     return buttons, axes, hats, absinfo
 
 
-# --------------------------------------------------------------- DS4 virtuelle
-DS4_BUTTONS = {
-    "a": e.BTN_SOUTH, "b": e.BTN_EAST, "x": e.BTN_WEST, "y": e.BTN_NORTH,
-    "leftshoulder": e.BTN_TL, "rightshoulder": e.BTN_TR,
-    "back": e.BTN_SELECT, "start": e.BTN_START, "guide": e.BTN_MODE,
-    "leftstick": e.BTN_THUMBL, "rightstick": e.BTN_THUMBR,
+# --------------------------------------------------------------- manettes virtuelles
+# Deux identités possibles :
+#  - ds4  : DualShock 4 (disposition hid-playstation, 054c:09cc)
+#  - xbox : Xbox 360 (disposition xpad, 045e:028e), celle de Steam Input
+PROFILES = {
+    "ds4": {
+        "name": DS4_NAME, "vendor": 0x054C, "product": 0x09CC, "version": 0x8111,
+        # Carré = BTN_WEST, triangle = BTN_NORTH (hid-playstation)
+        "buttons": {"a": e.BTN_SOUTH, "b": e.BTN_EAST, "x": e.BTN_WEST, "y": e.BTN_NORTH,
+                    "leftshoulder": e.BTN_TL, "rightshoulder": e.BTN_TR,
+                    "back": e.BTN_SELECT, "start": e.BTN_START, "guide": e.BTN_MODE,
+                    "leftstick": e.BTN_THUMBL, "rightstick": e.BTN_THUMBR},
+        "stick": (0, 255),
+        "triggers": {"lefttrigger": (e.ABS_Z, e.BTN_TL2), "righttrigger": (e.ABS_RZ, e.BTN_TR2)},
+    },
+    "xbox": {
+        "name": "Microsoft X-Box 360 pad", "vendor": 0x045E, "product": 0x028E, "version": 0x0114,
+        # xpad : X (gauche) = 0x133, Y (haut) = 0x134
+        "buttons": {"a": e.BTN_SOUTH, "b": e.BTN_EAST, "x": 0x133, "y": 0x134,
+                    "leftshoulder": e.BTN_TL, "rightshoulder": e.BTN_TR,
+                    "back": e.BTN_SELECT, "start": e.BTN_START, "guide": e.BTN_MODE,
+                    "leftstick": e.BTN_THUMBL, "rightstick": e.BTN_THUMBR},
+        "stick": (-32768, 32767),
+        "triggers": {"lefttrigger": (e.ABS_Z, None), "righttrigger": (e.ABS_RZ, None)},
+    },
 }
-DS4_STICKS = {"leftx": e.ABS_X, "lefty": e.ABS_Y, "rightx": e.ABS_RX, "righty": e.ABS_RY}
-DS4_TRIGGERS = {"lefttrigger": (e.ABS_Z, e.BTN_TL2), "righttrigger": (e.ABS_RZ, e.BTN_TR2)}
+STICKS = {"leftx": e.ABS_X, "lefty": e.ABS_Y, "rightx": e.ABS_RX, "righty": e.ABS_RY}
 DPAD = ("dpup", "dpdown", "dpleft", "dpright")
+IDENTITY = "ds4"
 
 
-def make_ds4():
-    stick = AbsInfo(value=128, min=0, max=255, fuzz=0, flat=0, resolution=0)
+def make_virtual():
+    p = PROFILES[IDENTITY]
+    lo, hi = p["stick"]
+    stick = AbsInfo(value=(lo + hi + 1) // 2, min=lo, max=hi, fuzz=0, flat=0, resolution=0)
     trig = AbsInfo(value=0, min=0, max=255, fuzz=0, flat=0, resolution=0)
     hat = AbsInfo(value=0, min=-1, max=1, fuzz=0, flat=0, resolution=0)
+    keys = list(p["buttons"].values()) + [b for _, b in p["triggers"].values() if b]
     caps = {
-        e.EV_KEY: [e.BTN_SOUTH, e.BTN_EAST, e.BTN_NORTH, e.BTN_WEST, e.BTN_TL, e.BTN_TR,
-                   e.BTN_TL2, e.BTN_TR2, e.BTN_SELECT, e.BTN_START, e.BTN_MODE,
-                   e.BTN_THUMBL, e.BTN_THUMBR],
+        e.EV_KEY: sorted(set(keys)),
         e.EV_ABS: [(e.ABS_X, stick), (e.ABS_Y, stick), (e.ABS_Z, trig),
                    (e.ABS_RX, stick), (e.ABS_RY, stick), (e.ABS_RZ, trig),
                    (e.ABS_HAT0X, hat), (e.ABS_HAT0Y, hat)],
     }
-    return UInput(caps, name=DS4_NAME, vendor=0x054C, product=0x09CC, version=0x8111, bustype=e.BUS_USB)
+    return UInput(caps, name=p["name"], vendor=p["vendor"], product=p["product"],
+                  version=p["version"], bustype=e.BUS_USB)
+
+
+def make_ds4():
+    return make_virtual()
 
 
 def make_mouse():
@@ -213,16 +238,19 @@ class Pad:
         return False
 
     def sync(self):
+        p = PROFILES[IDENTITY]
+        lo, hi = p["stick"]
         changed = False
-        for name, code in DS4_BUTTONS.items():
+        for name, code in p["buttons"].items():
             changed |= self._emit(e.EV_KEY, code, 1 if self.target(name) > 0.5 else 0)
-        for name, code in DS4_STICKS.items():
+        for name, code in STICKS.items():
             v = max(-1.0, min(1.0, self.target(name)))
-            changed |= self._emit(e.EV_ABS, code, int(round((v + 1.0) * 127.5)))
-        for name, (acode, bcode) in DS4_TRIGGERS.items():
+            changed |= self._emit(e.EV_ABS, code, int(round(lo + (v + 1.0) / 2.0 * (hi - lo))))
+        for name, (acode, bcode) in p["triggers"].items():
             v = self.trigger(name)
             changed |= self._emit(e.EV_ABS, acode, int(round(v * 255)))
-            changed |= self._emit(e.EV_KEY, bcode, 1 if v > 0.1 else 0)
+            if bcode:
+                changed |= self._emit(e.EV_KEY, bcode, 1 if v > 0.1 else 0)
         up, down, left, right = (self.target(d) > 0.5 for d in DPAD)
         changed |= self._emit(e.EV_ABS, e.ABS_HAT0X, int(right) - int(left))
         changed |= self._emit(e.EV_ABS, e.ABS_HAT0Y, int(down) - int(up))
@@ -363,7 +391,11 @@ def main():
     ap.add_argument("--quit", default="", help="commande lancée sur Hotkey + Start")
     ap.add_argument("--no-mouse", action="store_true")
     ap.add_argument("--mouse-speed", type=float, default=14.0)
+    ap.add_argument("--identity", choices=sorted(PROFILES), default="ds4")
     args = ap.parse_args()
+    global IDENTITY
+    IDENTITY = args.identity
+    log(f"Identité des manettes virtuelles : {PROFILES[IDENTITY]['name']}")
 
     cleanup_stale_rule()
     configs = parse_sdl_configs(os.environ.get("SDL_GAMECONTROLLERCONFIG", ""))
@@ -393,7 +425,7 @@ def main():
         pad = Pad(dev, mapping, hk, st, mouse)
         pads[dev.fd] = pad
         parents.append(input_parent(path))
-        log(f"{dev.name} ({path}, GUID {guid}) -> DS4 virtuelle {pad.ds4.device.path}"
+        log(f"{dev.name} ({path}, GUID {guid}) -> virtuelle {pad.ds4.device.path}"
             f" | hotkey={hk} start={st} | {len(pad.buttons)} boutons, {len(pad.axes)} axes, {len(pad.hats)} hats")
 
     if not pads:

@@ -597,7 +597,10 @@ WEBHID_FLAG="--disable-blink-features=WebHID"
 # (désactivable : touch $APP_DIR/disable_ds4). Log : $APP_DIR/ds4emu.log
 EMU_PID=""
 if [ ! -f "$APP_DIR/disable_ds4" ] && [ -f "$APP_DIR/ds4emu.py" ]; then
-    python3 "$APP_DIR/ds4emu.py" --quit "pkill -f $PROFILE_DIR" > "$APP_DIR/ds4emu.log" 2>&1 &
+    # Identité Xbox 360 au lieu de DS4 : touch $APP_DIR/pad_xbox
+    IDENTITY=ds4
+    [ -f "$APP_DIR/pad_xbox" ] && IDENTITY=xbox
+    python3 "$APP_DIR/ds4emu.py" --identity \$IDENTITY --quit "pkill -f $PROFILE_DIR" > "$APP_DIR/ds4emu.log" 2>&1 &
     EMU_PID=\$!
     sleep 1
 fi
