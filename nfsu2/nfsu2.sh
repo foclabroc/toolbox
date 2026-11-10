@@ -30,11 +30,69 @@ reload_es() {
 }
 
 # ---------------------------------------------------------------------
+# Gamelist (même méthode que les autres paquets de la toolbox)
+GAMELIST="/userdata/roms/ports/gamelist.xml"
+GAME_PATH="./${PORT_NAME}.sh"
+MEDIA_URL="https://raw.githubusercontent.com/foclabroc/toolbox/refs/heads/main/nfsu2/extra"
+MEDIA_FILES="NFSU2-screenshot.jpg NFSU2-wheel.png NFSU2-cartridge.jpg"
+XMLSTARLET_BIN="/userdata/system/pro/extra/xmlstarlet"
+XMLSTARLET_URL="https://github.com/foclabroc/toolbox/raw/refs/heads/main/app/xmlstarlet"
+
+ensure_xmlstarlet() {
+    if [ ! -f "$XMLSTARLET_BIN" ]; then
+        msg "Installation de XMLStarlet (pour l'édition du gamelist)..."
+        mkdir -p "$(dirname "$XMLSTARLET_BIN")"
+        curl -# -L "$XMLSTARLET_URL" -o "$XMLSTARLET_BIN"
+        chmod +x "$XMLSTARLET_BIN"
+    fi
+    ln -sf "$XMLSTARLET_BIN" /usr/bin/xmlstarlet
+}
+
+remove_gamelist_entry() {
+    [ -f "$GAMELIST" ] && xmlstarlet ed -L -d "/gameList/game[path=\"$GAME_PATH\"]" "$GAMELIST" 2>/dev/null
+}
+
+add_gamelist_entry() {
+    msg "Ajout des médias et de l'entrée gamelist..."
+    mkdir -p /userdata/roms/ports/images /userdata/roms/ports/videos
+    for F in $MEDIA_FILES; do
+        curl -sL --fail -o "/userdata/roms/ports/images/$F" "$MEDIA_URL/$F"
+    done
+    curl -sL --fail -o "/userdata/roms/ports/videos/NFSU2-video.mp4" "$MEDIA_URL/NFSU2-video.mp4"
+
+    [ -f "$GAMELIST" ] || echo '<?xml version="1.0" encoding="UTF-8"?><gameList></gameList>' > "$GAMELIST"
+    ensure_xmlstarlet
+    remove_gamelist_entry
+    xmlstarlet ed -L \
+        -s "/gameList" -t elem -n "game" -v "" \
+        -s "/gameList/game[last()]" -t elem -n "path" -v "$GAME_PATH" \
+        -s "/gameList/game[last()]" -t elem -n "name" -v "Need for Speed Underground 2 Revived" \
+        -s "/gameList/game[last()]" -t elem -n "desc" -v "Need for Speed: Underground 2 (2004) dans sa version Revived, le code du jeu PC recompilé pour le navigateur (WebGPU) par un projet fan. Course de rue nocturne dans la ville de Bayview : tuning poussé, free roam, drift, drag, URL et Street X. Jusqu'à 120 fps en écran large, support manette et volant, sauvegardes en ligne et courses Online en free roam avec tes amis et ton crew. Connexion Internet obligatoire. Quitter : Hotkey + Start. Projet fan non affilié à Electronic Arts." \
+        -s "/gameList/game[last()]" -t elem -n "developer" -v "EA Black Box" \
+        -s "/gameList/game[last()]" -t elem -n "publisher" -v "Electronic Arts" \
+        -s "/gameList/game[last()]" -t elem -n "genre" -v "Course" \
+        -s "/gameList/game[last()]" -t elem -n "players" -v "4+" \
+        -s "/gameList/game[last()]" -t elem -n "releasedate" -v "20041109T000000" \
+        -s "/gameList/game[last()]" -t elem -n "rating" -v "0.90" \
+        -s "/gameList/game[last()]" -t elem -n "region" -v "eu" \
+        -s "/gameList/game[last()]" -t elem -n "lang" -v "fr" \
+        -s "/gameList/game[last()]" -t elem -n "image" -v "./images/NFSU2-screenshot.jpg" \
+        -s "/gameList/game[last()]" -t elem -n "wheel" -v "./images/NFSU2-wheel.png" \
+        -s "/gameList/game[last()]" -t elem -n "thumbnail" -v "./images/NFSU2-cartridge.jpg" \
+        -s "/gameList/game[last()]" -t elem -n "video" -v "./videos/NFSU2-video.mp4" \
+        "$GAMELIST"
+}
+
+# ---------------------------------------------------------------------
 uninstall() {
     msg "Désinstallation..."
     pkill -f "$PROFILE_DIR" 2>/dev/null
     rm -rf "$APP_DIR" "$TMP_DIR"
     rm -f "$PORT_SH" "$PORT_KEYS"
+    for F in $MEDIA_FILES; do rm -f "/userdata/roms/ports/images/$F"; done
+    rm -f /userdata/roms/ports/videos/NFSU2-video.mp4
+    command -v xmlstarlet >/dev/null 2>&1 || ensure_xmlstarlet
+    remove_gamelist_entry
     reload_es
     msg "Terminé (les saves stockées dans le profil navigateur ont été supprimées)."
     sleep 5
@@ -498,6 +556,8 @@ cat > "$PORT_KEYS" <<EOF
 }
 EOF
 
+reload_es
+add_gamelist_entry
 reload_es
 
 msg "Installation terminée !"
