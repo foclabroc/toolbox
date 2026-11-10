@@ -273,7 +273,7 @@ class Pad:
 def is_gamepad(dev):
     """Vrai gamepad : sticks (ABS_X/ABS_Y) + boutons de manette.
     Écarte le clavier et la souris virtuels des trackpads (hid-steam) et les capteurs."""
-    caps = dev.capabilities()
+    caps = dev.capabilities(absinfo=False)
     absc = set(caps.get(e.EV_ABS, []))
     keys = set(caps.get(e.EV_KEY, []))
     if e.ABS_X not in absc or e.ABS_Y not in absc:
