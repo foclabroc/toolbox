@@ -561,6 +561,8 @@ def main():
     ap.add_argument("--quit", default="", help="commande lancée sur Hotkey + Start")
     ap.add_argument("--no-mouse", action="store_true")
     ap.add_argument("--mouse-speed", type=float, default=14.0)
+    ap.add_argument("--deadzone", type=float, default=0.30,
+                    help="zone morte du stick souris (0-0.9), à augmenter en cas de drift")
     ap.add_argument("--identity", choices=["ds4", "xbox"], default="ds4",
                     help="manette annoncée au site")
     ap.add_argument("--port", type=int, default=WS_PORT)
@@ -681,15 +683,18 @@ def main():
             last_t = now
             if mouse:
                 dx = dy = 0.0
+                dz = max(0.0, min(0.9, args.deadzone))
                 for pad in pads.values():
-                    for v, axis in ((pad.target("rightx"), "x"), (pad.target("righty"), "y")):
-                        if abs(v) > 0.2:
-                            s = (abs(v) - 0.2) / 0.8
-                            step = (s ** 2) * args.mouse_speed * dt * (1 if v > 0 else -1)
-                            if axis == "x":
-                                dx += step
-                            else:
-                                dy += step
+                    # Zone morte circulaire : un stick qui dérive un peu ne bouge plus la souris
+                    x, y = pad.target("rightx"), pad.target("righty")
+                    mag = min(1.0, (x * x + y * y) ** 0.5)
+                    if mag > dz:
+                        s = (mag - dz) / (1.0 - dz)
+                        speed = (s ** 2) * args.mouse_speed * dt
+                        dx += x / mag * speed
+                        dy += y / mag * speed
+                if dx == 0.0 and dy == 0.0:
+                    rx_acc = ry_acc = 0.0
                 rx_acc += dx
                 ry_acc += dy
                 mx, my = int(rx_acc), int(ry_acc)

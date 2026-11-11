@@ -600,7 +600,10 @@ if [ ! -f "$APP_DIR/disable_ds4" ] && [ -f "$APP_DIR/ds4emu.py" ]; then
     # Identité Xbox 360 au lieu de DS4 : touch $APP_DIR/pad_xbox
     IDENTITY=ds4
     [ -f "$APP_DIR/pad_xbox" ] && IDENTITY=xbox
-    python3 "$APP_DIR/ds4emu.py" --identity \$IDENTITY --quit "pkill -f $PROFILE_DIR" > "$APP_DIR/ds4emu.log" 2>&1 &
+    # Zone morte du stick souris (drift) : echo 0.4 > $APP_DIR/deadzone
+    DEADZONE=0.30
+    [ -f "$APP_DIR/deadzone" ] && DEADZONE=\$(cat "$APP_DIR/deadzone")
+    python3 "$APP_DIR/ds4emu.py" --identity \$IDENTITY --deadzone \$DEADZONE --quit "pkill -f $PROFILE_DIR" > "$APP_DIR/ds4emu.log" 2>&1 &
     EMU_PID=\$!
     sleep 1
 fi
